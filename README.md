@@ -8,15 +8,11 @@ Scaffold new projects from Github templates and process the files with custom ac
 
 ## Why this?
 
-Reusing code and quickly creating templates for projects we will repeat is an important part of our medical
-
-Bluprint is designed to make creating templates easy GitHub-based workflow.
-
-With bluprint, anyone can easily create a reusable codebase and a simple interface for jump-starting new projects from old ones. PIT let's us quickly create templates at exactly the point where reuse makes sense. It's a Goldilocks tool for easy replication on our team.
+TK.
 
 ## What's it do?
 
-Bluprint creates a
+TK.
 
 
 ## Quickstart
@@ -62,13 +58,28 @@ You now have a bluprint you and others can use with the CLI.
 
 ### Add a bluprint to your CLI
 
-Add the bluprint to your CLI using the GitHub repository.
+Add the bluprint to your CLI using the GitHub repository of your bluprint.
 
 ```
-$ bluprint add <user>/<project>
+$ bluprint add <github repo>
 ```
 
-If your repository is private, be sure to export a [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) so you can access your bluprint:
+Your GitHub repo can be referenced using any of:
+
+- the URL
+
+  `https://github.com/reuters-graphics/my-bluprint`
+
+- the ssh connect string
+
+  `git@github.com:reuters-graphics/my-bluprint.git`
+
+- the GitHub user/project shortcut
+
+  `reuters-graphics/my-bluprint`
+
+
+If your repository is private, be sure to export a [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) as the environment variable `GITHUB_TOKEN` to access your bluprint:
 
 ```
 export GITHUB_TOKEN=<your personal access token>
@@ -92,10 +103,17 @@ $ bluprint new
 
 The CLI will ask you to pick one of your bluprints to use and will guide you through any other information your bluprint needs to finish scaffolding your project.
 
+### Remove a bluprint from your CLI
+
+If you need to remove a bluprint from your CLI, you can:
+
+```
+$ bluprint remove
+```
 
 ## Actions
 
-Actions let you orchestrate complex transformations of your files. Each action is an object added to the `actions` array in your `.bluprintrc` file.
+Actions let you orchestrate complex transformations of your files after your repository is pulled down. Each action is an object added to the `actions` array in your `.bluprintrc` file.
 
 You can define as many actions as you like and they will be run in sequence when anyone uses your bluprint.
 
@@ -192,7 +210,7 @@ This action lets you move or rename files or directories.
 
 This action lets you ask your users for more information that is then available to subsequent actions.
 
-`questions` is an array of [prompts.js](https://github.com/terkelg/prompts) questions. The name of each question will be available in all actions that use templating syntax, like [`render`](#render) and [`log`](#log).
+`questions` is an array of [prompts.js](https://github.com/terkelg/prompts) questions. The name of each question will be available in all actions that use templating syntax, like [render](#render) and [log](#log).
 
 ### remove
 
@@ -234,15 +252,17 @@ This action overwrites files by passing them through a templating engine with cu
 
 `context` is an object of any additional context to pass to your templates.
 
-Remember, any answers to previous [`prompt`](#prompt) actions is also available as context to your templates.
+Remember, any answers to previous [prompt](#prompt) actions is also available as context to your templates.
 
-### Developing actions
+## Developing actions
 
-Create your new action in `lib/actions/` following the pattern of other actions. Remember, your action must be able to be described using JSON and should be validated using JSON schema.
+Developers can create new actions in `lib/actions/` following the pattern of other actions. Remember, your action must be able to be described using JSON and should be validated using JSON schema.
 
-Be sure to write a test for your action in `test/actions/`. Tests are all performed in memory using [memfs](https://www.npmjs.com/package/memfs).
+Be sure to write a test for your action in `test/actions/`. (Tests for this library are all performed in memory using [memfs](https://www.npmjs.com/package/memfs).)
 
 
-## Priors
+## Credits
 
 This project borrows from other newsroom-developed scaffolding tools, including [degit](https://github.com/Rich-Harris/degit), [create-clone](https://github.com/rdmurphy/create-clone) and [politico-interactive-templates](https://github.com/The-Politico/politico-interactive-templates).
+
+The bluprint logo was created by MHD AZMI DWIPRANATA and is part of [The Noun Project](https://thenounproject.com/), available via creative commons license.
