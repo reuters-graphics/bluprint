@@ -48,11 +48,11 @@ Add this bluprint to your CLI ...
   "actions": [
     {
       "action": "prompt",
-      "questions": {
+      "questions": [{
         "type": "text",
         "name": "projectName",
         "message": "What's the name of this project?"
-      }
+      }]
     }, {
       "action": "remove",
       "paths": ["README.md"]
