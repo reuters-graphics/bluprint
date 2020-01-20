@@ -51,14 +51,12 @@ Add a `category` if you like, which will be used in the CLI to group similar blu
 
 `actions` can be added to process your bluprint files after scaffolding your directory. Read more in [Actions](#actions).
 
-Commit your project to GitHub with the `.bluprintrc` file.
-
-You now have a bluprint you and others can use with the CLI.
+Commit your project to GitHub with the `.bluprintrc` file. You now have a bluprint you and others can use with the CLI!
 
 
 ### Add a bluprint to your CLI
 
-Add the bluprint to your CLI using the GitHub repository of your bluprint.
+Add the bluprint to your CLI using its GitHub repository.
 
 ```
 $ bluprint add <github repo>
@@ -151,7 +149,7 @@ This action executes arbitrary commands.
 
 `cmds` are arrays passed as arguments to a synchronous [child process](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options).
 
-In each array, the first item is a string representing the command. The second is an array of strings passed to the command as arguments.
+In each array, the first item is a string representing the command. The second is an array passed to the command as arguments.
 
 
 ### log
@@ -242,7 +240,7 @@ This action removes files or directories.
 }
 ```
 
-This action overwrites files by passing them through a templating engine with custom context.
+This action overwrites files after passing them through a templating engine with custom context.
 
 `engine` is the templating engine to use. Can be either `"mustache"` or `"ejs"`.
 
@@ -252,7 +250,7 @@ This action overwrites files by passing them through a templating engine with cu
 
 `context` is an object of any additional context to pass to your templates.
 
-Remember, any answers to previous [prompt](#prompt) actions is also available as context to your templates.
+Remember, any answers to previous [prompt](#prompt) actions are also available as context to your templates. See the docs on [mustache](https://mustache.github.io/) and [EJS](https://ejs.co/) for more information on using their templating syntax in your files.
 
 ## Developing actions
 
