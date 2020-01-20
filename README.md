@@ -199,9 +199,9 @@ This action lets you move or rename files or directories.
 {
   "action": "prompt",
   "questions": [{
-      "type": "text",
-      "name": "projectName",
-      "message": "What should we call this project?"
+    "type": "text",
+    "name": "projectName",
+    "message": "What should we call this project?"
   }],
 }
 ```
