@@ -1,9 +1,7 @@
 ![Reuters](./badge.svg)
 
-
-
 <br />
-<img src="logo.svg" width="300" alt="bluprint logo" />
+<img src="./logo.svg" width="300" alt="bluprint logo" />
 <br />
 
 Scaffold new projects from Github templates and process the files with custom actions.
@@ -19,7 +17,15 @@ TK.
 
 ### What's it do?
 
-TK.
+A bluprint is GitHub repository you want to use as a template to scaffold out your local directory. Just adding a `.bluprintrc` file to the root of your repo makes it a bluprint.
+
+The bluprint CLI lets you register bluprints you use regularly.
+
+When you start a new project from a bluprint, the CLI will download the latest tarball of your files from GituHub (public or private repos supported) and scaffold out your local directory. Then it will apply any custom actions defined in your `.bluprintrc`.
+
+bluprint actions can do complex things like move or rename files and folders, execute commands, ask users for input and render files through a templating engine to customize them for each project.
+
+Best of all, bluprint makes creating templates for whatever project with whatever languages or frameworks you prefer easy for anyone. It's the fastest way to build a library of reusable code and helps enforce good development patterns on your team by starting each project from solid boilerplate. Because the bluprint CLI always pulls your latest code directly from GitHub, it's easy to keep improving your bluprints, too, and helps everyone who uses your code stay up-to-date with the latest and greatest.
 
 
 ## Quickstart
@@ -35,15 +41,19 @@ or
 $ npm install -g @reuters-graphics/bluprint
 ```
 
+> This package supports the [latest active versions](https://nodejs.org/en/about/releases/) of node.
+
 ### Create a bluprint
 
-Run the `make` command at the root of a directory with the files you'd like to templatize:
+Creating a bluprint from existing code is as easy as adding a `.bluprintrc` file to the root of your project and pushing to GitHub.
+
+The easiest way to create your `.bluprintrc` is to run the `make` command in the root of the directory you'd like to templatize:
 
 ```
 $ bluprint make
 ```
 
-The command will create a `.bluprintrc` that's used to configure your bluprint.
+That creates your `.bluprintrc`.
 
 ```json
 {
@@ -63,7 +73,7 @@ Commit your project to GitHub with the `.bluprintrc` file. You now have a blupri
 
 ### Add a bluprint to your CLI
 
-Add the bluprint to your CLI using its GitHub repository.
+In order to use your new bluprint, you need to add it to your CLI using its GitHub repository.
 
 ```
 $ bluprint add <github repo>
@@ -106,7 +116,7 @@ Scaffold your project from one of your bluprints:
 $ bluprint new
 ```
 
-The CLI will ask you to pick one of your bluprints to use and will guide you through any other information your bluprint needs to finish scaffolding your project.
+The CLI will ask you to pick a bluprint and will guide you through any other information your bluprint needs to finish scaffolding your project.
 
 ### Remove a bluprint from your CLI
 

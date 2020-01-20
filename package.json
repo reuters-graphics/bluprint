@@ -4,6 +4,24 @@
   "description": "Scaffold new projects from Github templates with custom actions.",
   "main": "lib/index.js",
   "private": false,
+  "keywords": [
+    "scaffold",
+    "scaffolding",
+    "blueprints",
+		"template",
+    "git",
+    "github",
+    "repo",
+    "repository",
+    "dev",
+    "development",
+    "cli",
+    "tool",
+    "tooling",
+    "generator",
+    "extract",
+    "tarball"
+  ],
   "bin": {
     "bluprint": "lib/cli.js"
   },
@@ -40,5 +58,8 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:reuters-graphics/bluprint.git"
+  },
+  "engines": {
+    "node": ">= 10.18.1"
   }
 }
