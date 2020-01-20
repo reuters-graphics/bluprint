@@ -1,7 +1,7 @@
-![Reuters](./badge.svg)
+![Reuters](../badge.svg)
 
 <br />
-<img src="logo.svg" width="300" alt="bluprint logo" />
+<img src="../logo.svg" width="300" alt="bluprint logo" />
 <br />
 
 ## Developing actions
