@@ -2,9 +2,11 @@
 
 <br />
 
-![](logo.jpg)
+![logo](logo.svg)
 
-Scaffold new projects from Github templates with custom actions.
+Scaffold new projects from Github templates and process with custom actions.
+
+## Why this?
 
 ## Quickstart
 
