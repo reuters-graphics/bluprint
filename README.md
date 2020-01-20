@@ -1,10 +1,14 @@
 ![Reuters](./badge.svg)
 
+
+
 <br />
 <img src="logo.svg" width="300" alt="bluprint logo" />
 <br />
 
 Scaffold new projects from Github templates and process the files with custom actions.
+
+[![npm version](https://badge.fury.io/js/%40reuters-graphics%2Fbluprint.svg)](https://badge.fury.io/js/%40reuters-graphics%2Fbluprint)
 
 ## Why this?
 
