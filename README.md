@@ -1,8 +1,8 @@
 ![Reuters](./badge.svg)
 
 <br />
-
-<img src="logo.svg" style="max-width: 450px;" alt="bluprint logo" />
+<img src="logo.svg" width="300" alt="bluprint logo" />
+<br /><br />
 
 Scaffold new projects from Github templates and process with custom actions.
 
