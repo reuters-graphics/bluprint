@@ -1,3 +1,7 @@
+![Reuters](./badge.svg)
+
+<br />
+
 ![](logo.jpg)
 
 Scaffold new projects from Github templates with custom actions.
@@ -110,6 +114,3 @@ Actions let you complete complex operations on your project repo after.
 ## Priors
 
 This project borrows from [degit](https://github.com/Rich-Harris/degit), [create-clone](https://github.com/rdmurphy/create-clone) and [politico-interactive-templates](https://github.com/The-Politico/politico-interactive-templates).
-
-
-![Reuters](./badge.svg)
