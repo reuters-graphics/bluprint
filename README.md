@@ -2,7 +2,7 @@
 
 <br />
 <img src="logo.svg" width="300" alt="bluprint logo" />
-<br /><br />
+<br />
 
 Scaffold new projects from Github templates and process with custom actions.
 
