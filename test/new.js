@@ -18,24 +18,10 @@ describe('Test command: new', function() {
 
     const userConfig = {
       bluprints: {
-        test: {
+        'test bluprint': {
           user: 'reuters-graphics',
           project: 'test-bluprint',
           category: 'codes',
-          actions: [{
-            action: 'render',
-            engine: 'mustache',
-            files: ['template.js'],
-            questions: [{
-              type: 'text',
-              name: 'greeting',
-              message: 'Wut',
-            }],
-            inject: ['Hi'],
-          }, {
-            action: 'move',
-            paths: ['moveme/', 'moved/'],
-          }],
         },
       },
     };
@@ -47,7 +33,7 @@ describe('Test command: new', function() {
     const inject = {
       method: ['category'],
       category: ['codes'],
-      bluprint: ['test'],
+      bluprint: ['test bluprint'],
     };
 
     await newProject(null, inject, fs);
