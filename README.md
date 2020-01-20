@@ -21,7 +21,7 @@ bluprint is a fast, user-friendly and highly composable tool to build out a libr
 
 ### What's it do?
 
-A bluprint is GitHub repository you want to use as a template to scaffold out your local directory. Just adding a `.bluprintrc` file to the root of your repo makes it a bluprint.
+A bluprint is GitHub repository you want to use as a template to scaffold out your local directory. Just adding a `.bluprintrc` JSON file to the root of your repo makes it a bluprint.
 
 The bluprint CLI lets you register bluprints you use regularly.
 
@@ -49,7 +49,7 @@ $ npm install -g @reuters-graphics/bluprint
 
 ### Create a bluprint
 
-Creating a bluprint from existing code is as easy as adding a `.bluprintrc` file to the root of your project and pushing to GitHub.
+Creating a bluprint from existing code is as easy as adding a `.bluprintrc` JSON file to the root of your project and pushing to GitHub.
 
 The easiest way to create your `.bluprintrc` is to run the `make` command in the root of the directory you'd like to templatize:
 
