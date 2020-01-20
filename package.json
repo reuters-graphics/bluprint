@@ -1,0 +1,54 @@
+{
+  "name": "@reuters-graphis/bluprint",
+  "version": "0.0.1",
+  "description": "Templating engine for generating codebases.",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "bin": {
+    "bluprint": "lib/cli.js"
+  },
+  "scripts": {
+    "test": "NODE_ENV=test mocha --recursive"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
+    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/plugin-transform-runtime": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/register": "^7.0.0",
+    "@hobbes7878/eslint-config": "^0.0.2",
+    "eslint": "^5.14.1",
+    "eslint-plugin-mocha": "^5.3.0",
+    "expect.js": "^0.3.1",
+    "memfs": "^3.0.4",
+    "microbundle": "^0.11.0",
+    "mocha": "^5.2.0",
+    "mocha-sinon": "^2.1.0",
+    "rollup": "^1.17.0",
+    "rollup-plugin-alias": "^1.5.2",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "sinon": "^8.1.0"
+  },
+  "author": "Jon McClure <jon.r.mcclure@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^6.11.0",
+    "chalk": "^2.4.2",
+    "ejs": "^2.6.1",
+    "glob": "^7.1.6",
+    "hosted-git-info": "^3.0.2",
+    "minimatch": "^3.0.4",
+    "mustache": "^4.0.0",
+    "prompts": "^2.3.0",
+    "update-notifier": "^4.0.0",
+    "winston": "^3.2.1",
+    "yargs": "^13.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:reuters-graphics/bluprint.git"
+  }
+}

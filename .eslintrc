@@ -1,0 +1,11 @@
+{
+  "root": true,
+  "extends": "@hobbes7878/eslint-config",
+  "plugins": [
+      "mocha"
+  ],
+  "env": {
+    "mocha": true,
+    "node": true
+  }
+}
