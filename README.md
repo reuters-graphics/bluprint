@@ -70,7 +70,7 @@ That creates your `.bluprintrc`.
 
 Add a `category` if you like, which will be used in the CLI to group similar bluprints together.
 
-`actions` can be added to process your bluprint files after scaffolding your directory. Read more in [Actions](#actions).
+`actions` can be added to process your bluprint files after scaffolding your directory. Read more in [Actions](#%EF%B8%8F-actions).
 
 Commit your project to GitHub with the `.bluprintrc` file. You now have a bluprint you and others can use with the CLI!
 
