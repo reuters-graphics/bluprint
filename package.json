@@ -1,6 +1,6 @@
 {
   "name": "@reuters-graphics/bluprint",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Scaffold new projects from Github templates with custom actions.",
   "main": "lib/index.js",
   "private": false,
@@ -8,7 +8,7 @@
     "scaffold",
     "scaffolding",
     "blueprints",
-		"template",
+    "template",
     "git",
     "github",
     "repo",
