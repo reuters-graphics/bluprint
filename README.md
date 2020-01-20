@@ -10,7 +10,7 @@ Scaffold new projects from Github templates and process the files with custom ac
 
 TK.
 
-## What's it do?
+### What's it do?
 
 TK.
 
