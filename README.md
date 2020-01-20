@@ -252,11 +252,9 @@ This action overwrites files after passing them through a templating engine with
 
 Remember, any answers to previous [prompt](#prompt) actions are also available as context to your templates. See the docs on [mustache](https://mustache.github.io/) and [EJS](https://ejs.co/) for more information on using their templating syntax in your files.
 
-## Developing actions
+## Developing
 
-Developers can create new actions in `lib/actions/` following the pattern of other actions. Remember, your action must be able to be described using JSON and should be validated using JSON schema.
-
-Be sure to write a test for your action in `test/actions/`. (Tests for this library are all performed in memory using [memfs](https://www.npmjs.com/package/memfs).)
+See the [developing doc](DEVELOPING.md).
 
 
 ## Credits
