@@ -4,7 +4,7 @@
 <img src="./logo.svg" width="300" alt="bluprint logo" />
 <br />
 
-Scaffold new projects from Github templates and process the files with custom actions.
+Scaffold new projects from GitHub templates and process the files with custom actions.
 
 <br />
 
@@ -13,7 +13,11 @@ Scaffold new projects from Github templates and process the files with custom ac
 
 ## Why this?
 
-TK.
+Reusing good code is the easiest way to speed up your dev time and share good practices across a team.
+
+You may have used [Yeoman](https://yeoman.io/) or similar tools to build shareable templates. We have, too, but bluprint has two distinct benefits on our team: First, it's far simpler for anyone to create a template regardless of what languages they're comfortable working in. Second, bluprint's CLI pulls your template directly from GitHub, which means distributing your code is as easy as `git push`.
+
+bluprint is a fast, user-friendly and highly composable tool to build out a library of reusable code for your team.
 
 ### What's it do?
 
@@ -23,9 +27,9 @@ The bluprint CLI lets you register bluprints you use regularly.
 
 When you start a new project from a bluprint, the CLI will download the latest tarball of your files from GituHub (public or private repos supported) and scaffold out your local directory. Then it will apply any custom actions defined in your `.bluprintrc`.
 
-bluprint actions can do complex things like move or rename files and folders, execute commands, ask users for input and render files through a templating engine to customize them for each project.
+bluprint actions can do complex things like move or rename files and folders, execute shell commands, ask users for input and render files through a templating engine to customize them for each project.
 
-Best of all, bluprint makes creating templates for whatever project with whatever languages or frameworks you prefer easy for anyone. It's the fastest way to build a library of reusable code and helps enforce good development patterns on your team by starting each project from solid boilerplate. Because the bluprint CLI always pulls your latest code directly from GitHub, it's easy to keep improving your bluprints, too, and helps everyone who uses your code stay up-to-date with the latest and greatest.
+Best of all, bluprint makes creating templates for whatever project using whatever languages or frameworks you prefer easy for anyone. It's the fastest way to build a library of reusable code and helps enforce good development patterns on your team by starting each project from solid boilerplate. Because the bluprint CLI always pulls your latest code directly from GitHub, it's easy to keep improving your bluprints, too, and helps everyone who uses your code stay up-to-date with the latest and greatest.
 
 
 ## Quickstart
@@ -126,7 +130,7 @@ If you need to remove a bluprint from your CLI, you can:
 $ bluprint remove
 ```
 
-## Actions
+## ⚙️ Actions
 
 Actions let you orchestrate complex transformations of your files after your repository is pulled down. Each action is an object added to the `actions` array in your `.bluprintrc` file.
 
