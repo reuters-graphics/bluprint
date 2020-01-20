@@ -70,9 +70,11 @@ That creates your `.bluprintrc`.
 
 Add a `category` if you like, which will be used in the CLI to group similar bluprints together.
 
-`actions` can be added to process your bluprint files after scaffolding your directory. Read more in [Actions](#%EF%B8%8F-actions).
+`actions` can be added to process your bluprint files after scaffolding your directory. Read more in [Actions](#%EF%B8%8F-actions) and check out the [example bluprint](docs/example.md) to see what you can do.
 
 Commit your project to GitHub with the `.bluprintrc` file. You now have a bluprint you and others can use with the CLI!
+
+
 
 
 ### Add a bluprint to your CLI
@@ -136,6 +138,7 @@ Actions let you orchestrate complex transformations of your files after your rep
 
 You can define as many actions as you like and they will be run in sequence when anyone uses your bluprint.
 
+
 ```javascript
 {
   "bluprint": "^0.0.1",
@@ -153,6 +156,8 @@ You can define as many actions as you like and they will be run in sequence when
   }]
 }
 ```
+
+Check out the [example bluprint](docs/example.md) to see what you can do with actions.
 
 Here are the actions the CLI currently supports:
 
@@ -278,7 +283,7 @@ Remember, any answers to previous [prompt](#prompt) actions are also available a
 
 ## Developing
 
-See the [developing doc](DEVELOPING.md).
+See the [developing doc](docs/developing.md).
 
 
 ## Credits
