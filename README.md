@@ -142,11 +142,14 @@ You can define as many actions as you like and they will be run in sequence when
   "name": "My bluprint",
   "category": "",
   "actions": [{
-    "action": "my action type"
-    // ...
+    "action": "prompt"
+    // Runs first...
   }, {
-    "action": "another action type"
-    // ...
+    "action": "render"
+    // Runs second...
+  }, {
+    "action": "log"
+    // Runs last...
   }]
 }
 ```
