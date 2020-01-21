@@ -37,7 +37,7 @@ Best of all, bluprint makes creating templates for whatever project using whatev
 ### Install
 
 ```
-$ yarn add -g @reuters-graphics/bluprint
+$ yarn global add @reuters-graphics/bluprint
 ```
 or
 
