@@ -1,12 +1,7 @@
 const expect = require('expect.js');
 const { createFsFromVolume, Volume } = require('memfs');
 const path = require('path');
-const { newProject } = require('../lib');
-const os = require('os');
-
-const userConfigPath = path.join(os.homedir(), `.bluprintrc`);
-
-const resolvePath = (filePath) => path.join(process.cwd(), filePath);
+const { newBluprint } = require('../lib');
 
 describe('Test command: new', function() {
   this.timeout(10000);
@@ -14,34 +9,19 @@ describe('Test command: new', function() {
   const fs = createFsFromVolume(new Volume());
 
   before(function() {
-    fs.mkdirSync(os.homedir(), { recursive: true });
-
-    const userConfig = {
-      bluprints: {
-        'test bluprint': {
-          user: 'reuters-graphics',
-          project: 'test-bluprint',
-          category: 'codes',
-        },
-      },
-    };
-
-    fs.writeFileSync(userConfigPath, JSON.stringify(userConfig));
+    fs.mkdirSync(process.cwd(), { recursive: true });
   });
 
-  it('Creates a new project from bluprint', async function() {
-    const inject = {
-      method: ['category'],
-      category: ['codes'],
-      bluprint: ['test bluprint'],
-    };
+  it('Makes a config file', async function() {
+    const filePath = path.join(process.cwd(), '.bluprintrc');
 
-    await newProject(null, inject, fs);
+    await newBluprint(null, ['test'], fs);
 
-    expect(fs.existsSync(resolvePath('deep/file.html'))).to.be(true);
-    expect(fs.existsSync(resolvePath('moved/docs.md'))).to.be(true);
+    const bluprintConfig = fs.readFileSync(filePath, 'utf-8');
 
-    const templateFile = fs.readFileSync(resolvePath('template.js'), 'utf-8');
-    expect(templateFile).to.be('console.log(\'Hi\');\n');
+    const config = JSON.parse(bluprintConfig);
+
+    expect(config).to.have.property('name');
+    expect(config.name).to.be('test');
   });
 });

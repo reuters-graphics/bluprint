@@ -47,14 +47,14 @@ $ npm install -g @reuters-graphics/bluprint
 
 > This package supports the [latest active versions](https://nodejs.org/en/about/releases/) of node.
 
-### Create a bluprint
+### Create a new bluprint
 
 Creating a bluprint from existing code is as easy as adding a `.bluprintrc` JSON file to the root of your project and pushing to GitHub.
 
-The easiest way to create your `.bluprintrc` is to run the `make` command in the root of the directory you'd like to templatize:
+The easiest way to create your `.bluprintrc` is to run the `new` command in the root of the directory you'd like to templatize:
 
 ```
-$ bluprint make
+$ bluprint new
 ```
 
 That creates your `.bluprintrc`.
@@ -119,7 +119,7 @@ Scaffold your project from one of your bluprints:
 
 
 ```
-$ bluprint new
+$ bluprint start
 ```
 
 The CLI will ask you to pick a bluprint and will guide you through any other information your bluprint needs to finish scaffolding your project.
