@@ -50,6 +50,7 @@
     "minimatch": "^3.0.4",
     "mustache": "^4.0.0",
     "prompts": "^2.3.0",
+    "string": "^3.3.3",
     "tar": "^5.0.5",
     "update-notifier": "^4.0.0",
     "winston": "^3.2.1",

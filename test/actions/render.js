@@ -23,6 +23,14 @@ describe('Test action: render', function() {
       path.join(ROOT, 'renderAfterPrompt.json'),
       '{ "data": "<%= datum %>" }'
     );
+    fs.writeFileSync(
+      path.join(ROOT, 'renderMustacheUtils.json'),
+      '{ "data": "{{#slugify}}{{ datum }}{{/slugify}}" }'
+    );
+    fs.writeFileSync(
+      path.join(ROOT, 'renderEjsUtils.json'),
+      '{ "data": "<%= slugify(datum) %>" }'
+    );
   });
 
   it('Renders a mustache template with context', async function() {
@@ -92,5 +100,35 @@ describe('Test action: render', function() {
     );
 
     expect(ejs.data).to.be('nuthin');
+  });
+
+  it('Renders a mustache template using string utils', async function() {
+    const actions = [{
+      action: 'render',
+      engine: 'mustache',
+      context: { datum: 'hi there' },
+      files: [
+        'renderMustacheUtils.json',
+      ],
+    }, {
+      action: 'render',
+      engine: 'ejs',
+      context: { datum: 'hi there' },
+      files: [
+        'renderEjsUtils.json',
+      ],
+    }];
+
+    await handleActions(actions, fs);
+
+    const mustache = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'renderMustacheUtils.json'), 'utf-8')
+    );
+    const ejs = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'renderEjsUtils.json'), 'utf-8')
+    );
+
+    expect(mustache.data).to.be('hi-there');
+    expect(ejs.data).to.be('hi-there');
   });
 });

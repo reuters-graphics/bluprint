@@ -283,6 +283,20 @@ This action overwrites files after passing them through a templating engine with
 
 Remember, any answers to previous [prompt](#prompt) actions are also available as context to your templates. See the docs on [mustache](https://mustache.github.io/) and [EJS](https://ejs.co/) for more information on using their templating syntax in your files.
 
+There are also a few extra utility functions provided to your EJS and mustache templates from the [string](https://www.npmjs.com/package/string) package:  [`camelize`](https://www.npmjs.com/package/string#--camelize), [`capitalize`](https://www.npmjs.com/package/string#--capitalize), [`dasherize`](https://www.npmjs.com/package/string#--dasherize), [`humanize`](https://www.npmjs.com/package/string#--humanize), [`latinise`](https://www.npmjs.com/package/string#--latinise), [`slugify`](https://www.npmjs.com/package/string#--slugify), [`titleCase`](https://www.npmjs.com/package/string#--titlecase) and [`underscore`](https://www.npmjs.com/package/string#--underscore).
+
+In EJS, you'd use them like:
+
+```
+<%= slugify(myVariable) %>
+```
+
+... and in mustache ...
+
+```
+{{#slugify}}{{myVariable}}{{/slugify}}
+```
+
 ## Developing
 
 See the [developing doc](docs/developing.md).
