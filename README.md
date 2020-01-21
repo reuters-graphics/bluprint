@@ -171,6 +171,7 @@ Here are the actions the CLI currently supports:
     ["yarn"],
     ["git", ["init"]]
   ],
+  "silent": true
 }
 ```
 
@@ -180,6 +181,7 @@ This action executes arbitrary commands.
 
 In each array, the first item is a string representing the command. The second is an array passed to the command as arguments.
 
+`silent` is an optional boolean argument that when true will suppress the output of the child process.
 
 ### log
 
