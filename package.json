@@ -1,9 +1,25 @@
 {
   "name": "@reuters-graphics/bluprint",
   "version": "0.0.24",
-  "description": "Scaffold new projects from Github templates with custom actions.",
-  "main": "lib/index.js",
+  "description": "Dead easy application scaffolding and CLI.",
+  "homepage": "https://github.com/reuters-graphics/bluprint#readme",
+  "bugs": {
+		"url": "https://github.com/reuters-graphics/bluprint/issues"
+	},
+  "author": "Jon McClure <jon.r.mcclure@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:reuters-graphics/bluprint.git"
+  },
+  "main": "dist/index.js",
+  "bin": {
+    "bluprint": "dist/cli.js"
+  },
   "private": false,
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "keywords": [
     "scaffold",
     "scaffolding",
@@ -22,24 +38,26 @@
     "generator",
     "tarball"
   ],
-  "bin": {
-    "bluprint": "lib/cli.js"
-  },
   "scripts": {
+    "prepublishOnly": "npm run build",
+    "build": "rollup --config rollup.config.js",
     "test": "NODE_ENV=test mocha --recursive"
   },
   "devDependencies": {
     "@hobbes7878/eslint-config": "^0.0.2",
+    "@rollup/plugin-json": "^4.0.1",
+    "@rollup/plugin-node-resolve": "^7.0.0",
     "eslint": "^5.14.1",
     "eslint-plugin-mocha": "^5.3.0",
     "expect.js": "^0.3.1",
     "memfs": "^3.0.4",
     "mocha": "^5.2.0",
     "mocha-sinon": "^2.1.0",
+    "npm-run-all": "^4.1.5",
+    "rollup": "^1.29.1",
+    "rollup-plugin-node-externals": "^2.1.3",
     "sinon": "^8.1.0"
   },
-  "author": "Jon McClure <jon.r.mcclure@gmail.com>",
-  "license": "MIT",
   "dependencies": {
     "ajv": "^6.11.0",
     "ascii-art": "^2.5.0",
@@ -55,12 +73,5 @@
     "update-notifier": "^4.0.0",
     "winston": "^3.2.1",
     "yargs": "^13.3.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:reuters-graphics/bluprint.git"
-  },
-  "engines": {
-    "node": ">= 10.18.1"
   }
 }

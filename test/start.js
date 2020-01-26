@@ -1,7 +1,7 @@
 const expect = require('expect.js');
 const { createFsFromVolume, Volume } = require('memfs');
 const path = require('path');
-const { start } = require('../lib');
+const { start } = require('../dist');
 const os = require('os');
 
 const userConfigPath = path.join(os.homedir(), `.bluprintrc`);
@@ -11,9 +11,11 @@ const resolvePath = (filePath) => path.join(process.cwd(), filePath);
 describe('Test command: start', function() {
   this.timeout(10000);
 
-  const fs = createFsFromVolume(new Volume());
+  let fs;
 
-  before(function() {
+  beforeEach(function() {
+    fs = createFsFromVolume(new Volume());
+
     fs.mkdirSync(os.homedir(), { recursive: true });
 
     const userConfig = {
@@ -37,6 +39,16 @@ describe('Test command: start', function() {
     };
 
     await start(null, inject, fs);
+
+    expect(fs.existsSync(resolvePath('deep/file.html'))).to.be(true);
+    expect(fs.existsSync(resolvePath('moved/docs.md'))).to.be(true);
+
+    const templateFile = fs.readFileSync(resolvePath('template.js'), 'utf-8');
+    expect(templateFile).to.be('console.log(\'Hi\');\n');
+  });
+
+  it('Can take a GitHub repo passed directly to command', async function() {
+    await start('reuters-graphics/test-bluprint', [], fs);
 
     expect(fs.existsSync(resolvePath('deep/file.html'))).to.be(true);
     expect(fs.existsSync(resolvePath('moved/docs.md'))).to.be(true);

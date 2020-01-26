@@ -1,7 +1,7 @@
 const expect = require('expect.js');
 const { createFsFromVolume, Volume } = require('memfs');
 const path = require('path');
-const { remove } = require('../lib');
+const { remove } = require('../dist');
 const os = require('os');
 
 const userConfigPath = path.join(os.homedir(), `.bluprintrc`);

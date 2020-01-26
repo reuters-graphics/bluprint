@@ -1,7 +1,7 @@
 const expect = require('expect.js');
 const { createFsFromVolume, Volume } = require('memfs');
 const path = require('path');
-const { newBluprint } = require('../lib');
+const { newBluprint } = require('../dist');
 
 describe('Test command: new', function() {
   this.timeout(10000);

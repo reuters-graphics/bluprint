@@ -1,7 +1,7 @@
 const expect = require('expect.js');
 const { fs } = require('memfs');
 const path = require('path');
-const handleActions = require('../../lib/actions');
+const { handleActions } = require('../../dist/index.js');
 
 const ROOT = process.cwd();
 
@@ -19,6 +19,10 @@ describe('Test action: move', function() {
     );
     fs.writeFileSync(
       path.join(ROOT, 'oldDir/move.js'),
+      'console.log(\'hello world\');'
+    );
+    fs.writeFileSync(
+      path.join(ROOT, 'code.js'),
       'console.log(\'hello world\');'
     );
   });
@@ -54,5 +58,24 @@ describe('Test action: move', function() {
     await handleActions(actions, fs);
 
     expect(fs.existsSync(path.join(ROOT, 'newEmptyDir'))).to.be(true);
+  });
+
+  it('Uses template context in the destination string', async function() {
+    const actions = [{
+      action: 'prompt',
+      questions: [{
+        type: 'text',
+        name: 'path',
+        message: 'Wut?',
+      }],
+      inject: ['templated'],
+    }, {
+      action: 'move',
+      paths: ['code.js', '{{ path }}/path.js'],
+    }];
+
+    await handleActions(actions, fs);
+
+    expect(fs.existsSync(path.join(ROOT, 'templated/path.js'))).to.be(true);
   });
 });

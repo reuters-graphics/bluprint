@@ -1,6 +1,6 @@
 const expect = require('expect.js');
 const { fs } = require('memfs');
-const handleActions = require('../../lib/actions');
+const { handleActions } = require('../../dist/index.js');
 
 describe('Test action: prompt', function() {
   this.timeout(10000);

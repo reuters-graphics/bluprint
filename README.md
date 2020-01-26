@@ -4,7 +4,7 @@
 <img src="./logo.svg" width="300" alt="bluprint logo" />
 <br />
 
-Scaffold new projects from GitHub templates and process the files with custom actions.
+The simplest way to scaffold new projects from GitHub templates.
 
 <br />
 
@@ -13,23 +13,25 @@ Scaffold new projects from GitHub templates and process the files with custom ac
 
 ## Why this?
 
-Reusing good code is the easiest way to speed up your dev time and share good practices across a team.
+Reusing good code is the easiest way to speed up your dev time and share solid conventions with your team.
 
-You may have used [Yeoman](https://yeoman.io/) or similar tools to build shareable templates. We have, too, but bluprint has two distinct benefits on our team: First, it's far simpler for anyone to create a template regardless of what languages they're comfortable working in. Second, bluprint's CLI pulls your template directly from GitHub, which means distributing your code is as easy as `git push`.
+If you've used [Yeoman](https://yeoman.io/) or similar tools to build shareable templates, bluprint has a few distinct benefits:
 
-bluprint is a fast, user-friendly and highly composable tool to build out a library of reusable code for your team.
+- It's far simpler for _anyone_ on your team to create a template regardless of what language they're comfortable working in.
+- Your bluprint actually _looks like_ the boilerplate you'll start from, so it's easy to tell what your bluprint will do at a glance.
+- bluprint's CLI pulls your template directly from GitHub, which means distributing your code is as easy as `git push`.
+
+bluprint is designed to be a fast, accessible and highly composable tool to build out a library of reusable code.
 
 ### What's it do?
 
-A bluprint is a GitHub repository you want to use as a template to scaffold out your local directory. Just adding a `.bluprintrc` JSON file to the root of your repo makes it a bluprint.
+A bluprint is any GitHub repository you want to use as a template to scaffold out a new project. Just adding a `.bluprintrc` JSON file to the root of a repo makes it a bluprint.
 
-The bluprint CLI lets you register bluprints you use regularly.
+Register bluprints you use regularly with the CLI.
 
-When you start a new project from a bluprint, the CLI will download the latest tarball of your files from GituHub (public or private repos supported) and scaffold out your local directory. Then it will apply any custom actions defined in your `.bluprintrc`.
+When you start a new project, the CLI will download the latest tarball of your files from GituHub (public or private repos supported) and scaffold out your local directory. Then it will apply any custom actions defined in your `.bluprintrc` to transform your files.
 
 bluprint actions can do complex things like move or rename files and folders, execute shell commands, ask users for input and render files through a templating engine to customize them for each project.
-
-Best of all, bluprint makes creating templates for whatever project using whatever languages or frameworks you prefer easy for anyone. It's the fastest way to build a library of reusable code and helps enforce good development patterns on your team by starting each project from solid boilerplate. Because the bluprint CLI always pulls your latest code directly from GitHub, it's easy to keep improving your bluprints, too, and helps everyone who uses your code stay up-to-date with the latest and greatest.
 
 
 ## Quickstart
@@ -39,6 +41,7 @@ Best of all, bluprint makes creating templates for whatever project using whatev
 ```
 $ yarn global add @reuters-graphics/bluprint
 ```
+
 or
 
 ```
@@ -51,7 +54,7 @@ $ npm install -g @reuters-graphics/bluprint
 
 Creating a bluprint from existing code is as easy as adding a `.bluprintrc` JSON file to the root of your project and pushing to GitHub.
 
-The easiest way to create your `.bluprintrc` is to run the `new` command in the root of the directory you'd like to templatize:
+The simplest way to create your `.bluprintrc` is to run the `new` command in the root of the directory you'd like to templatize:
 
 ```
 $ bluprint new
@@ -72,14 +75,12 @@ Add a `category` if you like, which will be used in the CLI to group similar blu
 
 `actions` can be added to process your bluprint files after scaffolding your directory. Read more in [Actions](#%EF%B8%8F-actions) and check out the [example bluprint](docs/example.md) to see what you can do.
 
-Commit your project to GitHub with the `.bluprintrc` file. You now have a bluprint you and others can use with the CLI!
-
-
+Commit your project to GitHub with the `.bluprintrc` file.
 
 
 ### Add a bluprint to your CLI
 
-In order to use your new bluprint, you need to add it to your CLI using its GitHub repository.
+To use your new bluprint, add it to your CLI using its GitHub repository.
 
 ```
 $ bluprint add <github repo>
@@ -123,6 +124,12 @@ $ bluprint start
 ```
 
 The CLI will ask you to pick a bluprint and will guide you through any other information your bluprint needs to finish scaffolding your project.
+
+You can also pass a GitHub repo directly to this command:
+
+```
+$ bluprint start <github repo>
+```
 
 ### Remove a bluprint from your CLI
 
@@ -222,7 +229,11 @@ You can also reference any context your users supplied in a previous [prompt](#p
 
 This action lets you move or rename files or directories.
 
-`paths` is an array of arrays. Each inner array represents a move action. The first item in a move action represents the file or directory to be moved and the second, the destination.
+`paths` is an array of arrays. Each inner array represents a move action. The first item in a move action represents the file or directory to be moved and the second, the destination. You can use the answers from a previous [prompt](#prompt) action in the destination string with [mustache](https://mustache.github.io/) template syntax:
+
+```json
+["moveme/code.js", "{{ someAnswer }}/code.js"]
+```
 
 ### prompt
 
@@ -239,7 +250,7 @@ This action lets you move or rename files or directories.
 
 This action lets you ask your users for more information that is then available to subsequent actions.
 
-`questions` is an array of [prompts.js](https://github.com/terkelg/prompts) questions. The name of each question will be available in all actions that use templating syntax, like [render](#render) and [log](#log).
+`questions` is an array of [prompts.js](https://github.com/terkelg/prompts) questions. The name of each question will be available in all actions that use templating syntax, like [render](#render), [log](#log) and [move](#move).
 
 ### remove
 

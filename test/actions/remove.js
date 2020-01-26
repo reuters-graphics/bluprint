@@ -1,7 +1,7 @@
 const expect = require('expect.js');
 const { fs } = require('memfs');
 const path = require('path');
-const handleActions = require('../../lib/actions');
+const { handleActions } = require('../../dist/index.js');
 
 const ROOT = process.cwd();
 

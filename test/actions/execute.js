@@ -1,7 +1,7 @@
 const expect = require('expect.js');
 const { fs } = require('memfs');
 const realFS = require('fs');
-const handleActions = require('../../lib/actions');
+const { handleActions } = require('../../dist/index.js');
 const sinon = require('sinon');
 const childProcess = require('child_process');
 const path = require('path');
