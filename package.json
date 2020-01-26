@@ -16,6 +16,10 @@
   "bin": {
     "bluprint": "dist/cli.js"
   },
+  "files": [
+    "dist/*",
+    "docs/*"
+  ],
   "private": false,
   "engines": {
     "node": ">=8.0.0"
