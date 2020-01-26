@@ -1,11 +1,11 @@
 {
   "name": "@reuters-graphics/bluprint",
-  "version": "0.0.24",
+  "version": "0.1.0",
   "description": "Dead easy application scaffolding and CLI.",
   "homepage": "https://github.com/reuters-graphics/bluprint#readme",
   "bugs": {
-		"url": "https://github.com/reuters-graphics/bluprint/issues"
-	},
+    "url": "https://github.com/reuters-graphics/bluprint/issues"
+  },
   "author": "Jon McClure <jon.r.mcclure@gmail.com>",
   "license": "MIT",
   "repository": {
