@@ -13,5 +13,5 @@ Be sure to write a test for your action in `test/actions/`. (Tests for this libr
 ## Runnings tests
 
 ```
-$ yarn test
+$ yarn build && yarn test
 ```

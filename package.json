@@ -1,7 +1,7 @@
 {
   "name": "@reuters-graphics/bluprint",
   "version": "0.1.1",
-  "description": "Dead easy application scaffolding and CLI.",
+  "description": "Dead-easy application scaffolding and CLI.",
   "homepage": "https://github.com/reuters-graphics/bluprint#readme",
   "bugs": {
     "url": "https://github.com/reuters-graphics/bluprint/issues"
@@ -64,7 +64,6 @@
   },
   "dependencies": {
     "ajv": "^6.11.0",
-    "ascii-art": "^2.5.0",
     "chalk": "^2.4.2",
     "ejs": "^2.6.1",
     "glob": "^7.1.6",
