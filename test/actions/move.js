@@ -1,5 +1,5 @@
 const expect = require('expect.js');
-const { fs } = require('memfs');
+const { createFsFromVolume, Volume } = require('memfs');
 const path = require('path');
 const { handleActions } = require('../../dist/index.js');
 
@@ -7,6 +7,8 @@ const ROOT = process.cwd();
 
 describe('Test action: move', function() {
   this.timeout(10000);
+
+  const fs = createFsFromVolume(new Volume());
 
   before(function() {
     fs.mkdirSync(path.join(process.cwd(), 'oldDir'), { recursive: true });

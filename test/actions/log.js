@@ -1,5 +1,5 @@
 const expect = require('expect.js');
-const { fs } = require('memfs');
+const { createFsFromVolume, Volume } = require('memfs');
 const { handleActions } = require('../../dist/index.js');
 const sinon = require('sinon');
 const chalk = require('chalk');
@@ -8,6 +8,8 @@ let spy;
 
 describe('Test action: log', function() {
   this.timeout(10000);
+
+  const fs = createFsFromVolume(new Volume());
 
   before(function() {
     spy = sinon.spy(console, 'log');

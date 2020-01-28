@@ -250,7 +250,28 @@ This action lets you move or rename files or directories.
 
 This action lets you ask your users for more information that is then available to subsequent actions.
 
-`questions` is an array of [prompts.js](https://github.com/terkelg/prompts) questions. The name of each question will be available in all actions that use templating syntax, like [render](#render), [log](#log) and [move](#move).
+`questions` is an array of [prompts.js](https://github.com/terkelg/prompts) questions. The name of each question will be available in all actions that use templating syntax, like [render](#render), [log](#log), [move](#move) and [regexreplace](#regexreplace).
+
+### regexreplace
+
+```json
+{
+  "action": "regexreplace",
+  "files": [
+    "README.md"
+  ],
+  "replace": [
+    ["color", "colour"],
+    ["([0-9]{3}) ([0-9]{3}) - ([0-9]{4})", "$1.$2.$3", "g"]
+  ]
+}
+```
+
+This action allows you to make replacements in files using regular expressions. The files array is a list of files in which to replace text. The first item in each replace array is a regular expression string; the second, a replacement string, which can use regex capture groups; and, optionally, a third to override [regex flags](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Advanced_searching_with_flags_2) (defaults to `gm`). You can also use the answers from a previous [prompt](#prompt) action in the replacement string with [mustache](https://mustache.github.io/) template syntax:
+
+```
+["^Name: .+$", "Name: {{ userName }}"]
+```
 
 ### remove
 
@@ -315,6 +336,6 @@ See the [developing doc](docs/developing.md).
 
 ## Credits
 
-This project borrows from other newsroom-developed scaffolding tools, including [degit](https://github.com/Rich-Harris/degit), [create-clone](https://github.com/rdmurphy/create-clone) and [politico-interactive-templates](https://github.com/The-Politico/politico-interactive-templates).
+This project borrows  from other newsroom-developed scaffolding tools, including [degit](https://github.com/Rich-Harris/degit), [create-clone](https://github.com/rdmurphy/create-clone) and [politico-interactive-templates](https://github.com/The-Politico/politico-interactive-templates).
 
 The bluprint logo was created by MHD AZMI DWIPRANATA and is part of [The Noun Project](https://thenounproject.com/), available via creative commons license.
