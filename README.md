@@ -262,7 +262,7 @@ This action lets you ask your users for more information that is then available 
   ],
   "replace": [
     ["color", "colour"],
-    ["([0-9]{3}) ([0-9]{3}) - ([0-9]{4})", "$1.$2.$3", "g"]
+    ["([0-9]{2})\/([0-9]{2})\/([0-9]{4})", "$2.$1.$3", "g"]
   ]
 }
 ```
