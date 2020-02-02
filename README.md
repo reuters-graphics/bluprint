@@ -139,6 +139,31 @@ If you need to remove a bluprint from your CLI, you can:
 $ bluprint remove
 ```
 
+### Cloning repos
+
+You can also use the CLI to directly clone a GitHub repo, without further processing the files as a bluprint:
+
+```
+$ bluprint clone <github repo>
+```
+
+## CLI commands
+
+```
+bluprint [command]
+
+Commands:
+  bluprint add [repo]         Add a new bluprint to your CLI
+  bluprint clone <repo>       Clone a repo with bluprint
+  bluprint new [name]         Create a new .bluprintrc file
+  bluprint remove [bluprint]  Remove a bluprint from your CLI
+  bluprint start [bluprint]   Start a new project from a bluprint
+
+Options:
+  --version  Show version number
+  --help     Show help
+```
+
 ## ⚙️ Actions
 
 Actions let you orchestrate complex transformations of your files after your repository is pulled down. Each action is an object added to the `actions` array in your `.bluprintrc` file.
