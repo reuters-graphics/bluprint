@@ -16,11 +16,11 @@ const getPackageDeps = () => { // eslint-disable-line no-unused-vars
 describe('Test action: execute', function() {
   this.timeout(60000);
 
-  before(function() {
+  beforeEach(function() {
     spy = sinon.spy(childProcess, 'spawnSync');
   });
 
-  after(function() {
+  afterEach(function() {
     spy.restore();
   });
 

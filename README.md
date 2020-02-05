@@ -354,6 +354,47 @@ In EJS, you'd use them like:
 {{#slugify}}{{myVariable}}{{/slugify}}
 ```
 
+### Conditioning actions on prompt values
+
+All actions can be conditioned on the answer to a previous prompt by adding a `condition` key to the action object:
+
+```json
+[
+  {
+    "action": "prompt",
+    "questions": [{
+      "type": "text",
+      "name": "userName",
+      "message": "What's your name?"
+    }]
+  },
+  {
+    "action": "log",
+    "msg": "Hi, Jon!" ,
+    "condition": ["userName", "Jon"]
+  }
+]
+```
+
+The first item in the array is the [string object path](https://lodash.com/docs/4.17.15#get) of the prompt variable name you want to test, the second is the value it should be.
+
+```json
+{
+  "condition": ["myPromptVar", "some value"]  
+}
+```
+
+You may also condition an action on multiple prompt values:
+
+```json
+{
+  "condition": [
+    ["myPromptVar", "some value"],
+    ["myOtherVar", true]
+  ]
+}
+```
+
 ## Developing
 
 See the [developing doc](docs/developing.md).

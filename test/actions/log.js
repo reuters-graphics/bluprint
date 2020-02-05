@@ -11,11 +11,11 @@ describe('Test action: log', function() {
 
   const fs = createFsFromVolume(new Volume());
 
-  before(function() {
+  beforeEach(function() {
     spy = sinon.spy(console, 'log');
   });
 
-  after(function() {
+  afterEach(function() {
     spy.restore();
   });
 
