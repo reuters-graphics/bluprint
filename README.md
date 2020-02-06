@@ -101,11 +101,19 @@ Your GitHub repo can be referenced using any of:
   `reuters-graphics/my-bluprint`
 
 
-If your repository is private, be sure to export a [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) as the environment variable `GITHUB_TOKEN` to access your bluprint:
+If your repository is **private**, you can make sure the CLI has permission to access it by either:
 
-```
-export GITHUB_TOKEN=<your personal access token>
-```
+1. Exporting a [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) as the environment variable `GITHUB_TOKEN`:
+
+  ```
+  export GITHUB_TOKEN=<your personal access token>
+  ```
+2. Adding your personal access token to the CLI:
+
+  ```
+  $ bluprint token
+  ```
+
 
 ### Using bluprints with the CLI
 
@@ -153,11 +161,12 @@ $ bluprint clone <github repo>
 bluprint [command]
 
 Commands:
-  bluprint add [repo]         Add a new bluprint to your CLI
-  bluprint clone <repo>       Clone a repo with bluprint
-  bluprint new [name]         Create a new .bluprintrc file
-  bluprint remove [bluprint]  Remove a bluprint from your CLI
-  bluprint start [bluprint]   Start a new project from a bluprint
+  bluprint add [repo]           Add a new bluprint to your CLI
+  bluprint clone <repo>         Clone a repo with bluprint
+  bluprint new [name]           Create a new .bluprintrc file
+  bluprint remove [bluprint]    Remove a bluprint from your CLI
+  bluprint start [bluprint]     Start a new project from a bluprint
+  bluprint token [accessToken]  Add a GitHub personal access token to your CLI
 
 Options:
   --version  Show version number
