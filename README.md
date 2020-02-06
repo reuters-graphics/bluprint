@@ -365,7 +365,7 @@ In EJS, you'd use them like:
 
 ### Conditioning actions on prompt values
 
-All actions can be conditioned on the answer to a previous prompt by adding a `condition` key to the action object:
+All actions can be conditionally run based on the answer to a previous prompt by adding a `condition` key to the action object:
 
 ```json
 [
@@ -385,7 +385,7 @@ All actions can be conditioned on the answer to a previous prompt by adding a `c
 ]
 ```
 
-The first item in the array is the [string object path](https://lodash.com/docs/4.17.15#get) of the prompt variable name you want to test, the second is the value it should be.
+The first item in the array is the [string object path](https://lodash.com/docs/4.17.15#get) of the prompt variable name you want to test, the second is the value it should be. Any action that fails a condition test will be skipped.
 
 ```json
 {
