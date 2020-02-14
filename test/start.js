@@ -25,6 +25,11 @@ describe('Test command: start', function() {
           project: 'test-bluprint',
           category: 'codes',
         },
+        'test bluprint parts': {
+          user: 'reuters-graphics',
+          project: 'test-bluprint-parts',
+          category: 'codes',
+        },
       },
     };
 
@@ -55,5 +60,27 @@ describe('Test command: start', function() {
 
     const templateFile = fs.readFileSync(resolvePath('template.js'), 'utf-8');
     expect(templateFile).to.be('console.log(\'Hi\');\n');
+  });
+
+  it('Can use bluprint parts', async function() {
+    const inject = {
+      partConfirm: [true],
+      partChoice: ['bluprint part'],
+    };
+
+    await start('reuters-graphics/test-bluprint-parts', inject, fs);
+
+    expect(fs.existsSync(resolvePath('README.md'))).to.be(true);
+    expect(fs.existsSync(resolvePath('IGNOREME.md'))).to.be(false);
+    expect(fs.existsSync(resolvePath('used/index.js'))).to.be(true);
+    expect(fs.existsSync(resolvePath('used/noaction.js'))).to.be(true);
+    expect(fs.existsSync(resolvePath('used/skipped.jsx'))).to.be(false);
+    expect(fs.existsSync(resolvePath('ingnore/index.js'))).to.be(false);
+
+    const templatedFile = fs.readFileSync(resolvePath('used/index.js'), 'utf-8');
+    expect(templatedFile).to.be('console.log(\'Using bluprint part!\');\n');
+
+    const notTemplatedFile = fs.readFileSync(resolvePath('used/noaction.js'), 'utf-8');
+    expect(notTemplatedFile).to.be('console.log(\'{{ bluprintPart }}\');\n');
   });
 });

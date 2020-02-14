@@ -45,7 +45,7 @@ describe('Test action: render', function() {
       ],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     const mustache = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'renderMustache.json'), 'utf-8')
@@ -69,7 +69,7 @@ describe('Test action: render', function() {
       ],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     const ejs = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'renderEjs.json'), 'utf-8')
@@ -95,7 +95,7 @@ describe('Test action: render', function() {
       ],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     const ejs = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'renderAfterPrompt.json'), 'utf-8')
@@ -121,7 +121,7 @@ describe('Test action: render', function() {
       ],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     const mustache = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'renderMustacheUtils.json'), 'utf-8')

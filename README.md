@@ -404,6 +404,49 @@ You may also condition an action on multiple prompt values:
 }
 ```
 
+## Parts
+
+Sometimes it's handy to use just _a part_ of your bluprint. For example, you might want to update a few files in a project already underway to sync up with an update added to the bluprint.
+
+Parts makes it possible. Just add a `parts` object to your `.bluprintrc`. The keys should be the names of your parts, and the values, arrays of glob strings matching files in your project.
+
+```json
+{
+  "bluprint": "^0.0.1",
+  "name": "My bluprint",
+  "category": "",
+  "actions": [],
+  "parts": {
+    "Config files": [
+      "config/*",
+      ".tasksrc"
+    ],
+    "JS components": [
+      "src/js/components/*",
+      "src/scss/component-styles/*"
+    ]
+  }
+}
+```
+
+Now, when a user uses your bluprint, they'll be asked if they want to use the whole bluprint or just a part. If they choose a part, files matching any glob will be copied into the project directory. Those that don't will simply be ignored.
+
+You can condition an action on the part chosen using the `bluprintPart` context variable.
+
+```json
+{
+  "condition": ["bluprintPart", "Config files"]  
+}
+```
+
+If you want to run an action only when the _whole bluprint_ is used, you can test for `null`:
+
+```json
+{
+  "condition": ["bluprintPart", null]  
+}
+```
+
 ## Developing
 
 See the [developing doc](docs/developing.md).

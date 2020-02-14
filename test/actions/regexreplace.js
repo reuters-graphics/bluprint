@@ -36,7 +36,7 @@ describe('Test action: regexreplace', function() {
       replace: ['data', 'data is plural'],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     const file = fs.readFileSync(path.join(ROOT, 'replaceString.json'), 'utf-8');
     expect(JSON.parse(file).datum).to.be('data is plural');
@@ -49,7 +49,7 @@ describe('Test action: regexreplace', function() {
       replace: ['^([0-9]{3})-([0-9]{3})-([0-9]{4})$', '$1.$2.$3', 'gm'],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     const file = fs.readFileSync(path.join(ROOT, 'replaceRegex.txt'), 'utf-8');
     expect(file.split('\n')[0]).to.be('214.555.5677');
@@ -78,7 +78,7 @@ describe('Test action: regexreplace', function() {
       ],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     const file = fs.readFileSync(path.join(ROOT, 'replaceWithContext.txt'), 'utf-8');
     expect(file.split('\n')[0]).to.be('Name: Lisa McDonald');

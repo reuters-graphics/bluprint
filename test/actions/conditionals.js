@@ -38,7 +38,7 @@ describe('Test action: conditionals', function() {
       cmds: [['echo', ['dog']]],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     expect(spy.calledWith('echo', ['cat'])).to.be(false);
     expect(spy.calledWith('echo', ['dog'])).to.be(true);
@@ -59,7 +59,7 @@ describe('Test action: conditionals', function() {
       cmds: [['echo', ['cat']]],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     expect(spy.calledWith('echo', ['cat'])).to.be(true);
   });

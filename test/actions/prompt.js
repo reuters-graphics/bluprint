@@ -18,7 +18,7 @@ describe('Test action: prompt', function() {
       inject: ['nuthin'],
     }];
 
-    const context = await handleActions(actions, fs);
+    const context = await handleActions(actions, null, fs);
 
     expect(context.answer).to.be('nuthin');
   });

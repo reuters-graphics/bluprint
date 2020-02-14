@@ -35,7 +35,7 @@ describe('Test action: move', function() {
       paths: ['move.js', 'moved.js'],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     expect(fs.existsSync(path.join(ROOT, 'moved.js'))).to.be(true);
   });
@@ -46,7 +46,7 @@ describe('Test action: move', function() {
       paths: ['oldDir', 'newDir'],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     expect(fs.existsSync(path.join(ROOT, 'newDir/move.js'))).to.be(true);
   });
@@ -57,7 +57,7 @@ describe('Test action: move', function() {
       paths: ['oldEmptyDir', 'newEmptyDir'],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     expect(fs.existsSync(path.join(ROOT, 'newEmptyDir'))).to.be(true);
   });
@@ -76,7 +76,7 @@ describe('Test action: move', function() {
       paths: ['code.js', '{{ path }}/path.js'],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     expect(fs.existsSync(path.join(ROOT, 'templated/path.js'))).to.be(true);
   });

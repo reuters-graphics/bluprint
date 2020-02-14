@@ -31,7 +31,7 @@ describe('Test action: remove', function() {
       ],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     const path1 = path.join(ROOT, 'remove/script.js');
     const path2 = path.join(ROOT, 'remove/index.js');

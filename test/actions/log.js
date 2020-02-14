@@ -25,7 +25,7 @@ describe('Test action: log', function() {
       msg: 'a message',
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     expect(spy.calledWith('a message')).to.be(true);
   });
@@ -36,7 +36,7 @@ describe('Test action: log', function() {
       msg: 'a {green message}',
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     expect(spy.calledWith(chalk`a {green message}`)).to.be(true);
   });
@@ -55,7 +55,7 @@ describe('Test action: log', function() {
       msg: 'a {green {{answer}} message}',
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     expect(spy.calledWith(chalk`a {green nice message}`)).to.be(true);
   });

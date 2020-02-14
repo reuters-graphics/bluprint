@@ -30,7 +30,7 @@ describe('Test action: execute', function() {
       cmds: [['echo', ['cat']]],
     }];
 
-    await handleActions(actions, fs);
+    await handleActions(actions, null, fs);
 
     expect(spy.calledWith('echo', ['cat'])).to.be(true);
   });
@@ -53,7 +53,7 @@ describe('Test action: execute', function() {
   //     cmds: [['yarn', ['remove', 'react']]],
   //   }];
   //
-  //   await handleActions(removeActions, fs);
+  //   await handleActions(removeActions, null, fs);
   //
   //   expect(spy.calledWith('yarn', ['remove', 'react'])).to.be(true);
   //
