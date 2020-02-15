@@ -408,7 +408,7 @@ You may also condition an action on multiple prompt values:
 
 Sometimes it's handy to use just _a part_ of your bluprint. For example, you might want to update a few files in a project to sync up with changes added to the bluprint.
 
-Parts make it possible to give your users the option to overwrite some files in a project scaffolded out with your bluprint. Just add a `parts` object to your `.bluprintrc`. The keys should be the names of your parts. The values should arrays of glob strings matching the files in your project that belong to each part.
+Parts make it possible to give your users the option to overwrite some files in a project scaffolded by your bluprint. Just add a `parts` object to your `.bluprintrc`. Each key should be the name of a part. The value should be an array of glob strings matching the files in your project that belong to that part.
 
 ```json
 {
