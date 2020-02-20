@@ -13,9 +13,9 @@ The simplest way to scaffold new projects from GitHub templates.
 
 ## Why this?
 
-Reusing good code is the easiest way to speed up your dev time and share solid conventions with your team.
+Reusing good code is the easiest way to speed up your development time and share solid conventions across your team.
 
-If you've used [Yeoman](https://yeoman.io/) or similar tools to build shareable templates, bluprint has a few distinct benefits:
+If you've used [Yeoman](https://yeoman.io/) or similar tools to build shareable templates, bluprint has a few advantages:
 
 - It's far simpler for _anyone_ on your team to create a template regardless of what language they're comfortable working in.
 - Your bluprint actually _looks like_ the boilerplate you'll start from, so it's easy to tell what your bluprint will do at a glance.
@@ -31,7 +31,9 @@ Register bluprints you use regularly with the CLI.
 
 When you start a new project, the CLI will download the latest tarball of your files from GituHub (public or private repos supported) and scaffold out your local directory. Then it will apply any custom actions defined in your `.bluprintrc` to transform your files.
 
-bluprint actions can do complex things like move or rename files and folders, execute shell commands, ask users for input and render files through a templating engine to customize them for each project.
+bluprint [actions](#%EF%B8%8F-actions) can do complex things like move or rename files and folders, execute shell commands, ask users for input, render files through a templating engine to customize them for each project and more.
+
+bluprint [parts](#-parts) let you split your template into segments that can help you keep files synced between projects already underway and your bluprint.
 
 
 ## Quickstart
@@ -54,7 +56,7 @@ $ npm install -g @reuters-graphics/bluprint
 
 Creating a bluprint from existing code is as easy as adding a `.bluprintrc` JSON file to the root of your project and pushing to GitHub.
 
-The simplest way to create your `.bluprintrc` is to run the `new` command in the root of the directory you'd like to templatize:
+Use the `new` command to create your `.bluprintrc` in the root of the project you'd like to templatize:
 
 ```
 $ bluprint new
@@ -108,7 +110,7 @@ If your repository is **private**, you can make sure the CLI has permission to a
   ```
   export GITHUB_TOKEN=<your personal access token>
   ```
-2. Adding your personal access token to the CLI:
+2. Adding your personal access token directly to the CLI:
 
   ```
   $ bluprint token
@@ -131,7 +133,7 @@ Scaffold your project from one of your bluprints:
 $ bluprint start
 ```
 
-The CLI will ask you to pick a bluprint and will guide you through any other information your bluprint needs to finish scaffolding your project.
+The CLI will ask you to pick a bluprint and will guide you through providing any other information your bluprint needs to finish scaffolding your project.
 
 You can also pass a GitHub repo directly to this command:
 
@@ -154,6 +156,8 @@ You can also use the CLI to directly clone a GitHub repo, without further proces
 ```
 $ bluprint clone <github repo>
 ```
+
+You can clone any GitHub repo using this command, including private repos (with a GitHub personal access token) and regardless of whether it has a `.bluprintrc` config or not. This command basically duplicates the functionality you get from tools like [degit](https://github.com/Rich-Harris/degit).
 
 ## CLI commands
 
@@ -431,7 +435,7 @@ Parts make it possible to give your users the option to overwrite some files in 
 
 Now, when a user uses your bluprint, they'll be asked if they want to use the whole bluprint or just a part. If they choose a part, files matching any glob will be copied into the project directory. Those that don't will simply be ignored.
 
-You can condition an action on the part chosen using the `bluprintPart` context variable.
+If you need to, you can make any action conditional on the part a user chooses using the `bluprintPart` context variable.
 
 ```json
 {
@@ -454,6 +458,6 @@ See the [developing doc](docs/developing.md).
 
 ## Credits
 
-This project borrows  from other newsroom-developed scaffolding tools, including [degit](https://github.com/Rich-Harris/degit), [create-clone](https://github.com/rdmurphy/create-clone) and [politico-interactive-templates](https://github.com/The-Politico/politico-interactive-templates).
+This project follows other newsroom-developed scaffolding tools, including [degit](https://github.com/Rich-Harris/degit), [create-clone](https://github.com/rdmurphy/create-clone) and [politico-interactive-templates](https://github.com/The-Politico/politico-interactive-templates).
 
 The bluprint logo was created by MHD AZMI DWIPRANATA and is part of [The Noun Project](https://thenounproject.com/), available via creative commons license.
