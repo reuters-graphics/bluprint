@@ -426,7 +426,7 @@ Parts make it possible to give your users the option to overwrite some files in 
       ".tasksrc"
     ],
     "JS components": [
-      "src/js/components/*",
+      "src/js/components/**/*",
       "src/scss/component-styles/*"
     ]
   }
