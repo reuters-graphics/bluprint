@@ -17,6 +17,7 @@ describe('Test command: start', function() {
     fs = createFsFromVolume(new Volume());
 
     fs.mkdirSync(os.homedir(), { recursive: true });
+    fs.mkdirSync(process.cwd(), { recursive: true });
 
     const userConfig = {
       bluprints: {
@@ -82,5 +83,29 @@ describe('Test command: start', function() {
 
     const notTemplatedFile = fs.readFileSync(resolvePath('used/noaction.js'), 'utf-8');
     expect(notTemplatedFile).to.be('console.log(\'{{ bluprintPart }}\');\n');
+  });
+
+  it('Will prompt to merge JSON with bluprint parts', async function() {
+    const inject = {
+      partConfirm: [true],
+      partChoice: ['bluprint part'],
+      mergeChoice: [true],
+    };
+
+    const packagePath = resolvePath('package.json');
+
+    const packageJson = { test: 'datum', nested: { another: 'thing' } };
+
+    console.log('packagePath', packagePath);
+
+    fs.writeFileSync(packagePath, JSON.stringify(packageJson));
+
+    await start('reuters-graphics/test-bluprint-parts', inject, fs);
+
+    const mergedFile = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
+
+    expect(mergedFile.test).to.be('data');
+    expect(mergedFile.nested.deep).to.be('test');
+    expect(mergedFile.nested.another).to.be('thing');
   });
 });
