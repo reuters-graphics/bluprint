@@ -113,7 +113,7 @@ If your repository is **private**, you can make sure the CLI has permission to a
 2. Adding your personal access token directly to the CLI:
 
   ```
-  $ bluprint token
+  $ bluprint token <your token>
   ```
 
 
@@ -135,7 +135,7 @@ $ bluprint start
 
 The CLI will ask you to pick a bluprint and will guide you through providing any other information your bluprint needs to finish scaffolding your project.
 
-You can also pass a GitHub repo directly to this command:
+You can also pass a GitHub repo containing a bluprint directly to this command:
 
 ```
 $ bluprint start <github repo>
@@ -151,13 +151,15 @@ $ bluprint remove
 
 ### Cloning repos
 
-You can also use the CLI to directly clone a GitHub repo, without further processing the files as a bluprint:
+You can also use the CLI to directly clone a GitHub repo:
 
 ```
 $ bluprint clone <github repo>
 ```
 
-You can clone any GitHub repo using this command, including private repos (with a GitHub personal access token) and regardless of whether it has a `.bluprintrc` config or not. This command basically duplicates the functionality you get from tools like [degit](https://github.com/Rich-Harris/degit).
+You can clone *any* GitHub repo using this command, including private repos (with a GitHub personal access token), regardless of whether the repo has a `.bluprintrc` config or not.
+
+When using the clone command, all actions will be ignored in your `.bluprintrc`.
 
 ## CLI commands
 
@@ -410,7 +412,7 @@ You may also condition an action on multiple prompt values:
 
 ## 📦 Parts
 
-Sometimes it's handy to use just _a part_ of your bluprint. For example, you might want to update a few files in a project to sync up with changes added to the bluprint.
+Sometimes it's handy to use just _a part_ of your bluprint. For example, you might want to update a few files in a project to sync up with changes in the upstream bluprint.
 
 Parts make it possible to give your users the option to overwrite some files in a project scaffolded by your bluprint. Just add a `parts` object to your `.bluprintrc`. Each key should be the name of a part. The value should be an array of glob strings matching the files in your project that belong to that part.
 
@@ -451,13 +453,52 @@ If you want to run an action only when the _whole bluprint_ is used, you can tes
 }
 ```
 
+#### Merge JSON files
+
+You can add a `mergeJson` flag to your `.bluprintrc` to attempt to merge (using [lodash](https://lodash.com/docs/4.17.15#merge)) any existing JSON files with JSON files in a part that would overwrite them.
+
+```json
+{
+  "bluprint": "^0.0.1",
+  "name": "My bluprint",
+  "category": "",
+  "actions": [],
+  "parts": {},
+  "mergeJson": true
+}
+```
+
+Properties in the part's JSON file will take precedence over the existing file.
+
+So say you have an existing `package.json` like:
+
+```json
+{
+  "dependencies": {
+    "react": "14.0",
+    "lodash": "3.0"
+  }
+}
+```
+
+... and your bluprint is updated to React 16 and adds d3 to the dependencies. Running a part that includes `package.json` with `mergeJson` set to true would result in these dependencies:
+
+```json
+{
+  "dependencies": {
+    "react": "16.0",
+    "lodash": "3.0",
+    "d3": "5.0"
+  }
+}
+```
+
+
 ## Developing
 
 See the [developing doc](docs/developing.md).
 
 
 ## Credits
-
-This project follows other newsroom-developed scaffolding tools, including [degit](https://github.com/Rich-Harris/degit), [create-clone](https://github.com/rdmurphy/create-clone) and [politico-interactive-templates](https://github.com/The-Politico/politico-interactive-templates).
 
 The bluprint logo was created by MHD AZMI DWIPRANATA and is part of [The Noun Project](https://thenounproject.com/), available via creative commons license.

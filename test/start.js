@@ -85,18 +85,15 @@ describe('Test command: start', function() {
     expect(notTemplatedFile).to.be('console.log(\'{{ bluprintPart }}\');\n');
   });
 
-  it('Will prompt to merge JSON with bluprint parts', async function() {
+  it('Will merge JSON files', async function() {
     const inject = {
       partConfirm: [true],
       partChoice: ['bluprint part'],
-      mergeChoice: [true],
     };
 
     const packagePath = resolvePath('package.json');
 
     const packageJson = { test: 'datum', nested: { another: 'thing' } };
-
-    console.log('packagePath', packagePath);
 
     fs.writeFileSync(packagePath, JSON.stringify(packageJson));
 
