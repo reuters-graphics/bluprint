@@ -105,4 +105,23 @@ describe('Test command: start', function() {
     expect(mergedFile.nested.deep).to.be('test');
     expect(mergedFile.nested.another).to.be('thing');
   });
+
+  it('Will NOT merge BAD JSON files', async function() {
+    const inject = {
+      partConfirm: [true],
+      partChoice: ['bluprint part'],
+    };
+
+    const packagePath = resolvePath('package.json');
+
+    fs.writeFileSync(packagePath, '{ BAD JSON {');
+
+    await start('reuters-graphics/test-bluprint-parts', inject, fs);
+
+    const mergedFile = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
+
+    expect(mergedFile.test).to.be('data');
+    expect(mergedFile.nested.deep).to.be('test');
+    expect(mergedFile.nested.another).to.be(undefined);
+  });
 });
