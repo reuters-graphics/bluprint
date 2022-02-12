@@ -59,4 +59,15 @@ describe('Test action: log', function() {
 
     expect(spy.calledWith(chalk`a {green nice message}`)).to.be(true);
   });
+
+  it('Logs a message rendered with default context', async function() {
+    const actions = [{
+      action: 'log',
+      msg: 'a {green {{ year }} message}',
+    }];
+
+    await handleActions(actions, null, fs);
+
+    expect(spy.calledWith(chalk`a {green ${new Date().getFullYear()} message}`)).to.be(true);
+  });
 });
