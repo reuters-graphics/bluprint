@@ -33,6 +33,15 @@ describe('Test action: render', function() {
       path.join(ROOT, 'renderEjsUtils.json'),
       '{ "data": "<%= slugify(datum) %>" }'
     );
+    fs.writeFileSync(
+      path.join(ROOT, 'renderDefaultContext.json'),
+      `{ 
+        "year": "{{ year }}",
+        "month": "{{ month }}",
+        "day": "{{ day }}",
+        "dirname": "{{ dirname }}" 
+      }`
+    );
   });
 
   it('Renders a mustache template with context', async function() {
@@ -132,5 +141,28 @@ describe('Test action: render', function() {
 
     expect(mustache.data).to.be('hi-there');
     expect(ejs.data).to.be('hi-there');
+  });
+
+  it('Renders with default context', async function() {
+    const actions = [{
+      action: 'render',
+      engine: 'mustache',
+      files: [
+        'renderDefaultContext.json',
+      ],
+    }];
+
+    await handleActions(actions, null, fs);
+
+    const data = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'renderDefaultContext.json'), 'utf-8')
+    );
+
+    const date = new Date();
+
+    expect(data.year).to.be(String(date.getFullYear()));
+    expect(data.month).to.be(String(date.getMonth() + 1).padStart(2, '0'));
+    expect(data.day).to.be(String(date.getDate()).padStart(2, '0'));
+    expect(data.dirname).to.be(process.cwd().split(path.sep).slice(-1)[0]);
   });
 });

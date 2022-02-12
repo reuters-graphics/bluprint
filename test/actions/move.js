@@ -80,4 +80,21 @@ describe('Test action: move', function() {
 
     expect(fs.existsSync(path.join(ROOT, 'templated/path.js'))).to.be(true);
   });
+
+  it('Uses defualt context in the destination string', async function() {
+    const actions = [{
+      action: 'move',
+      paths: ['templated/path.js', '{{ year }}/{{ month }}/{{ day }}/path.js'],
+    }];
+
+    await handleActions(actions, null, fs);
+
+    const date = new Date();
+
+    const year = String(date.getFullYear());
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    expect(fs.existsSync(path.join(ROOT, `${year}/${month}/${day}/path.js`))).to.be(true);
+  });
 });

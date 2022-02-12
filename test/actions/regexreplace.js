@@ -27,6 +27,16 @@ describe('Test action: regexreplace', function() {
       path.join(ROOT, 'replaceWithContext.txt'),
       'Name: Jon McClure\nEmail: jon.r.mcclure@gmail.com\nAge: 35'
     );
+
+    fs.writeFileSync(
+      path.join(ROOT, 'replaceDefaultContext.json'),
+      `{ 
+        "year": "YYYY",
+        "month": "MM",
+        "day": "DD",
+        "dirname": "DIRNAME"
+      }`
+    );
   });
 
   it('Makes a replacement with a simple string', async function() {
@@ -84,5 +94,31 @@ describe('Test action: regexreplace', function() {
     expect(file.split('\n')[0]).to.be('Name: Lisa McDonald');
     expect(file.split('\n')[1]).to.be('Email: jon.r.mcclure@gmail.com');
     expect(file.split('\n')[2]).to.be('Age: 32');
+  });
+
+  it('Replace with default context', async function() {
+    const actions = [{
+      action: 'regexreplace',
+      files: ['replaceDefaultContext.json'],
+      replace: [
+        ['YYYY', '{{ year }}'],
+        ['MM', '{{ month }}'],
+        ['DD', '{{ day }}'],
+        ['DIRNAME', '{{ dirname }}'],
+      ],
+    }];
+
+    await handleActions(actions, null, fs);
+
+    const data = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'replaceDefaultContext.json'), 'utf-8')
+    );
+
+    const date = new Date();
+
+    expect(data.year).to.be(String(date.getFullYear()));
+    expect(data.month).to.be(String(date.getMonth() + 1).padStart(2, '0'));
+    expect(data.day).to.be(String(date.getDate()).padStart(2, '0'));
+    expect(data.dirname).to.be(process.cwd().split(path.sep).slice(-1)[0]);
   });
 });
