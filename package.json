@@ -45,7 +45,7 @@
   "scripts": {
     "prepublishOnly": "npm run build && npm run test",
     "build": "rollup --config rollup.config.js",
-    "test": "NODE_ENV=test mocha --recursive"
+    "test": "npm run build && NODE_ENV=test mocha --recursive"
   },
   "devDependencies": {
     "@hobbes7878/eslint-config": "^0.0.2",
