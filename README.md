@@ -10,7 +10,6 @@ The simplest way to scaffold new projects from GitHub templates.
 
 [![npm version](https://badge.fury.io/js/%40reuters-graphics%2Fbluprint.svg)](https://badge.fury.io/js/%40reuters-graphics%2Fbluprint) [![Reuters open source software](https://badgen.net/badge/Reuters/open%20source/?color=ff8000)](https://github.com/reuters-graphics/)
 
-
 ## Why this?
 
 Reusing good code is the easiest way to speed up your development time and share solid conventions across your team.
@@ -35,19 +34,18 @@ bluprint [actions](#%EF%B8%8F-actions) can do complex things like move or rename
 
 bluprint [parts](#-parts) let you split your template into segments that can help you keep files synced between projects already underway and your bluprint.
 
-
 ## Quickstart
 
 ### Install
 
 ```
-$ yarn global add @reuters-graphics/bluprint
+yarn global add @reuters-graphics/bluprint
 ```
 
 or
 
 ```
-$ npm install -g @reuters-graphics/bluprint
+npm install -g @reuters-graphics/bluprint
 ```
 
 > This package supports the [latest active versions](https://nodejs.org/en/about/releases/) of node.
@@ -59,7 +57,7 @@ Creating a bluprint from existing code is as easy as adding a `.bluprintrc` JSON
 Use the `new` command to create your `.bluprintrc` in the root of the project you'd like to templatize:
 
 ```
-$ bluprint new
+bluprint new
 ```
 
 That creates your `.bluprintrc`.
@@ -79,13 +77,12 @@ Add a `category` if you like, which will be used in the CLI to group similar blu
 
 Commit your project to GitHub with the `.bluprintrc` file.
 
-
 ### Add a bluprint to your CLI
 
 To use your new bluprint, add it to your CLI using its GitHub repository.
 
 ```
-$ bluprint add <github repo>
+bluprint add <github repo>
 ```
 
 Your GitHub repo can be referenced using any of:
@@ -102,7 +99,6 @@ Your GitHub repo can be referenced using any of:
 
   `reuters-graphics/my-bluprint`
 
-
 If your repository is **private**, you can make sure the CLI has permission to access it by either:
 
 1. Exporting a [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) as the environment variable `GITHUB_TOKEN`:
@@ -110,27 +106,26 @@ If your repository is **private**, you can make sure the CLI has permission to a
   ```
   export GITHUB_TOKEN=<your personal access token>
   ```
+
 2. Adding your personal access token directly to the CLI:
 
   ```
-  $ bluprint token <your token>
+  bluprint token <your token>
   ```
-
 
 ### Using bluprints with the CLI
 
 Create a fresh directory for your new project.
 
 ```
-$ mkdir my-new-project
-$ cd my-new-project
+mkdir my-new-project
+cd my-new-project
 ```
 
 Scaffold your project from one of your bluprints:
 
-
 ```
-$ bluprint start
+bluprint start
 ```
 
 The CLI will ask you to pick a bluprint and will guide you through providing any other information your bluprint needs to finish scaffolding your project.
@@ -138,7 +133,7 @@ The CLI will ask you to pick a bluprint and will guide you through providing any
 You can also pass a GitHub repo containing a bluprint directly to this command:
 
 ```
-$ bluprint start <github repo>
+bluprint start <github repo>
 ```
 
 ### Remove a bluprint from your CLI
@@ -146,7 +141,7 @@ $ bluprint start <github repo>
 If you need to remove a bluprint from your CLI, you can:
 
 ```
-$ bluprint remove
+bluprint remove
 ```
 
 ### Cloning repos
@@ -154,10 +149,10 @@ $ bluprint remove
 You can also use the CLI to directly clone a GitHub repo:
 
 ```
-$ bluprint clone <github repo>
+bluprint clone <github repo>
 ```
 
-You can clone *any* GitHub repo using this command, including private repos (with a GitHub personal access token), regardless of whether the repo has a `.bluprintrc` config or not.
+You can clone _any_ GitHub repo using this command, including private repos (with a GitHub personal access token), regardless of whether the repo has a `.bluprintrc` config or not.
 
 When using the clone command, all actions will be ignored in your `.bluprintrc`.
 
@@ -185,7 +180,6 @@ Actions let you orchestrate complex transformations of your files after your rep
 
 You can define as many actions as you like and they will be run in sequence when anyone uses your bluprint.
 
-
 ```javascript
 {
   "bluprint": "^0.0.1",
@@ -205,9 +199,6 @@ You can define as many actions as you like and they will be run in sequence when
 ```
 
 Check out the [example bluprint](docs/example.md) to see what you can do with actions.
-
-Here are the actions the CLI currently supports:
-
 
 ### execute
 
@@ -349,7 +340,7 @@ This action overwrites files after passing them through a templating engine with
 
 `files` is an array of files to pass through the templating engine.
 
-`questions` is an array of [prompts.js](https://github.com/terkelg/prompts) questions. The name of each question will be available *only in this action* as context to your template.
+`questions` is an array of [prompts.js](https://github.com/terkelg/prompts) questions. The name of each question will be available _only in this action_ as context to your template.
 
 `context` is an object of any additional context to pass to your templates.
 
@@ -359,14 +350,36 @@ There are also a few extra utility functions provided to your EJS and mustache t
 
 In EJS, you'd use them like:
 
-```
+```txt
 <%= slugify(myVariable) %>
 ```
 
 ... and in mustache ...
 
-```
+```txt
 {{#slugify}}{{myVariable}}{{/slugify}}
+```
+
+#### Default context
+
+Some actions -- `log`, `move`, `regexreplace` & `render` -- are given default context variables you can use. These variables include:
+
+- `year`: full year at runtime, e.g., `2022`
+- `month`: zero-padded month at runtime, e.g., `02`
+- `day`: zero-padded date at runtime, e.g., `07`
+- `dirname`: the name of the parent directory where bluprint is being executed at runtime, e.g., `my-project-folder`
+
+You use them in string replacement operations, like:
+
+```json
+{
+  "action": "regexreplace",
+  "files": ["my-file.txt"],
+  "replace": [
+    ["YYYY", "{{ year }}"],
+    ["project-name", "{{ dirname }}"]
+  ]
+}
 ```
 
 ### Conditioning actions on prompt values
@@ -493,11 +506,9 @@ So say you have an existing `package.json` like:
 }
 ```
 
-
 ## Developing
 
 See the [developing doc](docs/developing.md).
-
 
 ## Credits
 
