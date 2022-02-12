@@ -360,7 +360,7 @@ In EJS, you'd use them like:
 {{#slugify}}{{myVariable}}{{/slugify}}
 ```
 
-#### Default context
+### Default context
 
 Some actions -- `log`, `move`, `regexreplace` & `render` -- are given default context variables you can use. These variables include:
 
