@@ -200,6 +200,8 @@ You can define as many actions as you like and they will be run in sequence when
 
 Check out the [example bluprint](docs/example.md) to see what you can do with actions.
 
+Here are the actions the CLI currently supports:
+
 ### execute
 
 ```json
