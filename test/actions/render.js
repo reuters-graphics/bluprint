@@ -1,5 +1,6 @@
 const expect = require('expect.js');
-const { createFsFromVolume, Volume } = require('memfs');
+const mock = require('mock-fs');
+const fs = require('fs');
 const path = require('path');
 const { handleActions } = require('../../dist/index.js');
 
@@ -8,9 +9,9 @@ const ROOT = process.cwd();
 describe('Test action: render', function() {
   this.timeout(10000);
 
-  const fs = createFsFromVolume(new Volume());
-
   before(function() {
+    mock({});
+
     fs.mkdirSync(process.cwd(), { recursive: true });
 
     fs.writeFileSync(
@@ -44,6 +45,10 @@ describe('Test action: render', function() {
     );
   });
 
+  after(function() {
+    mock.restore();
+  });
+
   it('Renders a mustache template with context', async function() {
     const actions = [{
       action: 'render',
@@ -54,7 +59,7 @@ describe('Test action: render', function() {
       ],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     const mustache = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'renderMustache.json'), 'utf-8')
@@ -78,7 +83,7 @@ describe('Test action: render', function() {
       ],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     const ejs = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'renderEjs.json'), 'utf-8')
@@ -104,7 +109,7 @@ describe('Test action: render', function() {
       ],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     const ejs = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'renderAfterPrompt.json'), 'utf-8')
@@ -130,7 +135,7 @@ describe('Test action: render', function() {
       ],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     const mustache = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'renderMustacheUtils.json'), 'utf-8')
@@ -152,7 +157,7 @@ describe('Test action: render', function() {
       ],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     const data = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'renderDefaultContext.json'), 'utf-8')

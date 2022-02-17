@@ -1,24 +1,24 @@
 const expect = require('expect.js');
-const { createFsFromVolume, Volume } = require('memfs');
+const mock = require('mock-fs');
 const path = require('path');
 const { clone } = require('../dist');
-const os = require('os');
+const fs = require('fs');
 
 const resolvePath = (filePath) => path.join(process.cwd(), filePath);
 
 describe('Test command: clone', function() {
   this.timeout(10000);
 
-  let fs;
-
   beforeEach(function() {
-    fs = createFsFromVolume(new Volume());
+    mock({});
+  });
 
-    fs.mkdirSync(os.homedir(), { recursive: true });
+  afterEach(function() {
+    mock.restore();
   });
 
   it('Clones a repo', async function() {
-    await clone('reuters-graphics/test-bluprint', fs);
+    await clone('reuters-graphics/test-bluprint');
 
     expect(fs.existsSync(resolvePath('.bluprintrc'))).to.be(true);
     expect(fs.existsSync(resolvePath('moveme/docs.md'))).to.be(true);

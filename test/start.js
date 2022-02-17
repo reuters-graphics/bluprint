@@ -1,8 +1,9 @@
 const expect = require('expect.js');
-const { createFsFromVolume, Volume } = require('memfs');
+const mock = require('mock-fs');
 const path = require('path');
 const { start } = require('../dist');
 const os = require('os');
+const fs = require('fs');
 
 const userConfigPath = path.join(os.homedir(), `.bluprintrc`);
 
@@ -11,14 +12,7 @@ const resolvePath = (filePath) => path.join(process.cwd(), filePath);
 describe('Test command: start', function() {
   this.timeout(10000);
 
-  let fs;
-
   beforeEach(function() {
-    fs = createFsFromVolume(new Volume());
-
-    fs.mkdirSync(os.homedir(), { recursive: true });
-    fs.mkdirSync(process.cwd(), { recursive: true });
-
     const userConfig = {
       bluprints: {
         'test bluprint': {
@@ -34,7 +28,13 @@ describe('Test command: start', function() {
       },
     };
 
-    fs.writeFileSync(userConfigPath, JSON.stringify(userConfig));
+    mock({
+      [userConfigPath]: JSON.stringify(userConfig),
+    });
+  });
+
+  afterEach(function() {
+    mock.restore();
   });
 
   it('Creates a new project from bluprint', async function() {
@@ -44,7 +44,7 @@ describe('Test command: start', function() {
       bluprint: ['test bluprint'],
     };
 
-    await start(null, inject, fs);
+    await start(null, inject);
 
     expect(fs.existsSync(resolvePath('deep/file.html'))).to.be(true);
     expect(fs.existsSync(resolvePath('moved/docs.md'))).to.be(true);
@@ -54,7 +54,7 @@ describe('Test command: start', function() {
   });
 
   it('Can take a GitHub repo passed directly to command', async function() {
-    await start('reuters-graphics/test-bluprint', [], fs);
+    await start('reuters-graphics/test-bluprint', []);
 
     expect(fs.existsSync(resolvePath('deep/file.html'))).to.be(true);
     expect(fs.existsSync(resolvePath('moved/docs.md'))).to.be(true);
@@ -69,7 +69,7 @@ describe('Test command: start', function() {
       partChoice: ['bluprint part'],
     };
 
-    await start('reuters-graphics/test-bluprint-parts', inject, fs);
+    await start('reuters-graphics/test-bluprint-parts', inject);
 
     expect(fs.existsSync(resolvePath('README.md'))).to.be(true);
     expect(fs.existsSync(resolvePath('IGNOREME.md'))).to.be(false);
@@ -97,7 +97,7 @@ describe('Test command: start', function() {
 
     fs.writeFileSync(packagePath, JSON.stringify(packageJson));
 
-    await start('reuters-graphics/test-bluprint-parts', inject, fs);
+    await start('reuters-graphics/test-bluprint-parts', inject);
 
     const mergedFile = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
 
@@ -116,7 +116,7 @@ describe('Test command: start', function() {
 
     fs.writeFileSync(packagePath, '{ BAD JSON {');
 
-    await start('reuters-graphics/test-bluprint-parts', inject, fs);
+    await start('reuters-graphics/test-bluprint-parts', inject);
 
     const mergedFile = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
 

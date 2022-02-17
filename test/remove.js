@@ -1,19 +1,16 @@
 const expect = require('expect.js');
-const { createFsFromVolume, Volume } = require('memfs');
+const mock = require('mock-fs');
 const path = require('path');
 const { remove } = require('../dist');
 const os = require('os');
+const fs = require('fs');
 
 const userConfigPath = path.join(os.homedir(), `.bluprintrc`);
 
 describe('Test command: remove', function() {
   this.timeout(10000);
 
-  const fs = createFsFromVolume(new Volume());
-
   before(function() {
-    fs.mkdirSync(os.homedir(), { recursive: true });
-
     const userConfig = {
       bluprints: {
         'test-deregister': {
@@ -24,11 +21,17 @@ describe('Test command: remove', function() {
       },
     };
 
-    fs.writeFileSync(userConfigPath, JSON.stringify(userConfig));
+    mock({
+      [userConfigPath]: JSON.stringify(userConfig),
+    });
+  });
+
+  after(function() {
+    mock.restore();
   });
 
   it('Removes a bluprint', async function() {
-    await remove(null, ['test-deregister'], fs);
+    await remove(null, ['test-deregister']);
 
     const { bluprints } = JSON.parse(fs.readFileSync(userConfigPath, 'utf-8'));
 
