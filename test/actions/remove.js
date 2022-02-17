@@ -1,5 +1,6 @@
 const expect = require('expect.js');
-const { createFsFromVolume, Volume } = require('memfs');
+const mock = require('mock-fs');
+const fs = require('fs');
 const path = require('path');
 const { handleActions } = require('../../dist/index.js');
 
@@ -8,9 +9,9 @@ const ROOT = process.cwd();
 describe('Test action: remove', function() {
   this.timeout(10000);
 
-  const fs = createFsFromVolume(new Volume());
-
   before(function() {
+    mock({});
+
     fs.mkdirSync(path.join(process.cwd(), 'remove/'), { recursive: true });
 
     fs.writeFileSync(
@@ -23,6 +24,10 @@ describe('Test action: remove', function() {
     );
   });
 
+  after(function() {
+    mock.restore();
+  });
+
   it('Removes files', async function() {
     const actions = [{
       action: 'remove',
@@ -31,7 +36,7 @@ describe('Test action: remove', function() {
       ],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     const path1 = path.join(ROOT, 'remove/script.js');
     const path2 = path.join(ROOT, 'remove/index.js');

@@ -1,20 +1,27 @@
 const expect = require('expect.js');
-const { createFsFromVolume, Volume } = require('memfs');
+const mock = require('mock-fs');
 const path = require('path');
 const { add } = require('../dist');
 const os = require('os');
+const fs = require('fs');
 
 const userConfigPath = path.join(os.homedir(), `.bluprintrc`);
 
 describe('Test command: add', function() {
   this.timeout(10000);
 
-  const fs = createFsFromVolume(new Volume());
+  before(function() {
+    mock({
+      [userConfigPath]: '{}',
+    });
+  });
 
-  fs.mkdirSync(path.dirname(userConfigPath), { recursive: true });
+  after(function() {
+    mock.restore();
+  });
 
   it('Adds a new bluprint', async function() {
-    await add(null, ['reuters-graphics/test-bluprint'], fs);
+    await add(null, ['reuters-graphics/test-bluprint']);
 
     const { bluprints } = JSON.parse(fs.readFileSync(userConfigPath, 'utf-8'));
 

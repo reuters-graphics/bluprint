@@ -1,5 +1,6 @@
 const expect = require('expect.js');
-const { createFsFromVolume, Volume } = require('memfs');
+const mock = require('mock-fs');
+const fs = require('fs');
 const path = require('path');
 const { handleActions } = require('../../dist/index.js');
 
@@ -8,9 +9,9 @@ const ROOT = process.cwd();
 describe('Test action: move', function() {
   this.timeout(10000);
 
-  const fs = createFsFromVolume(new Volume());
-
   before(function() {
+    mock({});
+
     fs.mkdirSync(path.join(process.cwd(), 'oldDir'), { recursive: true });
 
     fs.mkdirSync(path.join(process.cwd(), 'oldEmptyDir'), { recursive: true });
@@ -29,13 +30,17 @@ describe('Test action: move', function() {
     );
   });
 
+  after(function() {
+    mock.restore();
+  });
+
   it('Moves a file', async function() {
     const actions = [{
       action: 'move',
       paths: ['move.js', 'moved.js'],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     expect(fs.existsSync(path.join(ROOT, 'moved.js'))).to.be(true);
   });
@@ -46,7 +51,7 @@ describe('Test action: move', function() {
       paths: ['oldDir', 'newDir'],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     expect(fs.existsSync(path.join(ROOT, 'newDir/move.js'))).to.be(true);
   });
@@ -57,7 +62,7 @@ describe('Test action: move', function() {
       paths: ['oldEmptyDir', 'newEmptyDir'],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     expect(fs.existsSync(path.join(ROOT, 'newEmptyDir'))).to.be(true);
   });
@@ -76,7 +81,7 @@ describe('Test action: move', function() {
       paths: ['code.js', '{{ path }}/path.js'],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     expect(fs.existsSync(path.join(ROOT, 'templated/path.js'))).to.be(true);
   });
@@ -87,7 +92,7 @@ describe('Test action: move', function() {
       paths: ['templated/path.js', '{{ year }}/{{ month }}/{{ day }}/path.js'],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     const date = new Date();
 

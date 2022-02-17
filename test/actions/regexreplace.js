@@ -1,6 +1,7 @@
 const expect = require('expect.js');
-const { createFsFromVolume, Volume } = require('memfs');
+const mock = require('mock-fs');
 const path = require('path');
+const fs = require('fs');
 const { handleActions } = require('../../dist/index.js');
 
 const ROOT = process.cwd();
@@ -8,9 +9,9 @@ const ROOT = process.cwd();
 describe('Test action: regexreplace', function() {
   this.timeout(10000);
 
-  const fs = createFsFromVolume(new Volume());
-
   before(function() {
+    mock({});
+
     fs.mkdirSync(process.cwd(), { recursive: true });
 
     fs.writeFileSync(
@@ -39,6 +40,10 @@ describe('Test action: regexreplace', function() {
     );
   });
 
+  after(function() {
+    mock.restore();
+  });
+
   it('Makes a replacement with a simple string', async function() {
     const actions = [{
       action: 'regexreplace',
@@ -46,7 +51,7 @@ describe('Test action: regexreplace', function() {
       replace: ['data', 'data is plural'],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     const file = fs.readFileSync(path.join(ROOT, 'replaceString.json'), 'utf-8');
     expect(JSON.parse(file).datum).to.be('data is plural');
@@ -59,7 +64,7 @@ describe('Test action: regexreplace', function() {
       replace: ['^([0-9]{3})-([0-9]{3})-([0-9]{4})$', '$1.$2.$3', 'gm'],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     const file = fs.readFileSync(path.join(ROOT, 'replaceRegex.txt'), 'utf-8');
     expect(file.split('\n')[0]).to.be('214.555.5677');
@@ -88,7 +93,7 @@ describe('Test action: regexreplace', function() {
       ],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     const file = fs.readFileSync(path.join(ROOT, 'replaceWithContext.txt'), 'utf-8');
     expect(file.split('\n')[0]).to.be('Name: Lisa McDonald');
@@ -108,7 +113,7 @@ describe('Test action: regexreplace', function() {
       ],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     const data = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'replaceDefaultContext.json'), 'utf-8')

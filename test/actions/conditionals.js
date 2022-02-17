@@ -1,5 +1,5 @@
 const expect = require('expect.js');
-const { createFsFromVolume, Volume } = require('memfs');
+const mock = require('mock-fs');
 const { handleActions } = require('../../dist/index.js');
 const sinon = require('sinon');
 const childProcess = require('child_process');
@@ -9,13 +9,13 @@ let spy;
 describe('Test action: conditionals', function() {
   this.timeout(10000);
 
-  const fs = createFsFromVolume(new Volume());
-
   beforeEach(function() {
+    mock({});
     spy = sinon.spy(childProcess, 'spawnSync');
   });
 
   afterEach(function() {
+    mock.restore();
     spy.restore();
   });
 
@@ -38,7 +38,7 @@ describe('Test action: conditionals', function() {
       cmds: [['echo', ['dog']]],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     expect(spy.calledWith('echo', ['cat'])).to.be(false);
     expect(spy.calledWith('echo', ['dog'])).to.be(true);
@@ -59,7 +59,7 @@ describe('Test action: conditionals', function() {
       cmds: [['echo', ['cat']]],
     }];
 
-    await handleActions(actions, null, fs);
+    await handleActions(actions, null);
 
     expect(spy.calledWith('echo', ['cat'])).to.be(true);
   });

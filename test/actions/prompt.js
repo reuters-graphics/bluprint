@@ -1,11 +1,17 @@
 const expect = require('expect.js');
-const { createFsFromVolume, Volume } = require('memfs');
+const mock = require('mock-fs');
 const { handleActions } = require('../../dist/index.js');
 
 describe('Test action: prompt', function() {
   this.timeout(10000);
 
-  const fs = createFsFromVolume(new Volume());
+  before(function() {
+    mock({});
+  });
+
+  after(function() {
+    mock.restore();
+  });
 
   it('Asks questions and adds answers to context', async function() {
     const actions = [{
@@ -18,7 +24,7 @@ describe('Test action: prompt', function() {
       inject: ['nuthin'],
     }];
 
-    const context = await handleActions(actions, null, fs);
+    const context = await handleActions(actions, null);
 
     expect(context.answer).to.be('nuthin');
   });
