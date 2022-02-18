@@ -268,6 +268,26 @@ This action lets you move or rename files or directories.
 ["moveme/code.js", "{{ someAnswer }}/code.js"]
 ```
 
+### copy
+
+```json
+{
+  "action": "copy",
+  "paths": [
+    ["from/", "to/"],
+    ["copyme.md", "copied.md"]
+  ],
+}
+```
+
+This action lets you copy files or directories.
+
+`paths` is an array of arrays. Each inner array represents a copy action. The first item in a copy action represents the file or directory to be copied and the second, the name of the copied file or directory. You can use the answers from a previous [prompt](#prompt) action in the copied name string with [mustache](https://mustache.github.io/) template syntax:
+
+```json
+["copyme/code.js", "{{ someAnswer }}/code.js"]
+```
+
 ### prompt
 
 ```json
