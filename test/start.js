@@ -25,6 +25,11 @@ describe('Test command: start', function() {
           project: 'test-bluprint-parts',
           category: 'codes',
         },
+        'baker example': {
+          user: 'datadesk',
+          project: 'baker-example-page-template',
+          category: 'codes',
+        },
       },
     };
 
@@ -55,6 +60,7 @@ describe('Test command: start', function() {
 
   it('Can take a GitHub repo passed directly to command', async function() {
     await start('reuters-graphics/test-bluprint', []);
+    await start('datadesk/baker-example-page-template', []);
 
     expect(fs.existsSync(resolvePath('deep/file.html'))).to.be(true);
     expect(fs.existsSync(resolvePath('moved/docs.md'))).to.be(true);
