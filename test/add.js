@@ -22,6 +22,7 @@ describe('Test command: add', function() {
 
   it('Adds a new bluprint', async function() {
     await add(null, ['reuters-graphics/test-bluprint']);
+    await add(null, ['datadesk/baker-example-page-template']);
 
     const { bluprints } = JSON.parse(fs.readFileSync(userConfigPath, 'utf-8'));
 
