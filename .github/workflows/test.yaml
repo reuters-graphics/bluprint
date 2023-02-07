@@ -1,0 +1,68 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout repository
+        uses: actions/checkout@v3
+
+      - id: setup-node
+        name: Setup Node.JS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'yarn'
+
+      - id: install-deps
+        name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - id: lint
+        name: Lint code
+        run: yarn run eslint ./lib/ --ext .js --debug
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      matrix:
+        node-version: ['14', '16', '18']
+    steps:
+      - id: checkout
+        name: Checkout repository
+        uses: actions/checkout@v3
+
+      - id: setup-node
+        name: Setup Node.JS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - id: install-deps
+        name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - id: build
+        name: Build library
+        run: yarn build
+
+      - id: tests
+        name: Run tests
+        run: yarn test
+
+      - id: upload-artifact
+        name: Upload release candidate
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-candidate
+          path: ./dist/
