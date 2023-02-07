@@ -14,8 +14,8 @@ jobs:
         name: Checkout repository
         uses: actions/checkout@v3
 
-      - id: setup-python
-        name: Setup Python
+      - id: setup-node
+        name: Setup Node.JS
         uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -41,8 +41,8 @@ jobs:
         name: Checkout repository
         uses: actions/checkout@v3
 
-      - id: setup-python
-        name: Setup Python
+      - id: setup-node
+        name: Setup Node.JS
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
