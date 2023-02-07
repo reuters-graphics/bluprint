@@ -33,6 +33,9 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     needs: lint
+    strategy:
+      matrix:
+        node-version: ['14', '16', '18']
     steps:
       - id: checkout
         name: Checkout repository
@@ -42,7 +45,7 @@ jobs:
         name: Setup Python
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: ${{ matrix.node-version }}
           cache: 'yarn'
 
       - id: install-deps
