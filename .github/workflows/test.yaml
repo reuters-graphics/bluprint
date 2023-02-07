@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test Python code
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout repository
+        uses: actions/checkout@v3
+
+      - id: setup-python
+        name: Setup Python
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'yarn'
+
+      - id: install-deps
+        name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - id: build
+        name: Build library
+        run: yarn build
+
+      - id: tests
+        name: Run tests
+        run: yarn test
+
+      - id: upload-artifact
+        name: Upload release candidate
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-candidate
+          path: ./dist/
