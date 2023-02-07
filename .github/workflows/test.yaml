@@ -27,7 +27,7 @@ jobs:
 
       - id: lint
         name: Lint code
-        run: yarn run eslint ./lib/**/*.js
+        run: yarn run eslint ./lib/**/*.js --debug
 
   test:
     name: Test code
