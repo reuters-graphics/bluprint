@@ -119,6 +119,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - id: commit
+        name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Updated package.json version to ${{ github.ref_name }}
