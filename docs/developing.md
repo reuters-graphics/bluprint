@@ -82,8 +82,6 @@ GitHub will take you to a page dedicated to your new release and start an automa
 
 That will take you to the Actions monitoring page. The task charged with publishing your release should be at the top.
 
-![Actions page](https://raw.githubusercontent.com/reuters-graphics/bluprint/master/.github/images/releasing-actions-start.png)
-
 After a few minutes, the process there should finish and show a green check mark. When it does, visit [bluprint’s page on npmjs.com](https://www.npmjs.com/package/bluprint), where you should see the latest version displayed at the top of the page.
 
 If the action fails, something has gone wrong with the deployment process. You can click into its debugging panel to search for the cause or ask the project maintainers for help.
