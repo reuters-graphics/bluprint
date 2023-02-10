@@ -76,6 +76,23 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - id: branch
+        name: Get current branch
+        run: |
+          raw=$(git branch -r --contains ${{ github.ref }})
+          branch=${raw##*/}
+          echo "branch=$branch" >> $GITHUB_OUTPUT
+          echo "Branch is $branch."
+
+      - id: vet
+        name: Verify default branch
+        if: ${{ steps.branch.outputs.branch != github.event.repository.default_branch }}
+        run: |
+          echo "'${{ steps.branch.outputs.branch }}' is not the default branch of '${{ github.event.repository.default_branch }}'"
+          exit 1
 
       - id: setup-node
         name: Setup Node.JS
