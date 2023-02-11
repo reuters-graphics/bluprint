@@ -60,13 +60,6 @@ jobs:
         name: Run tests
         run: yarn test
 
-      - id: upload-artifact
-        name: Upload release candidate
-        uses: actions/upload-artifact@v3
-        with:
-          name: release-candidate
-          path: ./dist/
-
   release:
     name: Release
     runs-on: ubuntu-latest
