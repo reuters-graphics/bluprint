@@ -43,7 +43,7 @@
     "tarball"
   ],
   "scripts": {
-    "prepublishOnly": "npm run test",
+    "prepublishOnly": "npm run build",
     "build": "rollup --config rollup.config.js",
     "test": "npm run build && NODE_ENV=test mocha --recursive"
   },
