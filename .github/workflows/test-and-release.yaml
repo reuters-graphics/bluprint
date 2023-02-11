@@ -112,5 +112,5 @@ jobs:
         name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Updated package.json version to ${{ github.ref_name }}
+          commit_message: Updated version to ${{ github.ref_name }}
           branch: ${{ github.event.repository.default_branch }}
