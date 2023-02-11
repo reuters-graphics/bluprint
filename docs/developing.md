@@ -52,13 +52,7 @@ Enter your version number into the box. Then click the "Create new tag" option t
 
 ![Tag dropdown](https://raw.githubusercontent.com/reuters-graphics/bluprint/master/.github/images/releasing-name-tag.png)
 
-### 4. Name the release
-
-Enter the same number into the "Release title" box.
-
-![Name box](https://raw.githubusercontent.com/reuters-graphics/bluprint/master/.github/images/releasing-name-release.png)
-
-### 5. Auto-generate release notes
+### 4. Auto-generate release notes
 
 Click the "Auto-generate release notes" button in the upper right corner of the large description box.
 
@@ -68,13 +62,13 @@ That should fill in the box below. What appears will depend on how many pull req
 
 ![Auto-generate release notes results](https://raw.githubusercontent.com/reuters-graphics/bluprint/master/github/images/releasing-changelog-entered.png)
 
-### 6. Publish the release
+### 5. Publish the release
 
 Click the green button that says "Publish release" at the bottom of the page.
 
 ![Publish button](https://raw.githubusercontent.com/reuters-graphics/bluprint/master/.github/images/releasing-publish-button.png)
 
-### 7. Wait for the Action to finish
+### 6. Wait for the Action to finish
 
 GitHub will take you to a page dedicated to your new release and start an automated process that releases your new version to the world. Follow its progress by clicking on the [Actions tab](https://github.comreuters-graphics/bluprint/actions) near the top of the page.
 
