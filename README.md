@@ -4,7 +4,7 @@
 <img src="./logo.svg" width="300" alt="bluprint logo" />
 <br />
 
-The simplest way to scaffold new projects from GitHub templates.
+Dead-easy application scaffolding and CLI.
 
 <br />
 
