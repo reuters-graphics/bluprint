@@ -1,0 +1,292 @@
+---
+title: CLI reference
+description: Complete reference for all bluprint CLI commands
+---
+
+This page provides a complete reference for all commands available in the bluprint CLI.
+
+## Global options
+
+These options are available for all commands:
+
+- `--version`: Show version number
+- `--help`: Show help
+
+## Commands
+
+### bluprint add
+
+Add a new bluprint to your CLI.
+
+```bash
+bluprint add [repo]
+```
+
+**Arguments:**
+- `repo` (optional): GitHub repository to add as a bluprint
+
+If no repository is provided, the CLI will prompt you to enter one.
+
+**Repository formats:**
+
+The GitHub repo can be referenced using any of:
+
+- Full URL: `https://github.com/reuters-graphics/my-bluprint`
+- SSH string: `git@github.com:reuters-graphics/my-bluprint.git`
+- GitHub shortcut: `reuters-graphics/my-bluprint`
+
+**Examples:**
+
+```bash
+# Interactive mode
+bluprint add
+
+# Direct URL
+bluprint add https://github.com/reuters-graphics/my-bluprint
+
+# GitHub shortcut
+bluprint add reuters-graphics/my-bluprint
+
+# SSH string
+bluprint add git@github.com:reuters-graphics/my-bluprint.git
+```
+
+**Private repositories:**
+
+For private repositories, ensure you have a GitHub personal access token configured:
+
+```bash
+export GITHUB_TOKEN=<your token>
+```
+
+or
+
+```bash
+bluprint token <your token>
+```
+
+---
+
+### bluprint clone
+
+Clone a GitHub repository without running bluprint actions.
+
+```bash
+bluprint clone <repo>
+```
+
+**Arguments:**
+- `repo` (required): GitHub repository to clone
+
+**Behavior:**
+
+- Clones any GitHub repository (with or without a `.bluprintrc`)
+- All bluprint actions are ignored
+- Works with private repositories (requires GitHub personal access token)
+- Useful for quickly copying any repository
+
+**Examples:**
+
+```bash
+bluprint clone reuters-graphics/my-bluprint
+bluprint clone https://github.com/reuters-graphics/my-project
+```
+
+---
+
+### bluprint new
+
+Create a new `.bluprintrc` configuration file.
+
+```bash
+bluprint new [name]
+```
+
+**Arguments:**
+- `name` (optional): Name for your bluprint
+
+Creates a `.bluprintrc` file in the current directory with the basic structure:
+
+```json
+{
+  "bluprint": "^0.0.1",
+  "name": "My bluprint",
+  "category": "",
+  "actions": []
+}
+```
+
+**Examples:**
+
+```bash
+# Interactive mode
+bluprint new
+
+# With name
+bluprint new "My React Template"
+```
+
+---
+
+### bluprint remove
+
+Remove a bluprint from your CLI.
+
+```bash
+bluprint remove [bluprint]
+```
+
+**Arguments:**
+- `bluprint` (optional): Name or identifier of the bluprint to remove
+
+If no bluprint is specified, the CLI will show a list of registered bluprints to choose from.
+
+**Examples:**
+
+```bash
+# Interactive mode
+bluprint remove
+
+# Specific bluprint
+bluprint remove my-bluprint
+```
+
+---
+
+### bluprint start
+
+Start a new project from a bluprint.
+
+```bash
+bluprint start [bluprint]
+```
+
+**Arguments:**
+- `bluprint` (optional): GitHub repository or registered bluprint name
+
+If no bluprint is specified, the CLI will show a list of your registered bluprints.
+
+**Behavior:**
+
+- Downloads the latest version from GitHub
+- Scaffolds files into the current directory
+- Runs all configured actions
+- Prompts for any required input
+
+**Repository formats:**
+
+When passing a repository directly, you can use:
+- Full URL: `https://github.com/reuters-graphics/my-bluprint`
+- SSH string: `git@github.com:reuters-graphics/my-bluprint.git`
+- GitHub shortcut: `reuters-graphics/my-bluprint`
+
+**Examples:**
+
+```bash
+# Interactive mode - choose from registered bluprints
+bluprint start
+
+# Use specific registered bluprint
+bluprint start my-template
+
+# Use repository directly
+bluprint start reuters-graphics/my-bluprint
+bluprint start https://github.com/reuters-graphics/my-bluprint
+```
+
+**Current directory requirement:**
+
+The `start` command scaffolds into the current directory. For best results:
+
+```bash
+mkdir my-new-project
+cd my-new-project
+bluprint start
+```
+
+---
+
+### bluprint token
+
+Add a GitHub personal access token to your CLI.
+
+```bash
+bluprint token [accessToken]
+```
+
+**Arguments:**
+- `accessToken` (optional): Your GitHub personal access token
+
+This command stores your token for accessing private GitHub repositories.
+
+**Examples:**
+
+```bash
+# Interactive mode
+bluprint token
+
+# Direct token
+bluprint token ghp_abc123def456...
+```
+
+**Alternative method:**
+
+You can also set the token as an environment variable:
+
+```bash
+export GITHUB_TOKEN=<your token>
+```
+
+**Creating a token:**
+
+To create a GitHub personal access token, visit:
+https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
+
+Required scopes:
+- `repo` (for private repositories)
+
+---
+
+## Exit codes
+
+The bluprint CLI uses standard exit codes:
+
+- `0`: Success
+- `1`: Error occurred
+
+## Configuration
+
+The CLI stores configuration in your home directory:
+
+- Registered bluprints
+- GitHub personal access token (if provided via `bluprint token`)
+
+## Environment variables
+
+- `GITHUB_TOKEN`: GitHub personal access token for accessing private repositories
+
+## Tips
+
+### Tab completion
+
+The CLI supports tab completion for commands. The exact setup depends on your shell.
+
+### Using with npm scripts
+
+You can add bluprint commands to your `package.json` scripts:
+
+```json
+{
+  "scripts": {
+    "scaffold": "bluprint start my-template"
+  }
+}
+```
+
+### CI/CD integration
+
+For automated workflows, use environment variables:
+
+```bash
+GITHUB_TOKEN=$GITHUB_PAT bluprint start my-org/my-template
+```

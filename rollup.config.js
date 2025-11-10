@@ -1,26 +1,26 @@
 import externals from 'rollup-plugin-node-externals';
 import json from '@rollup/plugin-json';
-import resolve from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
 
-const plugins = [
-  resolve({ preferBuiltins: true, modulesOnly: true }),
-  json(),
-  externals({ deps: true }),
-];
+const plugins = [json(), externals({ deps: true }), typescript()];
 
 const output = {
   dir: 'dist',
-  format: 'cjs',
-  paths: { bluprint: './index.js' },
+  format: 'es',
+  sourcemap: true,
+  paths: { '@reuters-graphics/bluprint': './index.js' },
 };
 
-export default [{
-  input: 'lib/index.js',
-  output,
-  plugins,
-}, {
-  input: 'lib/cli.js',
-  output: { ...output, ...{ banner: '#!/usr/bin/env node' } },
-  plugins,
-  external: ['bluprint'],
-}];
+export default [
+  {
+    input: 'src/index.ts',
+    output,
+    plugins,
+  },
+  {
+    input: 'src/cli.ts',
+    output: { ...output, ...{ banner: '#!/usr/bin/env node' } },
+    plugins,
+    external: ['@reuters-graphics/bluprint'],
+  },
+];

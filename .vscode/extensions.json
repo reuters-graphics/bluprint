@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "github.vscode-github-actions",
+    "dbaeumer.vscode-eslint",
+    "oouo-diogo-perdigao.docthis",
+    "yoavbls.pretty-ts-errors"
+  ]
+}

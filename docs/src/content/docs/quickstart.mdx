@@ -1,0 +1,94 @@
+---
+title: Quickstart
+description: Install bluprint and create your first template
+---
+
+## Install
+
+Install bluprint globally using your preferred package manager:
+
+```bash
+yarn global add @reuters-graphics/bluprint
+```
+
+or
+
+```bash
+npm install -g @reuters-graphics/bluprint
+```
+
+:::note
+This package supports the [latest active versions](https://nodejs.org/en/about/releases/) of node.
+:::
+
+## Create a new bluprint
+
+Creating a bluprint from existing code is as easy as adding a `.bluprintrc` JSON file to the root of your project and pushing to GitHub.
+
+Use the `new` command to create your `.bluprintrc` in the root of the project you'd like to templatize:
+
+```bash
+bluprint new
+```
+
+That creates your `.bluprintrc`:
+
+```json
+{
+  "bluprint": "^0.0.1",
+  "name": "My bluprint",
+  "category": "",
+  "actions": []
+}
+```
+
+Add a `category` if you like, which will be used in the CLI to group similar bluprints together.
+
+`actions` can be added to process your bluprint files after scaffolding your directory. Read more in [Actions](/guides/actions) and check out the [example bluprint](https://github.com/reuters-graphics/bluprint/blob/master/docs/example.md) to see what you can do.
+
+Commit your project to GitHub with the `.bluprintrc` file.
+
+## Add a bluprint to your CLI
+
+To use your new bluprint, add it to your CLI using its GitHub repository.
+
+```bash
+bluprint add <github repo>
+```
+
+Your GitHub repo can be referenced using any of:
+
+- the URL
+
+  `https://github.com/reuters-graphics/my-bluprint`
+
+- the ssh connect string
+
+  `git@github.com:reuters-graphics/my-bluprint.git`
+
+- the GitHub user/project shortcut
+
+  `reuters-graphics/my-bluprint`
+
+### Private repositories
+
+If your repository is **private**, you can make sure the CLI has permission to access it by either:
+
+1. Exporting a [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) as the environment variable `GITHUB_TOKEN`:
+
+  ```bash
+  export GITHUB_TOKEN=<your personal access token>
+  ```
+
+2. Adding your personal access token directly to the CLI:
+
+  ```bash
+  bluprint token <your token>
+  ```
+
+## Next steps
+
+Now that you have bluprint installed, learn how to:
+- [Use bluprints with the CLI](/guides/using)
+- [Add actions to your bluprint](/guides/actions)
+- [Create reusable parts](/guides/parts)

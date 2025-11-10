@@ -1,0 +1,34 @@
+---
+title: Introduction
+description: Dead-easy application scaffolding and CLI for reusable code templates
+---
+
+Dead-easy application scaffolding and CLI.
+
+## Why this?
+
+Reusing good code is the easiest way to speed up your development time and share solid conventions across your team.
+
+If you've used [Yeoman](https://yeoman.io/) or similar tools to build shareable templates, bluprint has a few advantages:
+
+- It's far simpler for _anyone_ on your team to create a template regardless of what language they're comfortable working in.
+- Your bluprint actually _looks like_ the boilerplate you'll start from, so it's easy to tell what your bluprint will do at a glance.
+- bluprint's CLI pulls your template directly from GitHub, which means distributing your code is as easy as `git push`.
+
+bluprint is designed to be a fast, accessible and highly composable tool to build out a library of reusable code.
+
+## What's it do?
+
+A bluprint is any GitHub repository you want to use as a template to scaffold out a new project. Just adding a `.bluprintrc` JSON file to the root of a repo makes it a bluprint.
+
+Register bluprints you use regularly with the CLI.
+
+When you start a new project, the CLI will download the latest tarball of your files from GitHub (public or private repos supported) and scaffold out your local directory. Then it will apply any custom actions defined in your `.bluprintrc` to transform your files.
+
+bluprint [actions](/guides/actions) can do complex things like move or rename files and folders, execute shell commands, ask users for input, render files through a templating engine to customize them for each project and more.
+
+bluprint [parts](/guides/parts) let you split your template into segments that can help you keep files synced between projects already underway and your bluprint.
+
+## Getting Started
+
+Ready to get started? Head over to the [Quickstart](/quickstart) guide to install bluprint and create your first template.

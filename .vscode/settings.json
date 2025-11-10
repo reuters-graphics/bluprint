@@ -1,0 +1,10 @@
+{
+  "npm.packageManager": "pnpm",
+  "eslint.validate": ["javascript", "typescript"],
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "emmet.excludeLanguages": ["markdown"],
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

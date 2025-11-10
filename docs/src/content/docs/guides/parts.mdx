@@ -1,0 +1,211 @@
+---
+title: Parts guide
+description: Learn how to create reusable template segments with parts
+---
+
+Parts allow you to use just a portion of your bluprint, making it easy to update specific files in existing projects or sync them with changes in the upstream template.
+
+## What are parts?
+
+Parts are named segments of your bluprint that users can apply individually instead of scaffolding the entire template. This is particularly useful for:
+
+- Updating configuration files in an existing project
+- Syncing specific components with the upstream template
+- Applying only certain features from a bluprint
+- Maintaining consistency across multiple projects
+
+## Defining parts
+
+Add a `parts` object to your `.bluprintrc`. Each key is the name of a part, and the value is an array of glob strings matching the files that belong to that part:
+
+```json
+{
+  "bluprint": "^0.0.1",
+  "name": "My bluprint",
+  "category": "",
+  "actions": [],
+  "parts": {
+    "Config files": [
+      "config/*",
+      ".tasksrc"
+    ],
+    "JS components": [
+      "src/js/components/**/*",
+      "src/scss/component-styles/*"
+    ]
+  }
+}
+```
+
+## How parts work
+
+When a user starts a project with your bluprint, they'll be asked if they want to use:
+
+- The whole bluprint (default)
+- A specific part
+
+If they choose a part:
+1. Only files matching that part's glob patterns are copied
+2. Files that don't match are ignored
+3. Actions can be conditionally run based on the selected part
+
+## Conditional actions with parts
+
+Use the `bluprintPart` context variable to make actions conditional on the selected part:
+
+```json
+{
+  "actions": [
+    {
+      "action": "execute",
+      "cmds": [["yarn", ["install"]]],
+      "condition": ["bluprintPart", "Config files"]
+    }
+  ]
+}
+```
+
+This action will only run when the "Config files" part is selected.
+
+### Running actions only for the full bluprint
+
+To run an action only when the whole bluprint is used (not a part), test for `null`:
+
+```json
+{
+  "action": "prompt",
+  "questions": [{
+    "type": "text",
+    "name": "projectName",
+    "message": "What should we call this project?"
+  }],
+  "condition": ["bluprintPart", null]
+}
+```
+
+## Merging JSON files
+
+When using parts to update existing projects, you may want to merge JSON files instead of replacing them entirely. Enable this with the `mergeJson` flag:
+
+```json
+{
+  "bluprint": "^0.0.1",
+  "name": "My bluprint",
+  "category": "",
+  "actions": [],
+  "parts": {},
+  "mergeJson": true
+}
+```
+
+When `mergeJson` is enabled, bluprint uses [lodash merge](https://lodash.com/docs/4.17.15#merge) to combine existing JSON files with those from your part.
+
+### Merge behavior
+
+Properties in the part's JSON file take precedence over the existing file.
+
+**Example:**
+
+Existing `package.json`:
+```json
+{
+  "dependencies": {
+    "react": "14.0",
+    "lodash": "3.0"
+  }
+}
+```
+
+Bluprint `package.json`:
+```json
+{
+  "dependencies": {
+    "react": "16.0",
+    "d3": "5.0"
+  }
+}
+```
+
+**Result after merge:**
+```json
+{
+  "dependencies": {
+    "react": "16.0",
+    "lodash": "3.0",
+    "d3": "5.0"
+  }
+}
+```
+
+Notice that:
+- `react` was updated to `16.0` (from the bluprint)
+- `lodash` was preserved (from the existing file)
+- `d3` was added (from the bluprint)
+
+## Use cases
+
+### Configuration updates
+
+Create a part for configuration files that can be updated as your team's standards evolve:
+
+```json
+{
+  "parts": {
+    "Config": [
+      ".eslintrc.js",
+      ".prettierrc",
+      "tsconfig.json"
+    ]
+  }
+}
+```
+
+### Component libraries
+
+Allow developers to add individual components without scaffolding a full project:
+
+```json
+{
+  "parts": {
+    "Button component": [
+      "src/components/Button/*",
+      "src/styles/button.scss"
+    ],
+    "Modal component": [
+      "src/components/Modal/*",
+      "src/styles/modal.scss"
+    ]
+  }
+}
+```
+
+### Build tooling
+
+Let teams update build configurations separately from application code:
+
+```json
+{
+  "parts": {
+    "Build tools": [
+      "webpack.config.js",
+      ".babelrc",
+      "package.json"
+    ]
+  },
+  "mergeJson": true
+}
+```
+
+## Best practices
+
+1. **Use descriptive names**: Choose clear, descriptive names for your parts that indicate what they contain
+2. **Keep parts focused**: Each part should represent a logical grouping of files
+3. **Enable mergeJson for configs**: When parts include JSON configuration files, enable `mergeJson` to prevent data loss
+4. **Add conditional actions**: Use `condition` to ensure actions only run when appropriate
+5. **Document your parts**: Include information about available parts in your bluprint's README
+
+## Next steps
+
+- Learn about [Actions](/guides/actions) to customize your parts
+- See how to [use bluprints](/guides/using) with parts
+- Check out the [example bluprint](https://github.com/reuters-graphics/bluprint/blob/master/docs/example.md)

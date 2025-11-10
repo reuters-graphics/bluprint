@@ -1,0 +1,94 @@
+---
+title: Using bluprints
+description: Learn how to scaffold projects using the bluprint CLI
+---
+
+Once you've [added bluprints to your CLI](/quickstart#add-a-bluprint-to-your-cli), you can use them to quickly scaffold new projects.
+
+## Starting a new project
+
+Create a fresh directory for your new project:
+
+```bash
+mkdir my-new-project
+cd my-new-project
+```
+
+Scaffold your project from one of your registered bluprints:
+
+```bash
+bluprint start
+```
+
+The CLI will ask you to pick a bluprint and will guide you through providing any other information your bluprint needs to finish scaffolding your project.
+
+### Using an ad-hoc bluprint
+
+You can also pass a GitHub repo containing a bluprint directly to the start command:
+
+```bash
+bluprint start <github repo>
+```
+
+This works with:
+- Full URLs: `https://github.com/reuters-graphics/my-bluprint`
+- SSH strings: `git@github.com:reuters-graphics/my-bluprint.git`
+- GitHub shortcuts: `reuters-graphics/my-bluprint`
+
+This is useful for trying out a bluprint before adding it to your CLI, or for one-off usage.
+
+## Cloning repositories
+
+You can use the CLI to directly clone a GitHub repo without running any actions:
+
+```bash
+bluprint clone <github repo>
+```
+
+Key features:
+- Works with _any_ GitHub repo, even without a `.bluprintrc`
+- Supports private repos (with a GitHub personal access token)
+- All actions are ignored when cloning
+- Useful for quickly grabbing a copy of any repository
+
+## Removing a bluprint
+
+If you need to remove a bluprint from your CLI:
+
+```bash
+bluprint remove
+```
+
+The CLI will show you a list of your registered bluprints and let you select which ones to remove.
+
+## Using parts
+
+If a bluprint has [parts](/guides/parts) defined, you'll be asked during scaffolding whether you want to use:
+
+- The whole bluprint (default)
+- A specific part
+
+This is useful for:
+- Updating specific files in an existing project
+- Syncing configuration files with the upstream template
+- Applying only certain features from a bluprint
+
+When you select a part, only the files matching that part's glob patterns will be copied. Actions may also be conditionally run based on the selected part.
+
+## Private repositories
+
+To work with private repositories, make sure you've set up authentication using one of these methods:
+
+1. Export a GitHub personal access token:
+
+```bash
+export GITHUB_TOKEN=<your personal access token>
+```
+
+2. Add your token to the CLI:
+
+```bash
+bluprint token <your token>
+```
+
+Learn more about creating personal access tokens in the [GitHub documentation](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line).

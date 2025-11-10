@@ -1,0 +1,7 @@
+dist
+dist-docs
+coverage
+node_modules
+pnpm-lock.yaml
+.astro
+.changeset
