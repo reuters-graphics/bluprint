@@ -26,11 +26,11 @@ Three strands:
 - [x] `profile/` — user profile at `~/.bluprint/profile.json` (tests passing)
 - [x] `context/` singleton (stub)
 - [x] `prompts/` — clack wrappers
-- [ ] **Fix `add` command** — it's half-migrated and broken (see blockers)
-- [ ] **Create new `src/cli.ts`** to wire commands (use `sade`); unblocks the build
+- [x] **Fix `add` command** — now uses the `profile` singleton + `config.module`
+- [x] **Create new `src/cli.ts`** to wire commands (use `sade`); unblocks the build
+- [x] Exclude `src/__archive/` from `tsconfig` so `tsc` is clean
 - [ ] Port remaining commands from `__archive`: `start`, `clone`, `new`, `remove`, `token`
 - [ ] Wire up `actions` in the new API (render/copy/move/etc. — currently only in `__archive`)
-- [ ] Exclude or delete `src/__archive/` so `tsc` is clean
 - [ ] Rewrite docs content for the new `bluprint.config.ts` API (currently still describes `.bluprintrc`)
 - [ ] Update the changeset — it inaccurately claims the CLI/`.bluprintrc` format is unchanged
 - [ ] Commit the working tree (currently all uncommitted)
@@ -55,15 +55,14 @@ Three strands:
 
 ## Open questions / blockers
 
-- **`add` command is broken** —
-  [`../../src/commands/add/index.ts`](../../src/commands/add/index.ts):
-  - imports `getUserProfile` / `writeUserProfile`, which no longer exist (use the
-    `profile` singleton instead)
-  - line ~63 references an undefined `bluprintrc`
-- **No `src/cli.ts`** — only exists in `__archive`. But
-  [`../../rollup.config.js`](../../rollup.config.js) and `package.json` `bin`
-  both point at `src/cli.ts` / `dist/cli.js`, so **the build fails** until it's
-  recreated. `sade` is already a dependency for this.
+- *(resolved 2026-07-01)* ~~`add` command broken~~ — now uses the `profile`
+  singleton and derives `title`/`hint` from `config.module.name`.
+- *(resolved 2026-07-01)* ~~No `src/cli.ts`~~ — recreated with `sade`; build +
+  CLI smoke test pass. Only `add` is wired; remaining commands get registered as
+  they're ported.
+- **Decide `__archive`'s fate** — currently excluded from `tsconfig` (so `tsc` is
+  clean) but still on disk as porting reference. Delete once all commands/actions
+  are ported.
 
 ## Progress log
 
@@ -73,3 +72,9 @@ Three strands:
 - **2026-07-01** — Reconstructed state after a break. `config` + `profile` tests
   green (33 passing). Identified the two blockers above (broken `add`, missing
   `cli.ts`). Set up this dev-notes system to avoid re-deriving state next time.
+- **2026-07-01** — Cleared both blockers. Fixed `add` to use the `profile`
+  singleton (`addBluprint`) and derive `title`/`hint` from `config.module.name`.
+  Recreated [`../../src/cli.ts`](../../src/cli.ts) with `sade` (only `add` wired
+  for now; fixed a `chalk` → `chalk-template` bug in the banner). Excluded
+  `src/__archive/` from `tsconfig`. Now: `tsc` clean, 33 tests pass, `pnpm build`
+  produces `dist/index.js` + `dist/cli.js`, and `node dist/cli.js --help` runs.

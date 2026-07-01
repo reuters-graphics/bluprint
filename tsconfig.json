@@ -1,7 +1,7 @@
 {
   "extends": "@reuters-graphics/yaks-ts/base",
   "include": ["src/**/*.ts"],
-  "exclude": ["dist", "test"],
+  "exclude": ["dist", "test", "src/__archive"],
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "dist",
