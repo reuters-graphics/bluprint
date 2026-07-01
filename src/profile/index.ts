@@ -111,6 +111,11 @@ class Profile {
     return Object.keys(this.readUserProfile().bluprints).sort();
   }
 
+  /** Resolve an installed bluprint's URL by its title, if registered. */
+  getBluprintUrl(title: string): string | undefined {
+    return this.readUserProfile().bluprints[title]?.url;
+  }
+
   /**
    * Prompt the user to choose an installed bluprint by title, e.g. to remove it.
    * @returns The chosen bluprint's title (its key in the profile).

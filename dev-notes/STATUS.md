@@ -21,13 +21,15 @@ the `add` command wired so far.
 - Tooling stack (pnpm, ESM, TS, Vitest, Valibot, changesets, rollup v4, Astro docs) — committed in `ca3eb43`.
 - New runtime modules with passing tests: [`config/`](../src/config/), [`profile/`](../src/profile/).
 - [`context/`](../src/context/) and [`prompts/`](../src/prompts/) modules in place.
-- [`add`](../src/commands/add/index.ts), [`token`](../src/commands/token/index.ts), and [`remove`](../src/commands/remove/index.ts) commands ported to the new `profile`/`config` APIs (with tests).
-- [`src/cli.ts`](../src/cli.ts) recreated (sade) — **builds and runs** (`add` + `token` + `remove` wired; others pending).
+- [`add`](../src/commands/add/index.ts), [`token`](../src/commands/token/index.ts), [`remove`](../src/commands/remove/index.ts), and [`start`](../src/commands/start/index.ts) commands ported to the new `profile`/`config`/`actions` APIs (with tests).
+- [`src/cli.ts`](../src/cli.ts) recreated (sade) — **builds and runs** (`add` + `start` + `token` + `remove` wired; `clone`/`new` pending).
 - [`src/actions/`](../src/actions/) — 13 actions as typed factory functions (copy/move/remove/render/regexreplace/execute/log/prompt/run/json/append/prepend/yaml) + `runActions` runner (with `failOnError`), exported from the package root (task 0002).
 
 ## What's broken / unfinished
 
-- Commands `start` / `clone` / `new` not yet ported from `__archive/` (not yet wired in `cli.ts`). `start` can now consume `runActions`.
+- Commands `clone` / `new` not yet ported from `__archive/` (not yet wired in `cli.ts`).
+- `start` scaffolds **remote git bluprints only** — `file://` local bluprints are rejected for now (deferred).
+- `start` hasn't been run against a real bluprint repo end-to-end yet (no v1 `bluprint.config.ts` repo to test against); logic is unit-tested with a tar fixture.
 - `actions` (render/copy/move/…) not yet ported to the new API.
 - Docs content still describes the old `.bluprintrc` API.
 - The v1 changeset text is inaccurate (claims API unchanged).
@@ -37,19 +39,19 @@ the `add` command wired so far.
 
 | Check | Command | Result |
 |---|---|---|
-| Tests | `pnpm test` (`vitest run`) | ✅ 96 passing (config + profile + token + remove + actions) |
+| Tests | `pnpm test` (`vitest run`) | ✅ 118 passing (config + profile + token + remove + start + actions) |
 | Lint | `pnpm lint` (`eslint`) | ✅ clean (`__archive/` ignored) |
 | Typecheck | `npx tsc --noEmit` | ✅ clean (`__archive/` excluded) |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |
-| CLI smoke | `node dist/cli.js --help` | ✅ runs, shows banner + `add` + `remove` + `token` |
+| CLI smoke | `node dist/cli.js --help` | ✅ runs, shows banner + `add` + `start` + `remove` + `token` |
 
 ## Suggested next step
 
-Port the **`start`** command (task 0001) — the big one. It selects a bluprint
-via `profile.promptForBluprint()`, loads its config, fetches/extracts the
-bluprint files (needs `fetchBluprint` ported), handles `parts` selection, then
-runs the config's actions via `runActions` (now available from task 0002).
-Worth its own plan. `clone` and `new` follow.
+End-to-end test `start` against a real v1 bluprint repo (one with a
+`bluprint.config.ts`) — the last unverified path. Then port the remaining
+commands: **`clone`** (clone a repo that has a bluprint) and **`new`** (scaffold
+a new `bluprint.config.ts`) from `__archive/`. After that: docs rewrite for the
+new API + fix the inaccurate v1 changeset.
 
 > ⚠️ When testing commands that touch the `profile` singleton, **seed state in
 > `beforeEach`** — mock-fs doesn't reliably reset the singleton's writes between

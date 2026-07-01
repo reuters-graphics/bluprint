@@ -1,44 +1,56 @@
-import prompts from 'prompts';
+import * as prompts from '../../../prompts';
+import type { BluprintConfig } from '../../../config/types';
+import type { Action } from '../../../actions/types';
 
-interface ChoosePartInject {
-  partConfirm: any[] | null;
-  partChoice: any[] | null;
-}
-
-interface ChoosePartResult {
+export interface PartSelection {
+  /** Chosen part key, or `null` for the whole bluprint. */
   part: string | null;
-  globs: string[] | null;
+  files: string | string[];
+  ignores: string | string[];
+  actions: Action[];
 }
 
-export default async (
-  parts: Record<string, string[]> | undefined,
-  inject: ChoosePartInject
-): Promise<ChoosePartResult> => {
-  if (!parts) return { part: null, globs: null };
+/**
+ * Resolve which files and actions a `start` run should use. If the bluprint
+ * defines parts, the user is asked whether to use one; choosing a part uses
+ * that part's `files`/`ignores` and its `actions` (falling back to the
+ * top-level actions if the part defines none). Otherwise the top-level
+ * `files`/`ignores`/`actions` are used.
+ */
+export const choosePart = async (
+  config: BluprintConfig
+): Promise<PartSelection> => {
+  const whole: PartSelection = {
+    part: null,
+    files: config.files,
+    ignores: config.ignores,
+    actions: config.actions ?? [],
+  };
 
-  const { partConfirm, partChoice } = inject;
+  const { parts } = config;
+  if (!parts || Object.keys(parts).length === 0) return whole;
 
-  if (partConfirm) prompts.inject(partConfirm);
+  const usePart = await prompts.confirm({
+    message:
+      'This bluprint has parts. Use just one part instead of the whole thing?',
+    initialValue: false,
+  });
+  if (!usePart) return whole;
 
-  const { usePart } = await prompts({
-    type: 'toggle',
-    name: 'usePart',
-    message: 'This bluprint has parts. Do you want to choose a part or use the whole bluprint?',
-    initial: false,
-    active: 'Pick a part',
-    inactive: 'Give me the whole enchilada 🌮',
+  const key = await prompts.select({
+    message: 'Which part would you like to use?',
+    options: Object.entries(parts).map(([value, part]) => ({
+      value,
+      label: part.title ?? value,
+      hint: part.hint,
+    })),
   });
 
-  if (!usePart) return { part: null, globs: null };
-
-  if (partChoice) prompts.inject(partChoice);
-
-  const { part } = await prompts({
-    type: 'select',
-    name: 'part',
-    message: 'OK, pick which part of this bluprint you\'d like to use.',
-    choices: Object.keys(parts).map(part => ({ title: part, value: part })),
-  });
-
-  return { part, globs: parts[part] };
+  const part = parts[key];
+  return {
+    part: key,
+    files: part.files,
+    ignores: part.ignores,
+    actions: part.actions ?? config.actions ?? [],
+  };
 };

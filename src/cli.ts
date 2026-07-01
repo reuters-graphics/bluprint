@@ -5,6 +5,7 @@ import updateNotifier from 'update-notifier';
 import { name, version } from '../package.json';
 import { add } from './commands/add';
 import { remove } from './commands/remove';
+import { start } from './commands/start';
 import { token } from './commands/token';
 
 updateNotifier({ pkg: { name, version } }).notify();
@@ -23,6 +24,13 @@ prog
   });
 
 prog
+  .command('start [bluprint]')
+  .describe('Start a new project from a bluprint')
+  .action(async (bluprint?: string) => {
+    await start(bluprint);
+  });
+
+prog
   .command('remove [bluprint]')
   .describe('Remove a bluprint from your CLI')
   .action(async (bluprint?: string) => {
@@ -36,8 +44,8 @@ prog
     await token(accessToken);
   });
 
-// TODO(0001-v1-api-rewrite): re-register `clone`, `new`, and `start` here as
-// each is ported from src/__archive/ to the new config/profile API.
+// TODO(0001-v1-api-rewrite): re-register `clone` and `new` here as each is
+// ported from src/__archive/ to the new config/profile API.
 // See dev-notes/tasks/0001-v1-api-rewrite.md.
 
 prog.parse(process.argv);

@@ -31,8 +31,9 @@ Three strands:
 - [x] Exclude `src/__archive/` from `tsconfig` so `tsc` is clean
 - [x] Port `token` command + wire into CLI (with tests)
 - [x] Port `remove` command + wire into CLI (with tests)
-- [ ] Wire up `actions` in the new API → **split out to task [0002](./0002-actions-function-api.md)** (function-based redesign)
-- [ ] Port remaining commands from `__archive`: `start` (needs 0002), `clone`, `new`
+- [x] Wire up `actions` in the new API → **split out to task [0002](./0002-actions-function-api.md)** (function-based redesign, done)
+- [x] Port `start` command (bluprint select → config load → choose part → tarball scaffold → runActions)
+- [ ] Port remaining commands from `__archive`: `clone`, `new`
 - [ ] Rewrite docs content for the new `bluprint.config.ts` API (currently still describes `.bluprintrc`)
 - [ ] Update the changeset — it inaccurately claims the CLI/`.bluprintrc` format is unchanged
 - [ ] Commit the working tree (currently all uncommitted)
@@ -95,6 +96,18 @@ Three strands:
   the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
   added 4 co-located tests (37 passing total). Discovered + documented the
   mock-fs/profile-singleton isolation quirk above (tests now self-seed state).
+- **2026-07-01** — Ported the **`start`** command
+  ([`../../src/commands/start/`](../../src/commands/start/)): resolve bluprint
+  (arg-title → url, or `promptForBluprint`), `config.load`, `choosePart`
+  (part *replaces* top-level: its files/ignores/actions, actions falling back to
+  top-level), `scaffold` (download repo tarball → `tar.extract` with `strip:1`
+  + `files`/`ignores` glob filter, `dot:true` so dotfiles copy), then
+  `runActions`. Remote-only for now (`file://` rejected). Added
+  `profile.getBluprintUrl`. Wired into `cli.ts`. 22 tests (118 total). **Impl
+  notes:** tar v7 renamed `Parse`→`Parser`; the manual Parser+buffer approach
+  hung on completion, so switched to `tar.extract` driven by
+  `stream/promises` `pipeline` (robust) with `strip:1` replacing manual deRoot
+  for writes. Dropped the old `mergeJson` (the `json` action covers it).
 - **2026-07-01** — Ported the `remove` command
   ([`../../src/commands/remove/index.ts`](../../src/commands/remove/index.ts)):
   added `profile.bluprintTitles` + `profile.promptForBluprintToRemove()` (title-
