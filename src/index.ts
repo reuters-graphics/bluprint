@@ -8,6 +8,8 @@ export {
   execute,
   log,
   prompt,
+  run,
+  json,
 } from './actions';
 export type {
   Action,

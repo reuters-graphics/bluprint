@@ -10,6 +10,8 @@ export {
 export { execute, type ExecuteOptions } from './execute';
 export { log } from './log';
 export { prompt, type PromptSpec } from './prompt';
+export { run } from './run';
+export { json } from './json';
 
 export { runActions } from './runner';
 export type {

@@ -22,6 +22,18 @@ bluprint's actions after fetching its files.
 > **keep positional signatures** (e.g. `copy(paths, options)`) rather than move
 > everything to object config — `failOnError` just joins the existing options
 > object.
+>
+> **Follow-up (2026-07-01):** added two actions that leverage the TS config —
+> now **10 actions**:
+> - `run(fn, options?)` — escape hatch; the user's function *is* the action's
+>   `run`. Receives context, may return a partial to merge back. Async.
+> - `json(file, editor, options?)` — edit a JSON file. The editor gets the parsed
+>   data + context and either mutates in place or returns a new value to
+>   overwrite (written 2-space pretty + trailing newline). Generic `<T>` for
+>   typed editing. Replaces the old `mergeJson` concept.
+>
+> Considered but **declined**: `write` (a templated file-create) — `run` covers
+> it. Kept `log` and `regexreplace` despite `run` overlap.
 
 
 1. **Actions are factory functions**, not `{ action: '...' }` data objects.
@@ -142,3 +154,7 @@ context by returning `{ [name]: answer }`.
   `Action`, threaded through all 8 factories; runner now `log.error`s and
   re-throws when a `failOnError` action throws (else warns + continues). Kept
   positional signatures per the user. +1 runner test (75 passing), tsc + build OK.
+- **2026-07-01** — Added `run` (custom function) and `json` (function-based
+  editor: mutate-in-place or return-to-overwrite, receives context, generic `T`).
+  Now 10 actions, both exported from the root. +10 tests (85 passing), tsc +
+  build OK; runtime exports confirmed to include `run` + `json`.
