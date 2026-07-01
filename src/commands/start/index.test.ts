@@ -10,7 +10,7 @@ vi.mock('../../profile', () => ({
 vi.mock('../../config', () => ({
   config: { load: vi.fn(), module: undefined },
 }));
-vi.mock('./scaffold', () => ({ scaffold: vi.fn() }));
+vi.mock('../../scaffold', () => ({ scaffold: vi.fn() }));
 vi.mock('./choosePart', () => ({ choosePart: vi.fn() }));
 vi.mock('../../actions', () => ({ runActions: vi.fn() }));
 vi.mock('@clack/prompts', () => ({
@@ -20,7 +20,7 @@ vi.mock('@clack/prompts', () => ({
 import { start } from './index';
 import { profile } from '../../profile';
 import { config } from '../../config';
-import { scaffold } from './scaffold';
+import { scaffold } from '../../scaffold';
 import { choosePart } from './choosePart';
 import { runActions } from '../../actions';
 import { log } from '@clack/prompts';

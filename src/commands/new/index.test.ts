@@ -1,28 +1,59 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import mockFs from 'mock-fs';
+import mock from 'mock-fs';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { newBluprint } from '../../index.js';
 
-describe('Test command: new', () => {
-  beforeAll(() => {
-    mockFs({});
+vi.mock('../../prompts', () => ({ text: vi.fn() }));
+vi.mock('@clack/prompts', () => ({
+  log: { info: vi.fn(), success: vi.fn() },
+}));
+
+import { newBluprint } from './index';
+import * as prompts from '../../prompts';
+import { log } from '@clack/prompts';
+
+const CWD = process.cwd();
+const read = () =>
+  fs.readFileSync(path.join(CWD, 'bluprint.config.ts'), 'utf-8');
+
+describe('newBluprint', () => {
+  afterEach(() => {
+    mock.restore();
+    vi.clearAllMocks();
   });
 
-  afterAll(() => {
-    mockFs.restore();
+  it('writes a starter config using the given name', async () => {
+    mock({});
+
+    await newBluprint('My Kit');
+
+    const contents = read();
+    expect(contents).toContain(
+      "import { defineConfig } from '@reuters-graphics/bluprint'"
+    );
+    expect(contents).toContain('name: "My Kit"');
+    expect(prompts.text).not.toHaveBeenCalled();
+    expect(log.success).toHaveBeenCalledOnce();
   });
 
-  it('Makes a config file', async () => {
-    const filePath = path.join(process.cwd(), '.bluprintrc');
+  it('prompts for a name when none is given', async () => {
+    mock({});
+    vi.mocked(prompts.text).mockResolvedValue('Prompted Kit');
 
-    await newBluprint(null, ['test']);
+    await newBluprint();
 
-    const bluprintConfig = fs.readFileSync(filePath, 'utf-8');
+    expect(prompts.text).toHaveBeenCalledOnce();
+    expect(read()).toContain('name: "Prompted Kit"');
+  });
 
-    const config = JSON.parse(bluprintConfig);
+  it('refuses when a config file already exists', async () => {
+    mock({ 'bluprint.config.ts': 'export default {}' });
 
-    expect(config).toHaveProperty('name');
-    expect(config.name).toBe('test');
+    await newBluprint('X');
+
+    expect(log.info).toHaveBeenCalledOnce();
+    expect(log.success).not.toHaveBeenCalled();
+    // untouched
+    expect(read()).toBe('export default {}');
   });
 });

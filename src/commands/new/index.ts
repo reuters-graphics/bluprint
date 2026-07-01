@@ -1,37 +1,51 @@
-import chalk from 'chalk';
-import defaultConfig from './default.js';
-import fs from 'fs';
-import getLogger from '../../utils/getLogger.js';
-import path from 'path';
-import prompts from 'prompts';
+import fs from 'node:fs';
+import path from 'node:path';
+import dedent from 'dedent';
+import chalk from 'chalk-template';
+import { log } from '@clack/prompts';
 
-const logger = getLogger();
+import * as prompts from '../../prompts';
+import { version } from '../../../package.json';
 
-export default async (name: string | null, inject: any[] | null = null): Promise<void> => {
-  const filePath = path.resolve(process.cwd(), '.bluprintrc');
+const CONFIG_FILE = 'bluprint.config.ts';
+
+const template = (name: string): string =>
+  dedent`
+    import { defineConfig } from '@reuters-graphics/bluprint';
+
+    export default defineConfig({
+      name: ${JSON.stringify(name)},
+      category: '',
+      bluprint: '^${version}',
+      files: ['**/*'],
+      ignores: [],
+      actions: [],
+    });
+  ` + '\n';
+
+/**
+ * Scaffold a starter `bluprint.config.ts` in the current directory so a repo can
+ * become a bluprint. Refuses if one already exists.
+ *
+ * @param name The bluprint's name. If omitted, the user is prompted.
+ */
+export const newBluprint = async (name?: string): Promise<void> => {
+  const filePath = path.resolve(process.cwd(), CONFIG_FILE);
 
   if (fs.existsSync(filePath)) {
-    logger.info(chalk`Looks like this is already a bluprint. Check the {green .blurprintrc} file.`);
+    log.info(
+      chalk`Looks like this is already a bluprint — see {green ${CONFIG_FILE}}.`
+    );
     return;
   }
 
-  let bluprintName = name;
+  const bluprintName =
+    name ??
+    (await prompts.text({ message: 'What should we call this bluprint?' }));
 
-  if (!bluprintName) {
-    if (inject) prompts.inject(inject);
+  fs.writeFileSync(filePath, template(bluprintName));
 
-    const { answer } = await prompts([{
-      type: 'text',
-      name: 'answer',
-      message: `What should we call this bluprint?`,
-    }]);
-
-    bluprintName = answer;
-  }
-
-  const config = Object.assign({}, defaultConfig, { name: bluprintName });
-
-  fs.writeFileSync(filePath, JSON.stringify(config, null, 2));
-
-  logger.info(chalk`Started your new bluprint {green.underline ${bluprintName || 'unnamed'}} in {green .bluprintrc}.`);
+  log.success(
+    chalk`Created {green ${CONFIG_FILE}} for {green ${bluprintName}}. Add your files and actions, then run {yellow bluprint add} to register it.`
+  );
 };

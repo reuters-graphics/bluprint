@@ -18,8 +18,12 @@ describe('normalizeGlobs', () => {
 });
 
 describe('shouldInclude', () => {
-  it('never includes the bluprint config file', () => {
+  it('excludes the bluprint config file by default', () => {
     expect(shouldInclude('bluprint.config.ts', ['**/*'], [])).toBe(false);
+  });
+
+  it('includes the config file when excludeConfig is false (clone)', () => {
+    expect(shouldInclude('bluprint.config.ts', ['**/*'], [], false)).toBe(true);
   });
 
   it('includes everything when files is empty', () => {

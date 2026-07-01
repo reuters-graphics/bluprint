@@ -5,7 +5,7 @@ import { profile } from '../../profile';
 import { config } from '../../config';
 import { runActions } from '../../actions';
 import { choosePart } from './choosePart';
-import { scaffold } from './scaffold';
+import { scaffold } from '../../scaffold';
 
 /**
  * Start a new project from a bluprint: pick a bluprint, load its config, choose

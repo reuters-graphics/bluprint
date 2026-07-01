@@ -6,6 +6,8 @@ import { deRoot, normalizeGlobs, shouldInclude } from './filter';
 export interface ScaffoldFilter {
   files: string | string[];
   ignores: string | string[];
+  /** Exclude the bluprint's own `bluprint.config.ts`. Defaults to `true`. */
+  excludeConfig?: boolean;
 }
 
 /**
@@ -17,7 +19,7 @@ export interface ScaffoldFilter {
  */
 export const extractTarball = async (
   stream: Readable,
-  { files, ignores }: ScaffoldFilter
+  { files, ignores, excludeConfig = true }: ScaffoldFilter
 ): Promise<void> => {
   const fileGlobs = normalizeGlobs(files);
   const ignoreGlobs = normalizeGlobs(ignores);
@@ -28,7 +30,12 @@ export const extractTarball = async (
       cwd: process.cwd(),
       strip: 1,
       filter: (rootedPath: string) =>
-        shouldInclude(deRoot(rootedPath), fileGlobs, ignoreGlobs),
+        shouldInclude(
+          deRoot(rootedPath),
+          fileGlobs,
+          ignoreGlobs,
+          excludeConfig
+        ),
     })
   );
 };

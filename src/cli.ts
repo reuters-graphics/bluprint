@@ -4,6 +4,8 @@ import updateNotifier from 'update-notifier';
 
 import { name, version } from '../package.json';
 import { add } from './commands/add';
+import { clone } from './commands/clone';
+import { newBluprint } from './commands/new';
 import { remove } from './commands/remove';
 import { start } from './commands/start';
 import { token } from './commands/token';
@@ -44,8 +46,18 @@ prog
     await token(accessToken);
   });
 
-// TODO(0001-v1-api-rewrite): re-register `clone` and `new` here as each is
-// ported from src/__archive/ to the new config/profile API.
-// See dev-notes/tasks/0001-v1-api-rewrite.md.
+prog
+  .command('clone <repo>')
+  .describe('Clone a git repo into the current directory')
+  .action(async (repo: string) => {
+    await clone(repo);
+  });
+
+prog
+  .command('new [name]')
+  .describe('Create a new bluprint config file')
+  .action(async (name?: string) => {
+    await newBluprint(name);
+  });
 
 prog.parse(process.argv);

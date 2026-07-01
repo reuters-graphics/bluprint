@@ -1,6 +1,6 @@
 import https from 'node:https';
 import hostedGitInfo from 'hosted-git-info';
-import { profile } from '../../../profile';
+import { profile } from '../profile';
 import { extractTarball, type ScaffoldFilter } from './extract';
 
 export type { ScaffoldFilter } from './extract';

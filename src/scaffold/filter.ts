@@ -24,16 +24,19 @@ const matchesAny = (filePath: string, globs: string[]): boolean =>
   globs.some((glob) => minimatch(filePath, glob, { dot: true }));
 
 /**
- * Decide whether a project-relative path should be scaffolded: never the config
- * file, must match a `files` glob (an empty `files` list matches everything),
- * and must not match any `ignores` glob.
+ * Decide whether a project-relative path should be scaffolded: must match a
+ * `files` glob (an empty `files` list matches everything) and must not match any
+ * `ignores` glob. By default the bluprint's own config file is excluded (`start`
+ * scaffolds a project *from* a bluprint); pass `excludeConfig: false` to include
+ * it (`clone` copies the whole repo).
  */
 export const shouldInclude = (
   filePath: string,
   files: string[],
-  ignores: string[]
+  ignores: string[],
+  excludeConfig = true
 ): boolean => {
-  if (filePath === CONFIG_FILE) return false;
+  if (excludeConfig && filePath === CONFIG_FILE) return false;
   const included = files.length === 0 || matchesAny(filePath, files);
   return included && !matchesAny(filePath, ignores);
 };

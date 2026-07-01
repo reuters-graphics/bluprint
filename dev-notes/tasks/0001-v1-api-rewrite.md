@@ -33,7 +33,8 @@ Three strands:
 - [x] Port `remove` command + wire into CLI (with tests)
 - [x] Wire up `actions` in the new API → **split out to task [0002](./0002-actions-function-api.md)** (function-based redesign, done)
 - [x] Port `start` command (bluprint select → config load → choose part → tarball scaffold → runActions)
-- [ ] Port remaining commands from `__archive`: `clone`, `new`
+- [x] Port `clone` command (whole-repo tarball extract) + `new` command (starter `bluprint.config.ts`)
+- [x] All CLI commands ported → `src/__archive/` is now fully superseded (safe to delete)
 - [ ] Rewrite docs content for the new `bluprint.config.ts` API (currently still describes `.bluprintrc`)
 - [ ] Update the changeset — it inaccurately claims the CLI/`.bluprintrc` format is unchanged
 - [ ] Commit the working tree (currently all uncommitted)
@@ -96,6 +97,13 @@ Three strands:
   the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
   added 4 co-located tests (37 passing total). Discovered + documented the
   mock-fs/profile-singleton isolation quirk above (tests now self-seed state).
+- **2026-07-01** — Ported **`clone`** and **`new`**, completing the CLI command
+  set (add/start/remove/token/clone/new). Moved `scaffold` from
+  `commands/start/scaffold/` to a shared [`../../src/scaffold/`](../../src/scaffold/)
+  (now used by both `start` and `clone`) and added an `excludeConfig` option
+  (`start` excludes the bluprint config; `clone` keeps it — whole-repo copy).
+  `new` writes a starter `bluprint.config.ts` (refuses if one exists). 124 tests.
+  `src/__archive/` is now fully superseded and can be deleted.
 - **2026-07-01** — Ported the **`start`** command
   ([`../../src/commands/start/`](../../src/commands/start/)): resolve bluprint
   (arg-title → url, or `promptForBluprint`), `config.load`, `choosePart`

@@ -1,24 +1,32 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import mockFs from 'mock-fs';
-import path from 'path';
-import { clone } from '../../index.js';
-import fs from 'fs';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 
-const resolvePath = (filePath: string) => path.join(process.cwd(), filePath);
+vi.mock('../../scaffold', () => ({ scaffold: vi.fn() }));
+vi.mock('@clack/prompts', () => ({
+  log: { error: vi.fn(), success: vi.fn(), info: vi.fn() },
+}));
 
-describe('Test command: clone', () => {
-  beforeEach(() => {
-    mockFs({});
+import { clone } from './index';
+import { scaffold } from '../../scaffold';
+import { log } from '@clack/prompts';
+
+describe('clone', () => {
+  afterEach(() => vi.clearAllMocks());
+
+  it('scaffolds the whole repo, including the config file', async () => {
+    await clone('user/repo');
+
+    expect(scaffold).toHaveBeenCalledWith('user/repo', {
+      files: ['**/*'],
+      ignores: [],
+      excludeConfig: false,
+    });
+    expect(log.success).toHaveBeenCalledOnce();
   });
 
-  afterEach(() => {
-    mockFs.restore();
-  });
+  it('rejects an invalid repo URL without scaffolding', async () => {
+    await clone('not a repo!!');
 
-  it('Clones a repo', async () => {
-    await clone('reuters-graphics/test-bluprint');
-
-    expect(fs.existsSync(resolvePath('.bluprintrc'))).toBe(true);
-    expect(fs.existsSync(resolvePath('moveme/docs.md'))).toBe(true);
+    expect(scaffold).not.toHaveBeenCalled();
+    expect(log.error).toHaveBeenCalledOnce();
   });
 });
