@@ -1,43 +1,48 @@
-import chalk from 'chalk';
-import getLogger from '../../utils/getLogger.js';
-import getUserConfig from '../../utils/getUserConfig.js';
-import prompts from 'prompts';
-import writeUserConfig from '../../utils/writeUserConfig.js';
+import chalk from 'chalk-template';
+import { log } from '@clack/prompts';
 
-const logger = getLogger();
+import * as prompts from '../../prompts';
+import { profile } from '../../profile';
 
-export default async function (accessToken: string | null = null, inject: any[] | null = null): Promise<void> {
-  const userConfig = getUserConfig();
-
-  const { token } = userConfig;
-
-  if (inject) prompts.inject(inject);
-
+/**
+ * Save a GitHub personal access token to the user's CLI profile.
+ *
+ * The token is used to fetch `bluprint.config.ts` from private repos. If a token
+ * is passed directly it's saved without prompting. Otherwise, when a token is
+ * already stored the user is asked whether to replace it; when none is stored
+ * they're prompted to enter one.
+ *
+ * @param accessToken A GitHub personal access token. If omitted, the user is
+ *   prompted (interactively) for one.
+ * @returns A promise that resolves once the token is saved, or early if the user
+ *   chooses to keep their existing token.
+ */
+export const token = async (accessToken?: string): Promise<void> => {
   if (accessToken) {
-    userConfig.token = accessToken;
-  } else if (token) {
-    const { confirm, newToken } = await prompts([{
-      type: 'confirm',
-      name: 'confirm',
-      message: chalk`You've already registered a personal access token:\n{green ${token}}\n\nDo you want to change this token?`,
-    }, {
-      type: (prev: boolean) => prev === true ? 'text' : null,
-      name: 'newToken',
-      message: `OK, what's your new personal access token?\n`,
-    }]);
-    if (!confirm) {
-      logger.info(`OK, we'll keep the same token going.`);
+    profile.token = accessToken;
+    log.success('Saved your new personal access token.');
+    return;
+  }
+
+  const existing = profile.token;
+
+  if (existing) {
+    const change = await prompts.confirm({
+      message: chalk`You've already registered a personal access token:\n{green ${existing}}\n\nDo you want to change it?`,
+      initialValue: false,
+    });
+    if (!change) {
+      log.info(`OK, we'll keep the same token going.`);
       return;
     }
-    userConfig.token = newToken;
+    profile.token = await prompts.text({
+      message: `OK, what's your new personal access token?`,
+    });
   } else {
-    const { newToken } = await prompts([{
-      type: 'text',
-      name: 'newToken',
-      message: `Let's save a personal access token. Get one from GitHub and then enter it below:\n`,
-    }]);
-    userConfig.token = newToken;
+    profile.token = await prompts.text({
+      message: `Let's save a personal access token. Get one from GitHub and then enter it below:`,
+    });
   }
-  writeUserConfig(userConfig);
-  logger.info(chalk`{green Success!} Saved your new personal access token.`);
-}
+
+  log.success('Saved your new personal access token.');
+};

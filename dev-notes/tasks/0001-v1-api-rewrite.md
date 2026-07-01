@@ -29,7 +29,8 @@ Three strands:
 - [x] **Fix `add` command** — now uses the `profile` singleton + `config.module`
 - [x] **Create new `src/cli.ts`** to wire commands (use `sade`); unblocks the build
 - [x] Exclude `src/__archive/` from `tsconfig` so `tsc` is clean
-- [ ] Port remaining commands from `__archive`: `start`, `clone`, `new`, `remove`, `token`
+- [x] Port `token` command + wire into CLI (with tests)
+- [ ] Port remaining commands from `__archive`: `start`, `clone`, `new`, `remove`
 - [ ] Wire up `actions` in the new API (render/copy/move/etc. — currently only in `__archive`)
 - [ ] Rewrite docs content for the new `bluprint.config.ts` API (currently still describes `.bluprintrc`)
 - [ ] Update the changeset — it inaccurately claims the CLI/`.bluprintrc` format is unchanged
@@ -63,6 +64,14 @@ Three strands:
 - **Decide `__archive`'s fate** — currently excluded from `tsconfig` (so `tsc` is
   clean) but still on disk as porting reference. Delete once all commands/actions
   are ported.
+- **mock-fs + `profile` singleton test-isolation quirk** — the `profile`
+  singleton's `fs` writes (to `~/.bluprint/profile.json`) appear to **survive
+  mock-fs resets between tests**, even though raw `fs` writes in the test file
+  reset correctly. Not caused by `vi.clearAllMocks()`, and the singleton has no
+  in-memory cache. The existing profile suite doesn't catch it (it never asserts
+  "empty" after a write). Workaround: **seed known state in `beforeEach`** rather
+  than rely on the reset (see [`token/index.test.ts`](../../src/commands/token/index.test.ts)).
+  Worth a proper root-cause investigation — it can make command tests flaky/order-dependent.
 
 ## Progress log
 
@@ -78,3 +87,8 @@ Three strands:
   for now; fixed a `chalk` → `chalk-template` bug in the banner). Excluded
   `src/__archive/` from `tsconfig`. Now: `tsc` clean, 33 tests pass, `pnpm build`
   produces `dist/index.js` + `dist/cli.js`, and `node dist/cli.js --help` runs.
+- **2026-07-01** — Ported the `token` command
+  ([`../../src/commands/token/index.ts`](../../src/commands/token/index.ts)) to
+  the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
+  added 4 co-located tests (37 passing total). Discovered + documented the
+  mock-fs/profile-singleton isolation quirk above (tests now self-seed state).

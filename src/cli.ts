@@ -4,6 +4,7 @@ import updateNotifier from 'update-notifier';
 
 import { name, version } from '../package.json';
 import { add } from './commands/add';
+import { token } from './commands/token';
 
 updateNotifier({ pkg: { name, version } }).notify();
 
@@ -20,8 +21,15 @@ prog
     await add(repo);
   });
 
-// TODO(0001-v1-api-rewrite): re-register `clone`, `new`, `remove`, `start`, and
-// `token` here as each is ported from src/__archive/ to the new config/profile
-// API. See dev-notes/tasks/0001-v1-api-rewrite.md.
+prog
+  .command('token [accessToken]')
+  .describe('Add a GitHub personal access token to your CLI')
+  .action(async (accessToken?: string) => {
+    await token(accessToken);
+  });
+
+// TODO(0001-v1-api-rewrite): re-register `clone`, `new`, `remove`, and `start`
+// here as each is ported from src/__archive/ to the new config/profile API.
+// See dev-notes/tasks/0001-v1-api-rewrite.md.
 
 prog.parse(process.argv);

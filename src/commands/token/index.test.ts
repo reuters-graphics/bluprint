@@ -1,40 +1,89 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import mock from 'mock-fs';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import path from 'path';
-import { token } from '../../index.js';
-import os from 'os';
-import mockFs from 'mock-fs';
 import fs from 'fs';
+import os from 'os';
+import { token } from './index';
+import { userProfilePath, type UserProfile } from '../../profile';
+import { version } from '../../../package.json';
 
-const userConfigPath = path.join(os.homedir(), `.bluprintrc`);
+const HOME_DIR = os.homedir();
+const PROFILE_DIR = path.join(HOME_DIR, '.bluprint');
 
-describe('Test command: token', () => {
-  beforeAll(() => {
-    const userConfig = {
-      bluprints: {},
-    };
+// Mock the interactive prompt wrappers so tests can drive the answers.
+vi.mock('../../prompts', () => ({
+  confirm: vi.fn(),
+  text: vi.fn(),
+}));
 
-    mockFs({
-      [userConfigPath]: JSON.stringify(userConfig),
-    });
+// Silence clack log output during tests.
+vi.mock('@clack/prompts', () => ({
+  log: { success: vi.fn(), info: vi.fn() },
+}));
+
+import * as prompts from '../../prompts';
+
+const readProfile = () =>
+  JSON.parse(fs.readFileSync(userProfilePath, 'utf-8')) as UserProfile;
+
+const seedProfile = (token: string) => {
+  fs.mkdirSync(PROFILE_DIR, { recursive: true });
+  const profile: UserProfile = { version, token, bluprints: {} };
+  fs.writeFileSync(userProfilePath, JSON.stringify(profile));
+};
+
+describe('token command', () => {
+  beforeEach(() => {
+    mock({ [HOME_DIR]: {} });
+    // Seed a known-empty profile every test. The `profile` singleton's fs
+    // writes survive mock-fs resets between tests (see dev-notes task 0001),
+    // so we establish state explicitly rather than rely on the reset.
+    seedProfile('');
   });
 
-  afterAll(() => {
-    mockFs.restore();
+  afterEach(() => {
+    mock.restore();
+    vi.clearAllMocks();
   });
 
-  it('Adds a token to user config', async () => {
-    await token(null, ['ABCD1234']);
+  it('saves a token passed directly without prompting', async () => {
+    await token('direct-token-123');
 
-    const { token: accessToken } = JSON.parse(fs.readFileSync(userConfigPath, 'utf-8'));
-
-    expect(accessToken).toEqual('ABCD1234');
+    expect(readProfile().token).toBe('direct-token-123');
+    expect(prompts.confirm).not.toHaveBeenCalled();
+    expect(prompts.text).not.toHaveBeenCalled();
   });
 
-  it('Updates a token', async () => {
-    await token(null, [true, 'ZYXW9876']);
+  it('prompts for a token when none is stored', async () => {
+    vi.mocked(prompts.text).mockResolvedValue('freshly-entered-token');
 
-    const { token: accessToken } = JSON.parse(fs.readFileSync(userConfigPath, 'utf-8'));
+    await token();
 
-    expect(accessToken).toEqual('ZYXW9876');
+    expect(prompts.text).toHaveBeenCalledOnce();
+    expect(prompts.confirm).not.toHaveBeenCalled();
+    expect(readProfile().token).toBe('freshly-entered-token');
+  });
+
+  it('replaces an existing token when the user confirms', async () => {
+    seedProfile('old-token');
+    vi.mocked(prompts.confirm).mockResolvedValue(true);
+    vi.mocked(prompts.text).mockResolvedValue('new-token');
+
+    await token();
+
+    expect(prompts.confirm).toHaveBeenCalledOnce();
+    expect(prompts.text).toHaveBeenCalledOnce();
+    expect(readProfile().token).toBe('new-token');
+  });
+
+  it('keeps the existing token when the user declines', async () => {
+    seedProfile('keep-me');
+    vi.mocked(prompts.confirm).mockResolvedValue(false);
+
+    await token();
+
+    expect(prompts.confirm).toHaveBeenCalledOnce();
+    expect(prompts.text).not.toHaveBeenCalled();
+    expect(readProfile().token).toBe('keep-me');
   });
 });
