@@ -20,12 +20,19 @@ export interface RenderOptions extends ActionOptions {
  * @example render({ files: ['README.md', 'package.json'], engine: 'mustache' })
  */
 export const render = (options: RenderOptions): Action => {
-  const { files, engine = 'mustache', context: extra = {}, when } = options;
+  const {
+    files,
+    engine = 'mustache',
+    context: extra = {},
+    when,
+    failOnError,
+  } = options;
   const fileList = Array.isArray(files) ? files : [files];
 
   return {
     name: 'render',
     when,
+    failOnError,
     run: (ctx) => {
       const localContext = { ...ctx, ...extra };
       for (const file of fileList) {

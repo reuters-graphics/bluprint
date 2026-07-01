@@ -37,7 +37,7 @@ the `add` command wired so far.
 
 | Check | Command | Result |
 |---|---|---|
-| Tests | `pnpm test` (`vitest run`) | ✅ 74 passing (config + profile + token + remove + actions) |
+| Tests | `pnpm test` (`vitest run`) | ✅ 75 passing (config + profile + token + remove + actions) |
 | Typecheck | `npx tsc --noEmit` | ✅ clean (`__archive/` excluded) |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |
 | CLI smoke | `node dist/cli.js --help` | ✅ runs, shows banner + `add` + `remove` + `token` |

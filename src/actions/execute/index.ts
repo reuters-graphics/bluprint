@@ -20,6 +20,7 @@ export const execute = (
 ): Action => ({
   name: 'execute',
   when: options.when,
+  failOnError: options.failOnError,
   run: () => {
     const stdio = options.silent ? 'pipe' : 'inherit';
     if (typeof command === 'string') {

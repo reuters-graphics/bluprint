@@ -65,6 +65,7 @@ export const prompt = (
 ): Action => ({
   name: 'prompt',
   when: options.when,
+  failOnError: options.failOnError,
   run: async () => {
     const answer = await ask(spec);
     return { [spec.name]: answer };

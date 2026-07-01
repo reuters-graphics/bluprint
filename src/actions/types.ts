@@ -32,6 +32,11 @@ export interface ActionOptions {
    * @example when: (ctx) => ctx.useTypeScript === true
    */
   when?: (ctx: ActionContext) => boolean;
+  /**
+   * If the action throws, abort the whole run instead of skipping it and
+   * continuing. Defaults to `false` (skip and continue).
+   */
+  failOnError?: boolean;
 }
 
 /**
@@ -44,6 +49,8 @@ export interface Action {
   readonly name: string;
   /** Optional gate; when it returns `false` the runner skips this action. */
   when?: (ctx: ActionContext) => boolean;
+  /** When `true`, a thrown error aborts the run instead of being skipped. */
+  failOnError?: boolean;
   /**
    * Perform the work. May return a partial context to merge into the run's
    * context for subsequent actions.

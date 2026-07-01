@@ -12,6 +12,7 @@ import type { Action, ActionOptions } from '../types';
 export const log = (message: string, options: ActionOptions = {}): Action => ({
   name: 'log',
   when: options.when,
+  failOnError: options.failOnError,
   run: (ctx) => {
     console.log(template(renderMustache(message, ctx)));
   },

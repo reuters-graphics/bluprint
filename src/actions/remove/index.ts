@@ -15,6 +15,7 @@ export const remove = (
 ): Action => ({
   name: 'remove',
   when: options.when,
+  failOnError: options.failOnError,
   run: () => {
     const globs = Array.isArray(paths) ? paths : [paths];
     const matches = globSync(globs, {

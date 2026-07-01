@@ -39,6 +39,7 @@ export const move = (
 ): Action => ({
   name: 'move',
   when: options.when,
+  failOnError: options.failOnError,
   run: (ctx) => {
     for (const [from, to] of normalizePairs(paths)) movePath(from, to, ctx);
   },

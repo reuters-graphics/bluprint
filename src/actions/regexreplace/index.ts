@@ -41,13 +41,14 @@ const normalizeReplacements = (
  * @example regexreplace({ files: ['README.md'], replace: ['^# .*', '# {{title}}'] })
  */
 export const regexreplace = (options: RegexReplaceOptions): Action => {
-  const { files, replace, when } = options;
+  const { files, replace, when, failOnError } = options;
   const fileList = Array.isArray(files) ? files : [files];
   const replacements = normalizeReplacements(replace);
 
   return {
     name: 'regexreplace',
     when,
+    failOnError,
     run: (ctx) => {
       for (const file of fileList) {
         const filePath = path.join(process.cwd(), file);

@@ -65,10 +65,11 @@ describe('copy action', () => {
     expect(exists('out.txt')).toBe(false);
   });
 
-  it('exposes its name and when option', () => {
+  it('exposes its name, when, and failOnError options', () => {
     const when = () => false;
-    const action = copy(['a', 'b'], { when });
+    const action = copy(['a', 'b'], { when, failOnError: true });
     expect(action.name).toBe('copy');
     expect(action.when).toBe(when);
+    expect(action.failOnError).toBe(true);
   });
 });

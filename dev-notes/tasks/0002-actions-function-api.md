@@ -16,6 +16,14 @@ bluprint's actions after fetching its files.
 
 ## Design decisions (agreed 2026-07-01)
 
+> **Follow-up (2026-07-01):** added a `failOnError?: boolean` option (default
+> `false`) to every action via `ActionOptions`. When `true`, a thrown error
+> aborts the run (runner re-throws) instead of being skipped. The user opted to
+> **keep positional signatures** (e.g. `copy(paths, options)`) rather than move
+> everything to object config — `failOnError` just joins the existing options
+> object.
+
+
 1. **Actions are factory functions**, not `{ action: '...' }` data objects.
    Before → after:
    ```ts
@@ -130,3 +138,7 @@ context by returning `{ [name]: answer }`.
   union (`select` without `options` is a type error). Found a **mock-fs gotcha**:
   keying by the absolute cwd path throws "already exists" — use **relative keys**
   (they resolve against cwd), which is what the file-action tests now do.
+- **2026-07-01** — Added `failOnError` (default `false`) to `ActionOptions` +
+  `Action`, threaded through all 8 factories; runner now `log.error`s and
+  re-throws when a `failOnError` action throws (else warns + continues). Kept
+  positional signatures per the user. +1 runner test (75 passing), tsc + build OK.

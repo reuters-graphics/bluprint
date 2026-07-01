@@ -56,6 +56,7 @@ export const copy = (
 ): Action => ({
   name: 'copy',
   when: options.when,
+  failOnError: options.failOnError,
   run: (ctx) => {
     for (const [from, to] of normalizePairs(paths)) copyPath(from, to, ctx);
   },

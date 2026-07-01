@@ -59,4 +59,19 @@ describe('runActions', () => {
     expect(after).toHaveBeenCalledOnce();
     expect(ctx).toHaveProperty('year');
   });
+
+  it('aborts the run when a failOnError action throws', async () => {
+    const after = vi.fn();
+    const boom: Action = {
+      name: 'boom',
+      failOnError: true,
+      run: () => {
+        throw new Error('kaboom');
+      },
+    };
+    const next: Action = { name: 'next', run: after };
+
+    await expect(runActions([boom, next])).rejects.toThrow('kaboom');
+    expect(after).not.toHaveBeenCalled();
+  });
 });
