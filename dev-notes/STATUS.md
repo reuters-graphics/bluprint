@@ -13,6 +13,8 @@ the `add` command wired so far.
 
 - **[0001 — v1.0.0 rewrite](./tasks/0001-v1-api-rewrite.md)** — *in progress*.
   Tooling + new `bluprint.config.ts` API + docs site.
+- **[0002 — Actions function API](./tasks/0002-actions-function-api.md)** —
+  *planned*. Port the 8 actions as typed factory functions. Blocks `start`.
 
 ## What works right now
 
@@ -41,12 +43,10 @@ the `add` command wired so far.
 
 ## Suggested next step
 
-Port the next command from `__archive/` to the new `config`/`profile` API and
-wire it into [`src/cli.ts`](../src/cli.ts). `start` is the most valuable and the
-biggest (it selects a bluprint via `profile.promptForBluprint()`, loads its
-config, and scaffolds a project — will pull in the not-yet-ported `actions`).
-`clone` and `new` remain after that. See the task's
-[plan](./tasks/0001-v1-api-rewrite.md#plan).
+Implement **[task 0002 — Actions function API](./tasks/0002-actions-function-api.md)**
+(the 8 actions as typed factory functions). This is the prerequisite for
+`start`, which runs a bluprint's actions after fetching its files. `start`,
+`clone`, and `new` remain in task 0001 and come after actions land.
 
 > ⚠️ When testing commands that touch the `profile` singleton, **seed state in
 > `beforeEach`** — mock-fs doesn't reliably reset the singleton's writes between

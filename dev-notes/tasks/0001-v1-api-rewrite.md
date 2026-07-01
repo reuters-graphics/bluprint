@@ -31,8 +31,8 @@ Three strands:
 - [x] Exclude `src/__archive/` from `tsconfig` so `tsc` is clean
 - [x] Port `token` command + wire into CLI (with tests)
 - [x] Port `remove` command + wire into CLI (with tests)
-- [ ] Port remaining commands from `__archive`: `start`, `clone`, `new`
-- [ ] Wire up `actions` in the new API (render/copy/move/etc. — currently only in `__archive`)
+- [ ] Wire up `actions` in the new API → **split out to task [0002](./0002-actions-function-api.md)** (function-based redesign)
+- [ ] Port remaining commands from `__archive`: `start` (needs 0002), `clone`, `new`
 - [ ] Rewrite docs content for the new `bluprint.config.ts` API (currently still describes `.bluprintrc`)
 - [ ] Update the changeset — it inaccurately claims the CLI/`.bluprintrc` format is unchanged
 - [ ] Commit the working tree (currently all uncommitted)
