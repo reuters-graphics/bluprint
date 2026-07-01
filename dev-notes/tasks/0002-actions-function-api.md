@@ -28,9 +28,11 @@ bluprint's actions after fetching its files.
 > - `run(fn, options?)` — escape hatch; the user's function *is* the action's
 >   `run`. Receives context, may return a partial to merge back. Async.
 > - `json(file, editor, options?)` — edit a JSON file. The editor gets the parsed
->   data + context and either mutates in place or returns a new value to
->   overwrite (written 2-space pretty + trailing newline). Generic `<T>` for
->   typed editing. Replaces the old `mergeJson` concept.
+>   data + context and **must return** the data to write (mutate-then-return, or
+>   return a fresh value) — no side-effect writes. Written 2-space pretty +
+>   trailing newline. Generic `<T>` for typed editing (with a typed/default `T`,
+>   a forgotten `return` is a compile error; explicit `any` opts out). Replaces
+>   the old `mergeJson` concept.
 >
 > Considered but **declined**: `write` (a templated file-create) — `run` covers
 > it. Kept `log` and `regexreplace` despite `run` overlap.
@@ -154,7 +156,9 @@ context by returning `{ [name]: answer }`.
   `Action`, threaded through all 8 factories; runner now `log.error`s and
   re-throws when a `failOnError` action throws (else warns + continues). Kept
   positional signatures per the user. +1 runner test (75 passing), tsc + build OK.
-- **2026-07-01** — Added `run` (custom function) and `json` (function-based
-  editor: mutate-in-place or return-to-overwrite, receives context, generic `T`).
-  Now 10 actions, both exported from the root. +10 tests (85 passing), tsc +
-  build OK; runtime exports confirmed to include `run` + `json`.
+- **2026-07-01** — Added `run` (custom function) and `json` (function editor,
+  receives context, generic `T`). Now 10 actions, both exported from the root.
+  +10 tests (85 passing), tsc + build OK; runtime exports confirmed.
+- **2026-07-01** — Tightened `json`: editor **must return** the data (was
+  mutate-in-place-or-return). Removes mysterious side-effect writes and makes a
+  forgotten `return` a compile error under a typed/default `T`. Tests updated.

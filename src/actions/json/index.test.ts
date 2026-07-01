@@ -19,11 +19,12 @@ const readJson = (p: string) =>
 describe('json action', () => {
   afterEach(() => mock.restore());
 
-  it('writes back a mutated object (no return)', async () => {
+  it('writes back a mutated-then-returned object', async () => {
     mock({ 'package.json': JSON.stringify({ name: 'old', version: '1.0.0' }) });
 
     await json('package.json', (pkg: any) => {
       pkg.name = 'new';
+      return pkg;
     }).run(ctx());
 
     const pkg = readJson('package.json');
@@ -31,7 +32,7 @@ describe('json action', () => {
     expect(pkg.version).toBe('1.0.0'); // untouched
   });
 
-  it('writes back a returned value (replace)', async () => {
+  it('writes back a fresh returned value (replace)', async () => {
     mock({ 'tsconfig.json': JSON.stringify({ a: 1 }) });
 
     await json('tsconfig.json', (cfg: any) => ({ ...cfg, b: 2 })).run(ctx());
@@ -46,6 +47,7 @@ describe('json action', () => {
 
     await json('package.json', (pkg: any) => {
       pkg.scripts.build = 'tsc';
+      return pkg;
     }).run(ctx());
 
     const pkg = readJson('package.json');
@@ -58,6 +60,7 @@ describe('json action', () => {
 
     await json('package.json', (pkg: any, c) => {
       pkg.name = c.name;
+      return pkg;
     }).run(ctx({ name: 'from-prompt' }));
 
     expect(readJson('package.json').name).toBe('from-prompt');
@@ -66,9 +69,7 @@ describe('json action', () => {
   it('pretty-prints with 2-space indentation and a trailing newline', async () => {
     mock({ 'f.json': '{"a":1}' });
 
-    await json('f.json', (d: any) => {
-      d.b = 2;
-    }).run(ctx());
+    await json('f.json', (d: any) => ({ ...d, b: 2 })).run(ctx());
 
     const raw = fs.readFileSync(path.join(CWD, 'f.json'), 'utf-8');
     expect(raw).toBe('{\n  "a": 1,\n  "b": 2\n}\n');
@@ -77,9 +78,7 @@ describe('json action', () => {
   it('supports async editors', async () => {
     mock({ 'f.json': '{}' });
 
-    await json('f.json', async (d: any) => {
-      d.async = true;
-    }).run(ctx());
+    await json('f.json', async (d: any) => ({ ...d, async: true })).run(ctx());
 
     expect(readJson('f.json')).toEqual({ async: true });
   });
