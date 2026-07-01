@@ -1,40 +1,35 @@
-import chalk from 'chalk';
-import getLogger from '../../utils/getLogger.js';
-import getUserConfig from '../../utils/getUserConfig.js';
-import prompts from 'prompts';
-import writeUserConfig from '../../utils/writeUserConfig.js';
+import chalk from 'chalk-template';
+import { log } from '@clack/prompts';
 
-const logger = getLogger();
+import { profile } from '../../profile';
 
-export default async (name: string | null = null, inject: any[] | null = null): Promise<void> => {
-  const userConfig = getUserConfig();
+/**
+ * Remove a bluprint from the user's CLI profile.
+ *
+ * If a name is given it's removed directly (after checking it exists);
+ * otherwise the user picks one from a list of installed bluprints.
+ *
+ * @param name The title of the bluprint to remove. If omitted, the user is
+ *   prompted to choose one.
+ * @returns A promise that resolves once the bluprint is removed, or early if
+ *   there are none installed or the given name doesn't match one.
+ */
+export const remove = async (name?: string): Promise<void> => {
+  const titles = profile.bluprintTitles;
 
-  if (!name) {
-    if (inject) prompts.inject(inject);
-
-    const bluprints = Object.keys(userConfig.bluprints);
-
-    bluprints.sort();
-
-    const { answer } = await prompts([{
-      type: 'autocomplete',
-      name: 'answer',
-      message: 'Which bluprint do you want to remove?',
-      choices: bluprints.map((name) => ({
-        title: name,
-        value: name,
-      })),
-    }]);
-
-    name = answer;
+  if (titles.length === 0) {
+    log.info('You have no bluprints to remove.');
+    return;
   }
 
-  if (name && name in userConfig.bluprints) {
-    delete userConfig.bluprints[name];
-    writeUserConfig(userConfig);
-
-    logger.info(chalk`Removed bluprint {green ${name}}.`);
-  } else {
-    logger.info(chalk`Couldn't find a bluprint with the name {green ${name || 'unknown'}}.`);
+  if (name && !titles.includes(name)) {
+    log.error(chalk`Couldn't find a bluprint named {green ${name}}.`);
+    return;
   }
+
+  const title = name ?? (await profile.promptForBluprintToRemove());
+
+  profile.removeBluprint(title);
+
+  log.success(chalk`Removed bluprint {green ${title}}.`);
 };

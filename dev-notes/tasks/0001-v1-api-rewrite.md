@@ -30,7 +30,8 @@ Three strands:
 - [x] **Create new `src/cli.ts`** to wire commands (use `sade`); unblocks the build
 - [x] Exclude `src/__archive/` from `tsconfig` so `tsc` is clean
 - [x] Port `token` command + wire into CLI (with tests)
-- [ ] Port remaining commands from `__archive`: `start`, `clone`, `new`, `remove`
+- [x] Port `remove` command + wire into CLI (with tests)
+- [ ] Port remaining commands from `__archive`: `start`, `clone`, `new`
 - [ ] Wire up `actions` in the new API (render/copy/move/etc. — currently only in `__archive`)
 - [ ] Rewrite docs content for the new `bluprint.config.ts` API (currently still describes `.bluprintrc`)
 - [ ] Update the changeset — it inaccurately claims the CLI/`.bluprintrc` format is unchanged
@@ -72,6 +73,8 @@ Three strands:
   "empty" after a write). Workaround: **seed known state in `beforeEach`** rather
   than rely on the reset (see [`token/index.test.ts`](../../src/commands/token/index.test.ts)).
   Worth a proper root-cause investigation — it can make command tests flaky/order-dependent.
+  **Deferred (2026-07-01):** the user flagged this as a possible reason to rewrite
+  the `profile` singleton later; commands seed state in `beforeEach` for now.
 
 ## Progress log
 
@@ -92,3 +95,8 @@ Three strands:
   the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
   added 4 co-located tests (37 passing total). Discovered + documented the
   mock-fs/profile-singleton isolation quirk above (tests now self-seed state).
+- **2026-07-01** — Ported the `remove` command
+  ([`../../src/commands/remove/index.ts`](../../src/commands/remove/index.ts)):
+  added `profile.bluprintTitles` + `profile.promptForBluprintToRemove()` (title-
+  keyed, unlike the URL-keyed `promptForBluprint`), wired into `cli.ts`, 4 tests
+  (41 passing total). Root-causing the singleton quirk deferred per the user.

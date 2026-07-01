@@ -4,6 +4,7 @@ import updateNotifier from 'update-notifier';
 
 import { name, version } from '../package.json';
 import { add } from './commands/add';
+import { remove } from './commands/remove';
 import { token } from './commands/token';
 
 updateNotifier({ pkg: { name, version } }).notify();
@@ -22,14 +23,21 @@ prog
   });
 
 prog
+  .command('remove [bluprint]')
+  .describe('Remove a bluprint from your CLI')
+  .action(async (bluprint?: string) => {
+    await remove(bluprint);
+  });
+
+prog
   .command('token [accessToken]')
   .describe('Add a GitHub personal access token to your CLI')
   .action(async (accessToken?: string) => {
     await token(accessToken);
   });
 
-// TODO(0001-v1-api-rewrite): re-register `clone`, `new`, `remove`, and `start`
-// here as each is ported from src/__archive/ to the new config/profile API.
+// TODO(0001-v1-api-rewrite): re-register `clone`, `new`, and `start` here as
+// each is ported from src/__archive/ to the new config/profile API.
 // See dev-notes/tasks/0001-v1-api-rewrite.md.
 
 prog.parse(process.argv);

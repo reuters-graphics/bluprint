@@ -19,12 +19,12 @@ the `add` command wired so far.
 - Tooling stack (pnpm, ESM, TS, Vitest, Valibot, changesets, rollup v4, Astro docs) — committed in `ca3eb43`.
 - New runtime modules with passing tests: [`config/`](../src/config/), [`profile/`](../src/profile/).
 - [`context/`](../src/context/) and [`prompts/`](../src/prompts/) modules in place.
-- [`add`](../src/commands/add/index.ts) and [`token`](../src/commands/token/index.ts) commands ported to the new `profile`/`config` APIs (with tests).
-- [`src/cli.ts`](../src/cli.ts) recreated (sade) — **builds and runs** (`add` + `token` wired; others pending).
+- [`add`](../src/commands/add/index.ts), [`token`](../src/commands/token/index.ts), and [`remove`](../src/commands/remove/index.ts) commands ported to the new `profile`/`config` APIs (with tests).
+- [`src/cli.ts`](../src/cli.ts) recreated (sade) — **builds and runs** (`add` + `token` + `remove` wired; others pending).
 
 ## What's broken / unfinished
 
-- Commands `start` / `clone` / `new` / `remove` not yet ported from `__archive/` (not yet wired in `cli.ts`).
+- Commands `start` / `clone` / `new` not yet ported from `__archive/` (not yet wired in `cli.ts`).
 - `actions` (render/copy/move/…) not yet ported to the new API.
 - Docs content still describes the old `.bluprintrc` API.
 - The v1 changeset text is inaccurate (claims API unchanged).
@@ -34,17 +34,19 @@ the `add` command wired so far.
 
 | Check | Command | Result |
 |---|---|---|
-| Tests | `pnpm test` (`vitest run`) | ✅ 37 passing (config + profile + token) |
+| Tests | `pnpm test` (`vitest run`) | ✅ 41 passing (config + profile + token + remove) |
 | Typecheck | `npx tsc --noEmit` | ✅ clean (`__archive/` excluded) |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |
-| CLI smoke | `node dist/cli.js --help` | ✅ runs, shows banner + `add` + `token` |
+| CLI smoke | `node dist/cli.js --help` | ✅ runs, shows banner + `add` + `remove` + `token` |
 
 ## Suggested next step
 
 Port the next command from `__archive/` to the new `config`/`profile` API and
-wire it into [`src/cli.ts`](../src/cli.ts). `start` is the most valuable
-(consumes a loaded config); `remove` is simple (mirror of `token`/`add` against
-the profile). See the task's [plan](./tasks/0001-v1-api-rewrite.md#plan).
+wire it into [`src/cli.ts`](../src/cli.ts). `start` is the most valuable and the
+biggest (it selects a bluprint via `profile.promptForBluprint()`, loads its
+config, and scaffolds a project — will pull in the not-yet-ported `actions`).
+`clone` and `new` remain after that. See the task's
+[plan](./tasks/0001-v1-api-rewrite.md#plan).
 
 > ⚠️ When testing commands that touch the `profile` singleton, **seed state in
 > `beforeEach`** — mock-fs doesn't reliably reset the singleton's writes between

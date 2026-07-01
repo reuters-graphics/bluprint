@@ -105,6 +105,27 @@ class Profile {
       options: this.getBluprintOptions(),
     });
   }
+
+  /** Titles of all installed bluprints, sorted alphabetically. */
+  get bluprintTitles(): string[] {
+    return Object.keys(this.readUserProfile().bluprints).sort();
+  }
+
+  /**
+   * Prompt the user to choose an installed bluprint by title, e.g. to remove it.
+   * @returns The chosen bluprint's title (its key in the profile).
+   */
+  async promptForBluprintToRemove(): Promise<string> {
+    const profile = this.readUserProfile();
+    return select({
+      message: 'Which bluprint do you want to remove?',
+      options: this.bluprintTitles.map((title) => ({
+        value: title,
+        label: profile.bluprints[title].title,
+        hint: profile.bluprints[title].category,
+      })),
+    });
+  }
 }
 
 export const profile = Profile.getInstance();
