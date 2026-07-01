@@ -6,22 +6,31 @@ import mock from 'mock-fs';
 
 const __dirname = import.meta.dirname;
 
-const nodeModuleDeps = globSync('*/', {
-  cwd: path.resolve(__dirname, '../../node_modules'),
-  absolute: true,
-});
+// `fs.existsSync` resolves symlinks, so this drops dangling symlinks left in
+// node_modules (e.g. orphaned after a dependency change) that would otherwise
+// make `mock.load` throw ENOENT.
+const existing = (dirs: string[]) => dirs.filter((dir) => fs.existsSync(dir));
+
+const nodeModuleDeps = existing(
+  globSync('*/', {
+    cwd: path.resolve(__dirname, '../../node_modules'),
+    absolute: true,
+  })
+);
 
 // Load only necessary packages from .pnpm for better performance
 // Include jiti and any packages that might be imported by config files
 const pnpmDir = path.resolve(__dirname, '../../node_modules/.pnpm');
 const pnpmPackageDirs =
   fs.existsSync(pnpmDir) ?
-    globSync(
-      '{jiti@*,@clack+core@*,@clack+prompts@*,@reuters-graphics+clack@*}/',
-      {
-        cwd: pnpmDir,
-        absolute: true,
-      }
+    existing(
+      globSync(
+        '{jiti@*,@clack+core@*,@clack+prompts@*,@reuters-graphics+clack@*}/',
+        {
+          cwd: pnpmDir,
+          absolute: true,
+        }
+      )
     )
   : [];
 

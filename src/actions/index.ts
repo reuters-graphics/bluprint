@@ -12,6 +12,8 @@ export { log } from './log';
 export { prompt, type PromptSpec } from './prompt';
 export { run } from './run';
 export { json } from './json';
+export { append, prepend } from './append';
+export { yaml } from './yaml';
 
 export { runActions } from './runner';
 export type {

@@ -36,6 +36,14 @@ bluprint's actions after fetching its files.
 >
 > Considered but **declined**: `write` (a templated file-create) — `run` covers
 > it. Kept `log` and `regexreplace` despite `run` overlap.
+>
+> **Follow-up (2026-07-01):** added two more — now **13 actions**:
+> - `append(file, content, options?)` / `prepend(...)` — add templated content to
+>   a file; create-if-missing; insert a separating newline so lines never glue
+>   together. Covers the common `.gitignore`/`.env`/`.npmrc` case.
+> - `yaml(file, editor, options?)` — the `json` analog for YAML (same must-return
+>   editor). Adds the `yaml` dep. **Round-trip drops comments/formatting** — for
+>   generated/config YAML, not hand-curated files. Declined `download`.
 
 
 1. **Actions are factory functions**, not `{ action: '...' }` data objects.
@@ -162,3 +170,13 @@ context by returning `{ [name]: answer }`.
 - **2026-07-01** — Tightened `json`: editor **must return** the data (was
   mutate-in-place-or-return). Removes mysterious side-effect writes and makes a
   forgotten `return` a compile error under a typed/default `T`. Tests updated.
+- **2026-07-01** — Lint pass: fixed `no-explicit-any` in the json test (proper
+  type args), prettier-formatted a few action files, and added `src/__archive` to
+  eslint's ignores. `eslint src` clean.
+- **2026-07-01** — Added `append`/`prepend` + `yaml` (13 actions total), added
+  the `yaml` dep, 96 tests. **Gotcha:** incrementally `pnpm add`-ing onto a
+  months-old `node_modules` left dangling symlinks (`eslint-utils`,
+  `@jridgewell/remapping`) that broke the config test's `mock.load`; a fresh
+  `rm -rf node_modules && pnpm install` fixed it (CI/clean installs are
+  unaffected). Also hardened `__test__/utils.ts` to skip dangling top-level
+  symlinks defensively.

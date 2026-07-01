@@ -23,7 +23,7 @@ the `add` command wired so far.
 - [`context/`](../src/context/) and [`prompts/`](../src/prompts/) modules in place.
 - [`add`](../src/commands/add/index.ts), [`token`](../src/commands/token/index.ts), and [`remove`](../src/commands/remove/index.ts) commands ported to the new `profile`/`config` APIs (with tests).
 - [`src/cli.ts`](../src/cli.ts) recreated (sade) — **builds and runs** (`add` + `token` + `remove` wired; others pending).
-- [`src/actions/`](../src/actions/) — 10 actions as typed factory functions (incl. `run` custom-fn + `json` editor) + `runActions` runner (with `failOnError`), exported from the package root (task 0002).
+- [`src/actions/`](../src/actions/) — 13 actions as typed factory functions (copy/move/remove/render/regexreplace/execute/log/prompt/run/json/append/prepend/yaml) + `runActions` runner (with `failOnError`), exported from the package root (task 0002).
 
 ## What's broken / unfinished
 
@@ -37,7 +37,8 @@ the `add` command wired so far.
 
 | Check | Command | Result |
 |---|---|---|
-| Tests | `pnpm test` (`vitest run`) | ✅ 85 passing (config + profile + token + remove + actions) |
+| Tests | `pnpm test` (`vitest run`) | ✅ 96 passing (config + profile + token + remove + actions) |
+| Lint | `pnpm lint` (`eslint`) | ✅ clean (`__archive/` ignored) |
 | Typecheck | `npx tsc --noEmit` | ✅ clean (`__archive/` excluded) |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |
 | CLI smoke | `node dist/cli.js --help` | ✅ runs, shows banner + `add` + `remove` + `token` |

@@ -10,6 +10,9 @@ export {
   prompt,
   run,
   json,
+  append,
+  prepend,
+  yaml,
 } from './actions';
 export type {
   Action,
