@@ -9,7 +9,17 @@ import * as prompts from '../../prompts';
 import { profile } from '../../profile';
 import { config } from '../../config';
 
-const validateBluprint = (urlOrPath: string) => {
+/**
+ * Validate that a bluprint source is reachable.
+ *
+ * For `file://` paths, checks that a `bluprint.config.ts` exists in the local
+ * directory. For everything else, checks that the string parses as a hosted git
+ * URL (e.g. `user/repo`, `https://…`, `git@…`).
+ *
+ * @param urlOrPath Git URL (or shorthand) or a `file://` path to a local bluprint.
+ * @returns An error message string if invalid, or `undefined` if valid.
+ */
+const validateBluprint = (urlOrPath: string): string | undefined => {
   if (urlOrPath.startsWith('file://')) {
     if (!fs.existsSync(new URL(path.join(urlOrPath, 'bluprint.config.ts'))))
       return chalk`Did not find a bluprint config file in your local directory: {yellow ${urlOrPath}}. Try again?`;
@@ -19,7 +29,19 @@ const validateBluprint = (urlOrPath: string) => {
   }
 };
 
-export const add = async (urlOrPath?: string) => {
+/**
+ * Add a bluprint to the user's CLI profile.
+ *
+ * Prompts for a source if none is given, loads the bluprint's
+ * `bluprint.config.ts`, then records it in the user profile
+ * (`~/.bluprint/profile.json`) keyed by its title.
+ *
+ * @param urlOrPath Git URL (or shorthand) or a `file://` path to the bluprint.
+ *   If omitted, the user is prompted for it.
+ * @returns A promise that resolves once the bluprint is saved (or early if the
+ *   source is invalid or the config fails to load).
+ */
+export const add = async (urlOrPath?: string): Promise<void> => {
   if (!urlOrPath) {
     urlOrPath = await prompts.text({
       message: dedent`Where is your bluprint?
