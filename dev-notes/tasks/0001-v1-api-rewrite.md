@@ -62,9 +62,9 @@ Three strands:
 - *(resolved 2026-07-01)* ~~No `src/cli.ts`~~ — recreated with `sade`; build +
   CLI smoke test pass. Only `add` is wired; remaining commands get registered as
   they're ported.
-- **Decide `__archive`'s fate** — currently excluded from `tsconfig` (so `tsc` is
-  clean) but still on disk as porting reference. Delete once all commands/actions
-  are ported.
+- **Decide `__archive`'s fate** — currently excluded from `tsconfig` *and*
+  `eslint` (so `tsc` and `pnpm lint` are clean) but still on disk as porting
+  reference. Delete once all commands/actions are ported.
 - **mock-fs + `profile` singleton test-isolation quirk** — the `profile`
   singleton's `fs` writes (to `~/.bluprint/profile.json`) appear to **survive
   mock-fs resets between tests**, even though raw `fs` writes in the test file

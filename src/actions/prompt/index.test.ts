@@ -56,10 +56,7 @@ describe('prompt action', () => {
       name: 'choice',
       type: 'select',
       message: 'Pick one',
-      options: [
-        { value: 'a' },
-        { value: 'b' },
-      ],
+      options: [{ value: 'a' }, { value: 'b' }],
     }).run(ctx());
 
     expect(prompts.select).toHaveBeenCalledOnce();

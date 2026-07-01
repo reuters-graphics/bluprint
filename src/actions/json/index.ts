@@ -1,11 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type {
-  Action,
-  ActionContext,
-  ActionOptions,
-  Awaitable,
-} from '../types';
+import type { Action, ActionContext, ActionOptions, Awaitable } from '../types';
 
 /**
  * Edit a JSON file. The editor receives the parsed data and the run context

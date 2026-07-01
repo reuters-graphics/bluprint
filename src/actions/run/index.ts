@@ -1,9 +1,4 @@
-import type {
-  Action,
-  ActionContext,
-  ActionOptions,
-  Awaitable,
-} from '../types';
+import type { Action, ActionContext, ActionOptions, Awaitable } from '../types';
 
 /**
  * Run an arbitrary function as an action — the escape hatch for logic no

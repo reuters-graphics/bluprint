@@ -22,7 +22,7 @@ describe('json action', () => {
   it('writes back a mutated-then-returned object', async () => {
     mock({ 'package.json': JSON.stringify({ name: 'old', version: '1.0.0' }) });
 
-    await json('package.json', (pkg: any) => {
+    await json<{ name: string; version: string }>('package.json', (pkg) => {
       pkg.name = 'new';
       return pkg;
     }).run(ctx());
@@ -35,7 +35,10 @@ describe('json action', () => {
   it('writes back a fresh returned value (replace)', async () => {
     mock({ 'tsconfig.json': JSON.stringify({ a: 1 }) });
 
-    await json('tsconfig.json', (cfg: any) => ({ ...cfg, b: 2 })).run(ctx());
+    await json<{ a: number; b?: number }>('tsconfig.json', (cfg) => ({
+      ...cfg,
+      b: 2,
+    })).run(ctx());
 
     expect(readJson('tsconfig.json')).toEqual({ a: 1, b: 2 });
   });
@@ -45,7 +48,7 @@ describe('json action', () => {
       'package.json': JSON.stringify({ scripts: { build: 'old', test: 'x' } }),
     });
 
-    await json('package.json', (pkg: any) => {
+    await json<{ scripts: Record<string, string> }>('package.json', (pkg) => {
       pkg.scripts.build = 'tsc';
       return pkg;
     }).run(ctx());
@@ -58,8 +61,8 @@ describe('json action', () => {
   it('passes the run context to the editor', async () => {
     mock({ 'package.json': JSON.stringify({ name: '' }) });
 
-    await json('package.json', (pkg: any, c) => {
-      pkg.name = c.name;
+    await json<{ name: string }>('package.json', (pkg, c) => {
+      pkg.name = String(c.name);
       return pkg;
     }).run(ctx({ name: 'from-prompt' }));
 
@@ -69,7 +72,10 @@ describe('json action', () => {
   it('pretty-prints with 2-space indentation and a trailing newline', async () => {
     mock({ 'f.json': '{"a":1}' });
 
-    await json('f.json', (d: any) => ({ ...d, b: 2 })).run(ctx());
+    await json<{ a: number; b?: number }>('f.json', (d) => ({
+      ...d,
+      b: 2,
+    })).run(ctx());
 
     const raw = fs.readFileSync(path.join(CWD, 'f.json'), 'utf-8');
     expect(raw).toBe('{\n  "a": 1,\n  "b": 2\n}\n');
@@ -78,7 +84,10 @@ describe('json action', () => {
   it('supports async editors', async () => {
     mock({ 'f.json': '{}' });
 
-    await json('f.json', async (d: any) => ({ ...d, async: true })).run(ctx());
+    await json<{ async?: boolean }>('f.json', async (d) => ({
+      ...d,
+      async: true,
+    })).run(ctx());
 
     expect(readJson('f.json')).toEqual({ async: true });
   });
