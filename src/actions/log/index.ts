@@ -1,12 +1,18 @@
-import chalk from 'chalk';
-import mustache from 'mustache';
-import type { LogAction } from './schema.js';
+import { template } from 'chalk-template';
+import { renderMustache } from '../render/template';
+import type { Action, ActionOptions } from '../types';
 
-export default (action: LogAction, context: Record<string, any>): void => {
-  const { msg } = action;
-
-  const renderedMsg = mustache.render(msg, context);
-  // Using tagged template literal for chalk
-  const chalkedMsg = new Function('chalk', 'msg', 'return chalk`' + renderedMsg + '`;')(chalk, renderedMsg);
-  console.log(chalkedMsg);
-};
+/**
+ * Print a message to the console. The message is rendered as a mustache
+ * template against the run context, then styled with
+ * [chalk-template](https://github.com/chalk/chalk-template) tags.
+ *
+ * @example log('Scaffolded {green {{name}}}! Run {yellow pnpm install} next.')
+ */
+export const log = (message: string, options: ActionOptions = {}): Action => ({
+  name: 'log',
+  when: options.when,
+  run: (ctx) => {
+    console.log(template(renderMustache(message, ctx)));
+  },
+});

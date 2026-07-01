@@ -1,6 +1,6 @@
 # 0002 — Actions redesign: function API
 
-- **Status:** planned
+- **Status:** done (docs deferred to the docs task)
 - **Started:** 2026-07-01
 - **Owner:** hobbes7878
 
@@ -72,19 +72,30 @@ context by returning `{ [name]: answer }`.
 
 ## Plan
 
-- [ ] Core types + `ActionContext` + default context (`year/month/day/dirname`)
-- [ ] Runner: iterate → gate on `when` → run → merge context → per-action try/catch
-- [ ] Templating utils: port mustache/ejs helpers from `__archive/actions/render/utils/`
-- [ ] Action factories (8): `copy`, `move`, `remove`, `render`, `regexreplace`,
+- [x] Core types + `ActionContext` + default context (`year/month/day/dirname`)
+- [x] Runner: iterate → gate on `when` → run → merge context → per-action try/catch
+- [x] Templating utils: port mustache/ejs helpers from `__archive/actions/render/utils/`
+- [x] Action factories (8): `copy`, `move`, `remove`, `render`, `regexreplace`,
       `execute`, `log`, `prompt`
-- [ ] `prompt` action: discriminated union on `type` (text/select/confirm/…) →
+- [x] `prompt` action: discriminated union on `type` (text/select/confirm/…) →
       returns `{ [name]: answer }` into context
-- [ ] Export all actions + `defineConfig` from `src/index.ts` (root)
-- [ ] Update `BluprintConfig['actions']` (and `parts[].actions`) type from the
+- [x] Export all actions + `defineConfig` from `src/index.ts` (root)
+- [x] Update `BluprintConfig['actions']` (and `parts[].actions`) type from the
       `[]` placeholder to `Action[]` in [`../../src/config/types.ts`](../../src/config/types.ts)
-- [ ] Co-located tests per action + the runner (seed profile-independent; use
-      mock-fs for file actions)
+- [x] Co-located tests per action + the runner (33 new tests; mock-fs for file actions)
 - [ ] Docs update — **deferred** to the docs task; note the breaking change
+
+## Resolutions to the open questions
+
+- **`execute`**: accepts `string` (run via shell) *or* `[cmd, ...args]` (no shell).
+  One command per call.
+- **`copy`/`move`**: accept a single `[from, to]` pair *or* an array of pairs.
+- **`remove`**: uses `glob`'s `globSync` and removes both files and matched
+  directories (`fs.rmSync` recursive) — slightly broader than the old files-only
+  behavior, which reads as the more intuitive expectation for a `remove` action.
+- **`DefaultContext`** had to be a **type alias, not an interface** — an interface
+  lacks the implicit index signature needed to compose into
+  `ActionContext = DefaultContext & Record<string, unknown>`.
 
 ## Open questions / to settle during implementation
 
@@ -111,3 +122,11 @@ context by returning `{ [name]: answer }`.
 - **2026-07-01** — Task created. Read the full archived actions system
   (dispatch, schemas, 8 actions, condition, `start` usage). Agreed the 5 design
   decisions above with the user. Next: draft the implementation plan.
+- **2026-07-01** — Implemented the whole system under `src/actions/`: core
+  types, `getDefaultContext`, shared render helpers (mustache/ejs), all 8 action
+  factories, the `runActions` runner, barrel + root exports, and the
+  `BluprintConfig.actions` type. 33 co-located tests. `tsc` clean, 74 tests pass,
+  build OK. Verified root exports at runtime and the `prompt` discriminated
+  union (`select` without `options` is a type error). Found a **mock-fs gotcha**:
+  keying by the absolute cwd path throws "already exists" — use **relative keys**
+  (they resolve against cwd), which is what the file-action tests now do.

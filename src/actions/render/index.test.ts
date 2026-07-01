@@ -1,171 +1,54 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import mockFs from 'mock-fs';
+import mock from 'mock-fs';
+import { describe, it, expect, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { handleActions } from '../../index.js';
+import { render } from './index';
+import type { ActionContext } from '../types';
 
-const ROOT = process.cwd();
+const CWD = process.cwd();
+const ctx = (extra: Record<string, unknown> = {}): ActionContext => ({
+  year: '2026',
+  month: '07',
+  day: '01',
+  dirname: 'proj',
+  ...extra,
+});
+const read = (p: string) => fs.readFileSync(path.join(CWD, p), 'utf-8');
 
-describe('Test action: render', () => {
-  beforeAll(() => {
-    mockFs({});
+describe('render action', () => {
+  afterEach(() => mock.restore());
 
-    fs.mkdirSync(process.cwd(), { recursive: true });
+  it('renders a mustache file in place (default engine)', async () => {
+    mock({ 'README.md': '# {{title}}' });
 
-    fs.writeFileSync(
-      path.join(ROOT, 'renderMustache.json'),
-      '{ "data": "{{ datum }}" }'
-    );
-    fs.writeFileSync(
-      path.join(ROOT, 'renderEjs.json'),
-      '{ "data": "<%= datum %>" }'
-    );
-    fs.writeFileSync(
-      path.join(ROOT, 'renderAfterPrompt.json'),
-      '{ "data": "<%= datum %>" }'
-    );
-    fs.writeFileSync(
-      path.join(ROOT, 'renderMustacheUtils.json'),
-      '{ "data": "{{#slugify}}{{ datum }}{{/slugify}}" }'
-    );
-    fs.writeFileSync(
-      path.join(ROOT, 'renderEjsUtils.json'),
-      '{ "data": "<%= slugify(datum) %>" }'
-    );
-    fs.writeFileSync(
-      path.join(ROOT, 'renderDefaultContext.json'),
-      `{
-        "year": "{{ year }}",
-        "month": "{{ month }}",
-        "day": "{{ day }}",
-        "dirname": "{{ dirname }}"
-      }`
-    );
+    await render({ files: 'README.md' }).run(ctx({ title: 'Hello' }));
+
+    expect(read('README.md')).toBe('# Hello');
   });
 
-  afterAll(() => {
-    mockFs.restore();
+  it('renders with EJS when engine is ejs', async () => {
+    mock({ 'f.txt': 'Hi <%= name %>' });
+
+    await render({ files: ['f.txt'], engine: 'ejs' }).run(ctx({ name: 'Sam' }));
+
+    expect(read('f.txt')).toBe('Hi Sam');
   });
 
-  it('Renders a mustache template with context', async () => {
-    const actions = [{
-      action: 'render',
-      engine: 'mustache',
-      context: { datum: 'hi' },
-      files: [
-        'renderMustache.json',
-      ],
-    }];
+  it('merges the action-local context over the run context', async () => {
+    mock({ 'f.txt': '{{a}}-{{b}}' });
 
-    await handleActions(actions, undefined);
-
-    const mustache = JSON.parse(
-      fs.readFileSync(path.join(ROOT, 'renderMustache.json'), 'utf-8')
+    await render({ files: 'f.txt', context: { b: 'local' } }).run(
+      ctx({ a: 'run', b: 'run' })
     );
 
-    expect(mustache.data).toBe('hi');
+    expect(read('f.txt')).toBe('run-local');
   });
 
-  it('Renders an ejs template with context', async () => {
-    const actions = [{
-      action: 'render',
-      engine: 'ejs',
-      questions: [{
-        type: 'text',
-        name: 'datum',
-        message: 'Wut?',
-      }],
-      inject: ['hello'],
-      files: [
-        'renderEjs.json',
-      ],
-    }];
+  it('exposes mustache helpers (e.g. slugify)', async () => {
+    mock({ 'f.txt': '{{#slugify}}{{title}}{{/slugify}}' });
 
-    await handleActions(actions, undefined);
+    await render({ files: 'f.txt' }).run(ctx({ title: 'Hello World' }));
 
-    const ejs = JSON.parse(
-      fs.readFileSync(path.join(ROOT, 'renderEjs.json'), 'utf-8')
-    );
-
-    expect(ejs.data).toBe('hello');
-  });
-
-  it('Renders with prompt action answers', async () => {
-    const actions = [{
-      action: 'prompt',
-      questions: [{
-        type: 'text',
-        name: 'datum',
-        message: 'What\'s the rumpus?',
-      }],
-      inject: ['nuthin'],
-    }, {
-      action: 'render',
-      engine: 'ejs',
-      files: [
-        'renderAfterPrompt.json',
-      ],
-    }];
-
-    await handleActions(actions, undefined);
-
-    const ejs = JSON.parse(
-      fs.readFileSync(path.join(ROOT, 'renderAfterPrompt.json'), 'utf-8')
-    );
-
-    expect(ejs.data).toBe('nuthin');
-  });
-
-  it('Renders a mustache template using string utils', async () => {
-    const actions = [{
-      action: 'render',
-      engine: 'mustache',
-      context: { datum: 'hi there' },
-      files: [
-        'renderMustacheUtils.json',
-      ],
-    }, {
-      action: 'render',
-      engine: 'ejs',
-      context: { datum: 'hi there' },
-      files: [
-        'renderEjsUtils.json',
-      ],
-    }];
-
-    await handleActions(actions, undefined);
-
-    const mustache = JSON.parse(
-      fs.readFileSync(path.join(ROOT, 'renderMustacheUtils.json'), 'utf-8')
-    );
-    const ejs = JSON.parse(
-      fs.readFileSync(path.join(ROOT, 'renderEjsUtils.json'), 'utf-8')
-    );
-
-    expect(mustache.data).toBe('hi-there');
-    expect(ejs.data).toBe('hi-there');
-  });
-
-  it('Renders with default context', async () => {
-    const actions = [{
-      action: 'render',
-      engine: 'mustache',
-      files: [
-        'renderDefaultContext.json',
-      ],
-    }];
-
-    await handleActions(actions, undefined);
-
-    const data = JSON.parse(
-      fs.readFileSync(path.join(ROOT, 'renderDefaultContext.json'), 'utf-8')
-    );
-
-    const date = new Date();
-
-    expect(data.year).toBe(String(date.getFullYear()));
-    expect(data.month).toBe(String(date.getMonth() + 1).padStart(2, '0'));
-    expect(data.day).toBe(String(date.getDate()).padStart(2, '0'));
-    expect(data.dirname).toBe(process.cwd().split(path.sep).slice(-1)[0]);
+    expect(read('f.txt')).toBe('hello-world');
   });
 });

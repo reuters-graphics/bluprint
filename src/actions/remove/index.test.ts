@@ -1,45 +1,48 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import mockFs from 'mock-fs';
+import mock from 'mock-fs';
+import { describe, it, expect, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { handleActions } from '../../index.js';
+import { remove } from './index';
+import type { ActionContext } from '../types';
 
-const ROOT = process.cwd();
+const CWD = process.cwd();
+const ctx = (): ActionContext => ({
+  year: '2026',
+  month: '07',
+  day: '01',
+  dirname: 'proj',
+});
+const exists = (p: string) => fs.existsSync(path.join(CWD, p));
 
-describe('Test action: remove', () => {
-  beforeAll(() => {
-    mockFs({});
+describe('remove action', () => {
+  afterEach(() => mock.restore());
 
-    fs.mkdirSync(path.join(process.cwd(), 'remove/'), { recursive: true });
+  it('removes files matching a glob', async () => {
+    mock({ 'a.log': '', 'b.log': '', 'keep.txt': '' });
 
-    fs.writeFileSync(
-      path.join(ROOT, 'remove/script.js'),
-      ''
-    );
-    fs.writeFileSync(
-      path.join(ROOT, 'remove/index.js'),
-      ''
-    );
+    await remove('*.log').run(ctx());
+
+    expect(exists('a.log')).toBe(false);
+    expect(exists('b.log')).toBe(false);
+    expect(exists('keep.txt')).toBe(true);
   });
 
-  afterAll(() => {
-    mockFs.restore();
+  it('removes a directory', async () => {
+    mock({ coverage: { 'index.html': '' }, src: { 'a.ts': '' } });
+
+    await remove('coverage').run(ctx());
+
+    expect(exists('coverage')).toBe(false);
+    expect(exists('src/a.ts')).toBe(true);
   });
 
-  it('Removes files', async () => {
-    const actions = [{
-      action: 'remove',
-      paths: [
-        'remove/*.js',
-      ],
-    }];
+  it('accepts multiple globs', async () => {
+    mock({ 'a.log': '', tmp: { x: '' }, 'keep.txt': '' });
 
-    await handleActions(actions, undefined);
+    await remove(['*.log', 'tmp']).run(ctx());
 
-    const path1 = path.join(ROOT, 'remove/script.js');
-    const path2 = path.join(ROOT, 'remove/index.js');
-
-    expect(fs.existsSync(path1)).toBe(false);
-    expect(fs.existsSync(path2)).toBe(false);
+    expect(exists('a.log')).toBe(false);
+    expect(exists('tmp')).toBe(false);
+    expect(exists('keep.txt')).toBe(true);
   });
 });

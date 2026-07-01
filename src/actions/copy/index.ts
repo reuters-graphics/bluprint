@@ -1,58 +1,62 @@
-import chalk from 'chalk';
-import fs from 'fs';
-import getLogger from '../../utils/getLogger.js';
-import mustache from 'mustache';
-import path from 'path';
-import type { CopyAction } from './schema.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import chalk from 'chalk-template';
+import { log } from '@clack/prompts';
+import { renderMustache } from '../render/template';
+import type { Action, ActionContext, ActionOptions } from '../types';
 
-const logger = getLogger();
+/** A `[from, to]` pair of project-relative paths. */
+export type PathPair = [from: string, to: string];
 
 const copyDir = (src: string, dest: string): void => {
   fs.mkdirSync(dest, { recursive: true });
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-
-  for (const entry of entries) {
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
-    if (entry.isDirectory()) {
-      copyDir(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
+    if (entry.isDirectory()) copyDir(srcPath, destPath);
+    else fs.copyFileSync(srcPath, destPath);
   }
 };
 
-const copy = (oldRelativePath: string, newRelativePath: string, context: Record<string, any>): void => {
-  const ROOT = process.cwd();
-
-  const oldPath = path.join(ROOT, oldRelativePath);
+const copyPath = (from: string, to: string, context: ActionContext): void => {
+  const root = process.cwd();
+  const oldPath = path.join(root, from);
 
   if (!fs.existsSync(oldPath)) {
-    logger.warn(chalk`Unable to find file {green.underline ${oldRelativePath}} in copy action. Skipping.`);
+    log.warn(
+      chalk`Unable to find {green.underline ${from}} in copy action. Skipping.`
+    );
     return;
   }
 
-  const stats = fs.statSync(oldPath);
+  // The destination is rendered through the template engine with context.
+  const newPath = path.join(root, renderMustache(to, context));
 
-  if (stats.isFile()) {
-    // Let new path be rendered through template engine with context
-    const newFilePath = path.join(ROOT, mustache.render(newRelativePath, context));
-    const dirPath = path.dirname(newFilePath);
-    fs.mkdirSync(dirPath, { recursive: true });
-    fs.copyFileSync(oldPath, newFilePath);
+  if (fs.statSync(oldPath).isFile()) {
+    fs.mkdirSync(path.dirname(newPath), { recursive: true });
+    fs.copyFileSync(oldPath, newPath);
   } else {
-    const newDirPath = path.join(ROOT, mustache.render(newRelativePath, context));
-    copyDir(oldPath, newDirPath);
+    copyDir(oldPath, newPath);
   }
 };
 
-export default (action: CopyAction, context: Record<string, any>): void => {
-  const { paths } = action;
+const normalizePairs = (paths: PathPair | PathPair[]): PathPair[] =>
+  Array.isArray(paths[0]) ? (paths as PathPair[]) : [paths as PathPair];
 
-  if (Array.isArray(paths[0])) {
-    (paths as [string, string][]).forEach((pathPair) => copy(pathPair[0], pathPair[1], context));
-  } else {
-    const [from, to] = paths as [string, string];
-    copy(from, to, context);
-  }
-};
+/**
+ * Copy files or directories within the scaffolded project. Destination paths
+ * are rendered as mustache templates against the run context.
+ *
+ * @param paths A single `[from, to]` pair or an array of pairs.
+ * @example copy(['tpl/readme.md', '{{name}}/README.md'])
+ */
+export const copy = (
+  paths: PathPair | PathPair[],
+  options: ActionOptions = {}
+): Action => ({
+  name: 'copy',
+  when: options.when,
+  run: (ctx) => {
+    for (const [from, to] of normalizePairs(paths)) copyPath(from, to, ctx);
+  },
+});

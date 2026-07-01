@@ -1,113 +1,74 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import mockFs from 'mock-fs';
+import mock from 'mock-fs';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { handleActions } from '../../index.js';
+import { copy } from './index';
+import type { ActionContext } from '../types';
 
-const ROOT = process.cwd();
+vi.mock('@clack/prompts', () => ({
+  log: { warn: vi.fn(), success: vi.fn(), info: vi.fn(), error: vi.fn() },
+}));
 
-describe('Test action: copy', () => {
-  beforeAll(() => {
-    mockFs({});
+// mock-fs resolves relative keys against process.cwd(), which is where the
+// actions operate. Keying by the absolute cwd path collides with mock-fs's own
+// cwd node, so we use relative keys.
+const CWD = process.cwd();
+const ctx = (extra: Record<string, unknown> = {}): ActionContext => ({
+  year: '2026',
+  month: '07',
+  day: '01',
+  dirname: 'proj',
+  ...extra,
+});
 
-    fs.mkdirSync(path.join(ROOT, 'oldDir/subfolder'), { recursive: true });
+const read = (p: string) => fs.readFileSync(path.join(CWD, p), 'utf-8');
+const exists = (p: string) => fs.existsSync(path.join(CWD, p));
 
-    fs.mkdirSync(path.join(ROOT, 'oldEmptyDir'), { recursive: true });
+describe('copy action', () => {
+  afterEach(() => mock.restore());
 
-    fs.writeFileSync(
-      path.join(ROOT, 'copy.js'),
-      'console.log(\'hello world\');'
-    );
-    fs.writeFileSync(
-      path.join(ROOT, 'oldDir/copy.js'),
-      'console.log(\'hello world\');'
-    );
-    fs.writeFileSync(
-      path.join(ROOT, 'oldDir/subfolder/copy.js'),
-      'console.log(\'hello world\');'
-    );
-    fs.writeFileSync(
-      path.join(ROOT, 'code.js'),
-      'console.log(\'hello world\');'
-    );
+  it('copies a file, rendering the destination path', async () => {
+    mock({ tpl: { 'readme.md': '# hi' } });
+
+    await copy(['tpl/readme.md', 'out/{{name}}.md']).run(ctx({ name: 'proj' }));
+
+    expect(read('out/proj.md')).toBe('# hi');
+    expect(read('tpl/readme.md')).toBe('# hi'); // original still there
   });
 
-  afterAll(() => {
-    mockFs.restore();
+  it('copies a directory recursively', async () => {
+    mock({ src: { 'a.txt': 'A', nested: { 'b.txt': 'B' } } });
+
+    await copy(['src', 'dest']).run(ctx());
+
+    expect(read('dest/a.txt')).toBe('A');
+    expect(read('dest/nested/b.txt')).toBe('B');
   });
 
-  it('Copies a file', async () => {
-    const actions = [{
-      action: 'copy',
-      paths: ['copy.js', 'new.js'],
-    }];
+  it('accepts multiple pairs', async () => {
+    mock({ 'a.txt': 'A', 'b.txt': 'B' });
 
-    await handleActions(actions, undefined);
+    await copy([
+      ['a.txt', 'x/a.txt'],
+      ['b.txt', 'x/b.txt'],
+    ]).run(ctx());
 
-    expect(fs.existsSync(path.join(ROOT, 'copy.js'))).toBe(true);
-    expect(fs.existsSync(path.join(ROOT, 'new.js'))).toBe(true);
+    expect(read('x/a.txt')).toBe('A');
+    expect(read('x/b.txt')).toBe('B');
   });
 
-  it('Copies a directory with files', async () => {
-    const actions = [{
-      action: 'copy',
-      paths: ['oldDir', 'newDir'],
-    }];
+  it('skips (does not throw) when the source is missing', async () => {
+    mock({});
 
-    await handleActions(actions, undefined);
-    expect(fs.existsSync(path.join(ROOT, 'oldDir/copy.js'))).toBe(true);
-    expect(fs.existsSync(path.join(ROOT, 'oldDir/subfolder/copy.js'))).toBe(true);
-    expect(fs.existsSync(path.join(ROOT, 'newDir/copy.js'))).toBe(true);
-    expect(fs.existsSync(path.join(ROOT, 'newDir/subfolder/copy.js'))).toBe(true);
+    await copy(['nope.txt', 'out.txt']).run(ctx());
+
+    expect(exists('out.txt')).toBe(false);
   });
 
-  it('Copies an empty directory', async () => {
-    const actions = [{
-      action: 'copy',
-      paths: [['oldEmptyDir', 'newEmptyDir']],
-    }];
-
-    await handleActions(actions, undefined);
-
-    expect(fs.existsSync(path.join(ROOT, 'oldEmptyDir'))).toBe(true);
-    expect(fs.existsSync(path.join(ROOT, 'newEmptyDir'))).toBe(true);
-  });
-
-  it('Uses template context in the destination string', async () => {
-    const actions = [{
-      action: 'prompt',
-      questions: [{
-        type: 'text',
-        name: 'path',
-        message: 'Wut?',
-      }],
-      inject: ['templated'],
-    }, {
-      action: 'copy',
-      paths: ['code.js', '{{ path }}/path.js'],
-    }];
-
-    await handleActions(actions, undefined);
-
-    expect(fs.existsSync(path.join(ROOT, 'code.js'))).toBe(true);
-    expect(fs.existsSync(path.join(ROOT, 'templated/path.js'))).toBe(true);
-  });
-
-  it('Uses defualt context in the destination string', async () => {
-    const actions = [{
-      action: 'copy',
-      paths: ['code.js', '{{ year }}/{{ month }}/{{ day }}/path.js'],
-    }];
-
-    await handleActions(actions, undefined);
-
-    const date = new Date();
-
-    const year = String(date.getFullYear());
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-
-    expect(fs.existsSync(path.join(ROOT, 'code.js'))).toBe(true);
-    expect(fs.existsSync(path.join(ROOT, `${year}/${month}/${day}/path.js`))).toBe(true);
+  it('exposes its name and when option', () => {
+    const when = () => false;
+    const action = copy(['a', 'b'], { when });
+    expect(action.name).toBe('copy');
+    expect(action.when).toBe(when);
   });
 });

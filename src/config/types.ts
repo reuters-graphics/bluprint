@@ -1,9 +1,11 @@
+import type { Action } from '../actions/types';
+
 type BluprintPart = {
   title?: string;
   hint?: string;
   files: string | string[];
   ignores: string | string[];
-  actions?: [];
+  actions?: Action[];
 };
 
 export type BluprintConfig = {
@@ -17,6 +19,6 @@ export type BluprintConfig = {
   bluprint?: string;
   files: string | string[];
   ignores: string | string[];
-  actions?: [];
+  actions?: Action[];
   parts?: Record<string, BluprintPart>;
 };

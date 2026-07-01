@@ -14,7 +14,7 @@ the `add` command wired so far.
 - **[0001 — v1.0.0 rewrite](./tasks/0001-v1-api-rewrite.md)** — *in progress*.
   Tooling + new `bluprint.config.ts` API + docs site.
 - **[0002 — Actions function API](./tasks/0002-actions-function-api.md)** —
-  *planned*. Port the 8 actions as typed factory functions. Blocks `start`.
+  *done* (docs deferred). 8 actions as typed factory functions + runner.
 
 ## What works right now
 
@@ -23,10 +23,11 @@ the `add` command wired so far.
 - [`context/`](../src/context/) and [`prompts/`](../src/prompts/) modules in place.
 - [`add`](../src/commands/add/index.ts), [`token`](../src/commands/token/index.ts), and [`remove`](../src/commands/remove/index.ts) commands ported to the new `profile`/`config` APIs (with tests).
 - [`src/cli.ts`](../src/cli.ts) recreated (sade) — **builds and runs** (`add` + `token` + `remove` wired; others pending).
+- [`src/actions/`](../src/actions/) — 8 actions as typed factory functions + `runActions` runner, exported from the package root (task 0002).
 
 ## What's broken / unfinished
 
-- Commands `start` / `clone` / `new` not yet ported from `__archive/` (not yet wired in `cli.ts`).
+- Commands `start` / `clone` / `new` not yet ported from `__archive/` (not yet wired in `cli.ts`). `start` can now consume `runActions`.
 - `actions` (render/copy/move/…) not yet ported to the new API.
 - Docs content still describes the old `.bluprintrc` API.
 - The v1 changeset text is inaccurate (claims API unchanged).
@@ -36,17 +37,18 @@ the `add` command wired so far.
 
 | Check | Command | Result |
 |---|---|---|
-| Tests | `pnpm test` (`vitest run`) | ✅ 41 passing (config + profile + token + remove) |
+| Tests | `pnpm test` (`vitest run`) | ✅ 74 passing (config + profile + token + remove + actions) |
 | Typecheck | `npx tsc --noEmit` | ✅ clean (`__archive/` excluded) |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |
 | CLI smoke | `node dist/cli.js --help` | ✅ runs, shows banner + `add` + `remove` + `token` |
 
 ## Suggested next step
 
-Implement **[task 0002 — Actions function API](./tasks/0002-actions-function-api.md)**
-(the 8 actions as typed factory functions). This is the prerequisite for
-`start`, which runs a bluprint's actions after fetching its files. `start`,
-`clone`, and `new` remain in task 0001 and come after actions land.
+Port the **`start`** command (task 0001) — the big one. It selects a bluprint
+via `profile.promptForBluprint()`, loads its config, fetches/extracts the
+bluprint files (needs `fetchBluprint` ported), handles `parts` selection, then
+runs the config's actions via `runActions` (now available from task 0002).
+Worth its own plan. `clone` and `new` follow.
 
 > ⚠️ When testing commands that touch the `profile` singleton, **seed state in
 > `beforeEach`** — mock-fs doesn't reliably reset the singleton's writes between

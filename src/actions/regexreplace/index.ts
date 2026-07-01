@@ -1,60 +1,68 @@
-import chalk from 'chalk';
-import fs from 'fs';
-import getLogger from '../../utils/getLogger.js';
-import mustache from 'mustache';
-import mustacheUtils from '../render/utils/mustache.js';
-import path from 'path';
-import type { RegexReplaceAction } from './schema.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import chalk from 'chalk-template';
+import { log } from '@clack/prompts';
+import { renderMustache } from '../render/template';
+import type { Action, ActionContext, ActionOptions } from '../types';
 
-const logger = getLogger();
+/** `[pattern, replacement]` or `[pattern, replacement, flags]` (default flags `'gm'`). */
+export type Replacement =
+  | [pattern: string, replacement: string]
+  | [pattern: string, replacement: string, flags: string];
 
-const renderMustache = (string: string, context: Record<string, any>): string =>
-  mustache.render(string, context);
+export interface RegexReplaceOptions extends ActionOptions {
+  /** Project-relative file(s) to run replacements in. */
+  files: string | string[];
+  /** A single replacement or an array of them. */
+  replace: Replacement | Replacement[];
+}
 
-const replaceInFileString = (
-  fileString: string,
-  replace: [string, string] | [string, string, string],
-  context: Record<string, any>
-): string => {
-  const flags = replace[2] || 'gm';
-  const replacement = renderMustache(replace[1], Object.assign({}, mustacheUtils, context));
-  return fileString.replace(new RegExp(replace[0], flags), replacement);
-};
+const applyReplacement = (
+  contents: string,
+  [pattern, replacement, flags]: Replacement,
+  context: ActionContext
+): string =>
+  contents.replace(
+    new RegExp(pattern, flags ?? 'gm'),
+    renderMustache(replacement, context)
+  );
 
-const replaceInFile = (
-  file: string,
-  replacements: ([string, string] | [string, string, string])[],
-  context: Record<string, any>
-): void => {
-  const filePath = path.join(process.cwd(), file);
+const normalizeReplacements = (
+  replace: Replacement | Replacement[]
+): Replacement[] =>
+  typeof replace[0] === 'string' ?
+    [replace as Replacement]
+  : (replace as Replacement[]);
 
-  if (!fs.existsSync(filePath)) {
-    logger.warn(chalk`Unable to find file {green.underline ${file}} in regexreplace action. Skipping.`);
-    return;
-  }
+/**
+ * Replace content in file(s) with regular expressions. Replacement strings are
+ * rendered as mustache templates against the run context.
+ *
+ * @example regexreplace({ files: ['README.md'], replace: ['^# .*', '# {{title}}'] })
+ */
+export const regexreplace = (options: RegexReplaceOptions): Action => {
+  const { files, replace, when } = options;
+  const fileList = Array.isArray(files) ? files : [files];
+  const replacements = normalizeReplacements(replace);
 
-  let fileString = fs.readFileSync(filePath, 'utf-8');
-
-  replacements.forEach((replace) => {
-    fileString = replaceInFileString(fileString, replace, context);
-  });
-
-  fs.writeFileSync(filePath, fileString);
-};
-
-const standardizeReplacements = (
-  replace: [string, string] | [string, string, string] | ([string, string] | [string, string, string])[]
-): ([string, string] | [string, string, string])[] => {
-  if (typeof replace[0] === 'string') return [replace as [string, string] | [string, string, string]];
-  return replace as ([string, string] | [string, string, string])[];
-};
-
-export default async (action: RegexReplaceAction, actionsContext: Record<string, any>): Promise<void> => {
-  const { files, replace } = action;
-
-  const replacements = standardizeReplacements(replace);
-
-  files.forEach((file) => {
-    replaceInFile(file, replacements, actionsContext);
-  });
+  return {
+    name: 'regexreplace',
+    when,
+    run: (ctx) => {
+      for (const file of fileList) {
+        const filePath = path.join(process.cwd(), file);
+        if (!fs.existsSync(filePath)) {
+          log.warn(
+            chalk`Unable to find {green.underline ${file}} in regexreplace action. Skipping.`
+          );
+          continue;
+        }
+        let contents = fs.readFileSync(filePath, 'utf-8');
+        for (const replacement of replacements) {
+          contents = applyReplacement(contents, replacement, ctx);
+        }
+        fs.writeFileSync(filePath, contents);
+      }
+    },
+  };
 };

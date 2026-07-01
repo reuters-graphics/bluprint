@@ -1,127 +1,66 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import mockFs from 'mock-fs';
-import path from 'path';
+import mock from 'mock-fs';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import fs from 'fs';
-import { handleActions } from '../../index.js';
+import path from 'path';
+import { regexreplace } from './index';
+import type { ActionContext } from '../types';
 
-const ROOT = process.cwd();
+vi.mock('@clack/prompts', () => ({
+  log: { warn: vi.fn(), success: vi.fn(), info: vi.fn(), error: vi.fn() },
+}));
 
-describe('Test action: regexreplace', () => {
-  beforeAll(() => {
-    mockFs({});
+const CWD = process.cwd();
+const ctx = (extra: Record<string, unknown> = {}): ActionContext => ({
+  year: '2026',
+  month: '07',
+  day: '01',
+  dirname: 'proj',
+  ...extra,
+});
+const read = (p: string) => fs.readFileSync(path.join(CWD, p), 'utf-8');
 
-    fs.mkdirSync(process.cwd(), { recursive: true });
+describe('regexreplace action', () => {
+  afterEach(() => mock.restore());
 
-    fs.writeFileSync(
-      path.join(ROOT, 'replaceString.json'),
-      '{"datum": "data"}'
-    );
+  it('replaces with a single replacement, rendering the replacement string', async () => {
+    mock({ 'README.md': '# Old Title' });
 
-    fs.writeFileSync(
-      path.join(ROOT, 'replaceRegex.txt'),
-      '214-555-5677\n913-555-5677\n816-222-2345'
-    );
+    await regexreplace({
+      files: 'README.md',
+      replace: ['^# .*$', '# {{title}}'],
+    }).run(ctx({ title: 'New' }));
 
-    fs.writeFileSync(
-      path.join(ROOT, 'replaceWithContext.txt'),
-      'Name: Jon McClure\nEmail: jon.r.mcclure@gmail.com\nAge: 35'
-    );
-
-    fs.writeFileSync(
-      path.join(ROOT, 'replaceDefaultContext.json'),
-      `{
-        "year": "YYYY",
-        "month": "MM",
-        "day": "DD",
-        "dirname": "DIRNAME"
-      }`
-    );
+    expect(read('README.md')).toBe('# New');
   });
 
-  afterAll(() => {
-    mockFs.restore();
-  });
+  it('applies multiple replacements in order', async () => {
+    mock({ 'f.txt': 'foo bar' });
 
-  it('Makes a replacement with a simple string', async () => {
-    const actions = [{
-      action: 'regexreplace',
-      files: ['replaceString.json'],
-      replace: ['data', 'data is plural'],
-    }];
-
-    await handleActions(actions, undefined);
-
-    const file = fs.readFileSync(path.join(ROOT, 'replaceString.json'), 'utf-8');
-    expect(JSON.parse(file).datum).toBe('data is plural');
-  });
-
-  it('Makes a global replacement with a regular expression', async () => {
-    const actions = [{
-      action: 'regexreplace',
-      files: ['replaceRegex.txt'],
-      replace: ['^([0-9]{3})-([0-9]{3})-([0-9]{4})$', '$1.$2.$3', 'gm'],
-    }];
-
-    await handleActions(actions, undefined);
-
-    const file = fs.readFileSync(path.join(ROOT, 'replaceRegex.txt'), 'utf-8');
-    expect(file.split('\n')[0]).toBe('214.555.5677');
-    expect(file.split('\n')[2]).toBe('816.222.2345');
-  });
-
-  it('Makes a replacement with context from a prompt', async () => {
-    const actions = [{
-      action: 'prompt',
-      questions: [{
-        type: 'text',
-        name: 'age',
-        message: 'Wut age?',
-      }, {
-        type: 'text',
-        name: 'name',
-        message: 'Wut name?',
-      }],
-      inject: ['32', 'Lisa McDonald'],
-    }, {
-      action: 'regexreplace',
-      files: ['replaceWithContext.txt'],
+    await regexreplace({
+      files: 'f.txt',
       replace: [
-        ['^(Name:) .+$', '$1 {{ name }}'],
-        ['^(Age:) \\d+$', '$1 {{ age }}'],
+        ['foo', 'baz'],
+        ['bar', 'qux'],
       ],
-    }];
+    }).run(ctx());
 
-    await handleActions(actions, undefined);
-
-    const file = fs.readFileSync(path.join(ROOT, 'replaceWithContext.txt'), 'utf-8');
-    expect(file.split('\n')[0]).toBe('Name: Lisa McDonald');
-    expect(file.split('\n')[1]).toBe('Email: jon.r.mcclure@gmail.com');
-    expect(file.split('\n')[2]).toBe('Age: 32');
+    expect(read('f.txt')).toBe('baz qux');
   });
 
-  it('Replace with default context', async () => {
-    const actions = [{
-      action: 'regexreplace',
-      files: ['replaceDefaultContext.json'],
-      replace: [
-        ['YYYY', '{{ year }}'],
-        ['MM', '{{ month }}'],
-        ['DD', '{{ day }}'],
-        ['DIRNAME', '{{ dirname }}'],
-      ],
-    }];
+  it('honors custom flags', async () => {
+    mock({ 'f.txt': 'a A a' });
 
-    await handleActions(actions, undefined);
+    await regexreplace({
+      files: 'f.txt',
+      replace: ['a', 'X', 'gi'],
+    }).run(ctx());
 
-    const data = JSON.parse(
-      fs.readFileSync(path.join(ROOT, 'replaceDefaultContext.json'), 'utf-8')
-    );
+    expect(read('f.txt')).toBe('X X X');
+  });
 
-    const date = new Date();
-
-    expect(data.year).toBe(String(date.getFullYear()));
-    expect(data.month).toBe(String(date.getMonth() + 1).padStart(2, '0'));
-    expect(data.day).toBe(String(date.getDate()).padStart(2, '0'));
-    expect(data.dirname).toBe(process.cwd().split(path.sep).slice(-1)[0]);
+  it('skips (does not throw) when a file is missing', async () => {
+    mock({});
+    await regexreplace({ files: 'nope.txt', replace: ['a', 'b'] }).run(ctx());
+    // no throw = pass
   });
 });

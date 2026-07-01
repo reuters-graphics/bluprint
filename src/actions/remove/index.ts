@@ -1,39 +1,29 @@
-import fs from 'fs';
-import { minimatch } from 'minimatch';
-import path from 'path';
-import type { RemoveAction } from './schema.js';
+import fs from 'node:fs';
+import { globSync } from 'glob';
+import type { Action, ActionOptions } from '../types';
 
-const walk = (dir: string): string[] => {
-  let files = fs.readdirSync(dir);
-  const results = files.map((file) => {
-    const filePath = path.join(dir, file);
-    const stats = fs.statSync(filePath);
-    if (stats.isDirectory()) return walk(filePath);
-    else if (stats.isFile()) return filePath;
-    return [];
-  });
-
-  return results.reduce<string[]>((all, folderContents) => {
-    if (Array.isArray(folderContents)) {
-      return all.concat(folderContents);
+/**
+ * Remove files and directories matching one or more globs, relative to the
+ * project root.
+ *
+ * @param paths A glob or array of globs, e.g. `'dist/*'` or `['*.log', 'tmp']`.
+ * @example remove(['**\/*.test.ts', 'coverage'])
+ */
+export const remove = (
+  paths: string | string[],
+  options: ActionOptions = {}
+): Action => ({
+  name: 'remove',
+  when: options.when,
+  run: () => {
+    const globs = Array.isArray(paths) ? paths : [paths];
+    const matches = globSync(globs, {
+      cwd: process.cwd(),
+      absolute: true,
+      dot: true,
+    });
+    for (const match of matches) {
+      fs.rmSync(match, { recursive: true, force: true });
     }
-    return all.concat([folderContents]);
-  }, []);
-};
-
-const removeGlob = (globPath: string): void => {
-  const files = walk(process.cwd());
-  const removeFiles = files.filter(f => {
-    const relativePath = path.relative(process.cwd(), f);
-    return minimatch(relativePath, globPath);
-  });
-  removeFiles.forEach((file) => {
-    fs.unlinkSync(file);
-  });
-};
-
-export default (action: RemoveAction): void => {
-  const { paths } = action;
-
-  paths.forEach(pathGlob => removeGlob(pathGlob));
-};
+  },
+});

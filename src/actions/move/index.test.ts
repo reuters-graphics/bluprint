@@ -1,103 +1,54 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import mockFs from 'mock-fs';
+import mock from 'mock-fs';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { handleActions } from '../../index.js';
+import { move } from './index';
+import type { ActionContext } from '../types';
 
-const ROOT = process.cwd();
+vi.mock('@clack/prompts', () => ({
+  log: { warn: vi.fn(), success: vi.fn(), info: vi.fn(), error: vi.fn() },
+}));
 
-describe('Test action: move', () => {
-  beforeAll(() => {
-    mockFs({});
+const CWD = process.cwd();
+const ctx = (extra: Record<string, unknown> = {}): ActionContext => ({
+  year: '2026',
+  month: '07',
+  day: '01',
+  dirname: 'proj',
+  ...extra,
+});
 
-    fs.mkdirSync(path.join(process.cwd(), 'oldDir'), { recursive: true });
+const exists = (p: string) => fs.existsSync(path.join(CWD, p));
+const read = (p: string) => fs.readFileSync(path.join(CWD, p), 'utf-8');
 
-    fs.mkdirSync(path.join(process.cwd(), 'oldEmptyDir'), { recursive: true });
+describe('move action', () => {
+  afterEach(() => mock.restore());
 
-    fs.writeFileSync(
-      path.join(ROOT, 'move.js'),
-      'console.log(\'hello world\');'
-    );
-    fs.writeFileSync(
-      path.join(ROOT, 'oldDir/move.js'),
-      'console.log(\'hello world\');'
-    );
-    fs.writeFileSync(
-      path.join(ROOT, 'code.js'),
-      'console.log(\'hello world\');'
-    );
+  it('moves a file, rendering the destination path', async () => {
+    mock({ 'index.ts': 'export {}' });
+
+    await move(['index.ts', 'src/{{name}}.ts']).run(ctx({ name: 'app' }));
+
+    expect(exists('index.ts')).toBe(false);
+    expect(read('src/app.ts')).toBe('export {}');
   });
 
-  afterAll(() => {
-    mockFs.restore();
+  it('accepts multiple pairs', async () => {
+    mock({ 'a.txt': 'A', 'b.txt': 'B' });
+
+    await move([
+      ['a.txt', 'x/a.txt'],
+      ['b.txt', 'y/b.txt'],
+    ]).run(ctx());
+
+    expect(read('x/a.txt')).toBe('A');
+    expect(read('y/b.txt')).toBe('B');
+    expect(exists('a.txt')).toBe(false);
   });
 
-  it('Moves a file', async () => {
-    const actions = [{
-      action: 'move',
-      paths: ['move.js', 'moved.js'],
-    }];
-
-    await handleActions(actions, undefined);
-
-    expect(fs.existsSync(path.join(ROOT, 'moved.js'))).toBe(true);
-  });
-
-  it('Moves a directory with files', async () => {
-    const actions = [{
-      action: 'move',
-      paths: ['oldDir', 'newDir'],
-    }];
-
-    await handleActions(actions, undefined);
-
-    expect(fs.existsSync(path.join(ROOT, 'newDir/move.js'))).toBe(true);
-  });
-
-  it('Moves an empty directory', async () => {
-    const actions = [{
-      action: 'move',
-      paths: ['oldEmptyDir', 'newEmptyDir'],
-    }];
-
-    await handleActions(actions, undefined);
-
-    expect(fs.existsSync(path.join(ROOT, 'newEmptyDir'))).toBe(true);
-  });
-
-  it('Uses template context in the destination string', async () => {
-    const actions = [{
-      action: 'prompt',
-      questions: [{
-        type: 'text',
-        name: 'path',
-        message: 'Wut?',
-      }],
-      inject: ['templated'],
-    }, {
-      action: 'move',
-      paths: ['code.js', '{{ path }}/path.js'],
-    }];
-
-    await handleActions(actions, undefined);
-
-    expect(fs.existsSync(path.join(ROOT, 'templated/path.js'))).toBe(true);
-  });
-
-  it('Uses defualt context in the destination string', async () => {
-    const actions = [{
-      action: 'move',
-      paths: ['templated/path.js', '{{ year }}/{{ month }}/{{ day }}/path.js'],
-    }];
-
-    await handleActions(actions, undefined);
-
-    const date = new Date();
-
-    const year = String(date.getFullYear());
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-
-    expect(fs.existsSync(path.join(ROOT, `${year}/${month}/${day}/path.js`))).toBe(true);
+  it('skips (does not throw) when the source is missing', async () => {
+    mock({});
+    await move(['nope', 'out']).run(ctx());
+    expect(exists('out')).toBe(false);
   });
 });
