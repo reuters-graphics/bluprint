@@ -19,4 +19,10 @@ export type {
   ActionContext,
   ActionOptions,
   DefaultContext,
-} from './actions/types';
+  PathPair,
+  RenderOptions,
+  RegexReplaceOptions,
+  Replacement,
+  ExecuteOptions,
+  PromptSpec,
+} from './actions';

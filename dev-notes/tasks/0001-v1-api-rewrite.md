@@ -120,7 +120,15 @@ command fns to `defineConfig` + actions). **Open parity gaps:**
   the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
   added 4 co-located tests (37 passing total). Discovered + documented the
   mock-fs/profile-singleton isolation quirk above (tests now self-seed state).
-- **2026-07-02** — Fixed the v1 changeset to describe the real breaking changes
+- **2026-07-02** — Added **knip** + **publint** (scripts `pnpm knip` / `pnpm
+  publint`). knip found dead deps/files; removed `chalk`, `prompts`, `winston`,
+  `valibot`, `@rollup/plugin-node-resolve`, `@types/prompts`, `@types/tar`,
+  `npm-run-all`, plus dead files `src/config/_example.ts`, `src/context/index.ts`
+  (the unused Context singleton), and the stale pre-rewrite `.eslintrc`. Exposed
+  the action option types from the package root (public + resolves knip) and made
+  `renderEjs` internal. publint flagged the `repository.url` format → fixed to
+  `git+https`. Both tools now clean; 140 tests pass. (Resolves the earlier
+  `valibot` dead-dep follow-up.)
   (was claiming the CLI/`.bluprintrc`/actions were unchanged). Deleted
   `src/__archive/` (fully superseded) and removed its tsconfig/eslint exclusions.
   Noted `valibot` is now a **dead dependency** (unused; config is TS-only) — a

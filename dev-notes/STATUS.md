@@ -33,13 +33,13 @@ before publishing, plus a deferred real-repo smoke test.
 - [`src/scaffold/`](../src/scaffold/) — shared scaffolding: tarball fetch+extract (`start`/`clone`) and `copyLocal` local copy (`preview`), sharing the glob filter + `excludeConfig` flag.
 - [`src/cli.ts`](../src/cli.ts) wires all seven commands; `bluprint --help` lists them.
 - [`docs/`](../docs/) — Astro/Starlight site rewritten for the new `bluprint.config.ts` + function-actions API (incl. a new Previewing guide). `pnpm build:docs` clean.
+- **knip** + **publint** wired in (`pnpm knip`, `pnpm publint`); both clean. Dead deps/files removed.
 - [`src/actions/`](../src/actions/) — 13 actions as typed factory functions (copy/move/remove/render/regexreplace/execute/log/prompt/run/json/append/prepend/yaml) + `runActions` runner (with `failOnError`), exported from the package root (task 0002).
 
 ## What's broken / unfinished
 
 - `start` scaffolds **remote git bluprints only** — `file://` local bluprints are rejected for now (deferred).
 - `start`/`clone`/`preview` haven't been run against a real repo end-to-end yet (no v1 `bluprint.config.ts` repo to test against); logic is unit/integration-tested with fixtures. Deferred until first 1.0 publish.
-- `valibot` is a **dead dependency** — listed in package.json but unused (config is TS-only, no runtime schema validation). Safe to remove in a dep cleanup.
 - Pre-rewrite deletions + new modules are committed incrementally on `main`; the two earliest session commits predate the foundation commit (accepted).
 
 ## Health check (2026-07-01)
@@ -50,15 +50,17 @@ before publishing, plus a deferred real-repo smoke test.
 | Lint | `pnpm lint` (`eslint`) | ✅ clean |
 | Typecheck | `npx tsc --noEmit` | ✅ clean |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |
+| Dead code | `pnpm knip` | ✅ clean |
+| Package | `pnpm publint` | ✅ all good |
 | CLI smoke | `node dist/cli.js --help` | ✅ lists add / start / remove / token / clone / new / preview |
 
 ## Suggested next step
 
-The v1 code + docs + changeset are done. Remaining before publish: the
-repo/release admin ([task 0003](./tasks/0003-repo-release-maintenance.md) —
-mostly GitHub/npm), an optional `valibot` dep cleanup, and the deferred
-end-to-end `start`/`clone`/`preview` smoke test against a real repo at the first
-1.0 publish.
+The v1 code + docs + changeset are done, and dead deps/package hygiene are
+verified (knip + publint clean). Remaining before publish: the repo/release
+admin ([task 0003](./tasks/0003-repo-release-maintenance.md) — mostly GitHub/npm),
+and the deferred end-to-end `start`/`clone`/`preview` smoke test against a real
+repo at the first 1.0 publish.
 
 > ⚠️ When testing commands that touch the `profile` singleton, **seed state in
 > `beforeEach`** — mock-fs doesn't reliably reset the singleton's writes between

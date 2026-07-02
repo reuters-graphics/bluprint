@@ -12,7 +12,7 @@ export const renderMustache = (
 ): string => mustache.render(template, { ...mustacheUtils, ...context });
 
 /** Render a template string with EJS, mixing in the EJS helpers. */
-export const renderEjs = (
+const renderEjs = (
   template: string,
   context: Record<string, unknown>
 ): string => ejs.render(template, { ...ejsUtils, ...context });
