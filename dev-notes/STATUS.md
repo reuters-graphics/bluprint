@@ -19,6 +19,9 @@ end-to-end verification, docs, and the changeset.
 - **[0003 — Repo & release maintenance](./tasks/0003-repo-release-maintenance.md)** —
   *planned*. Switch GitHub default branch `master` → `main`; verify the
   changesets npm-publish workflow. Mostly GitHub/npm admin work.
+- **[0004 — `preview` command](./tasks/0004-preview-command.md)** — *planned*.
+  New v1 feature: scaffold a local bluprint into a temp dir + run its actions so
+  authors can test before publishing. Implements local scaffolding.
 
 ## What works right now
 
