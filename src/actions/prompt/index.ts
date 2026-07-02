@@ -1,5 +1,10 @@
 import * as prompts from '../../prompts';
-import type { Action, ActionOptions } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  DefaultContext,
+} from '../types';
 
 interface SelectOption {
   value: string;
@@ -59,15 +64,17 @@ const ask = (spec: PromptSpec) => {
  * @example prompt({ name: 'name', type: 'text', message: 'Project name?' })
  * @example prompt({ name: 'ts', type: 'confirm', message: 'Use TypeScript?' })
  */
-export const prompt = (
+export const prompt = <Ctx extends DefaultContext = ActionContext>(
   spec: PromptSpec,
-  options: ActionOptions = {}
-): Action => ({
+  options: ActionOptions<Ctx> = {}
+): Action<Ctx> => ({
   name: 'prompt',
   when: options.when,
   failOnError: options.failOnError,
   run: async () => {
     const answer = await ask(spec);
-    return { [spec.name]: answer };
+    // The answer is stored under a dynamic key (`spec.name`); a typed config is
+    // expected to declare it on its context (see `defineConfig`).
+    return { [spec.name]: answer } as Partial<Ctx>;
   },
 });

@@ -25,13 +25,20 @@ export type DefaultContext = {
  */
 export type ActionContext = DefaultContext & Record<string, unknown>;
 
-/** Options common to every action factory. */
-export interface ActionOptions {
+/**
+ * Options common to every action factory.
+ *
+ * `Ctx` is the run-context shape the callbacks see. It defaults to the loose
+ * {@link ActionContext}; a typed config (`defineConfig<Extra>`) threads its own
+ * `DefaultContext & Extra` in so `when` is fully typed against the author's
+ * declared context.
+ */
+export interface ActionOptions<Ctx extends DefaultContext = ActionContext> {
   /**
    * Gate the action on the current context. Return `false` to skip it.
    * @example when: (ctx) => ctx.useTypeScript === true
    */
-  when?: (ctx: ActionContext) => boolean;
+  when?: (ctx: Ctx) => boolean;
   /**
    * If the action throws, abort the whole run instead of skipping it and
    * continuing. Defaults to `false` (skip and continue).
@@ -43,17 +50,19 @@ export interface ActionOptions {
  * A unit of work run against a scaffolded project. Actions are created by the
  * exported factory functions (`copy`, `render`, `prompt`, …), not constructed
  * directly.
+ *
+ * @typeParam Ctx - the run-context shape this action's callbacks receive.
  */
-export interface Action {
+export interface Action<Ctx extends DefaultContext = ActionContext> {
   /** Label used in logging (e.g. "copy"). */
   readonly name: string;
   /** Optional gate; when it returns `false` the runner skips this action. */
-  when?: (ctx: ActionContext) => boolean;
+  when?: (ctx: Ctx) => boolean;
   /** When `true`, a thrown error aborts the run instead of being skipped. */
   failOnError?: boolean;
   /**
    * Perform the work. May return a partial context to merge into the run's
    * context for subsequent actions.
    */
-  run(ctx: ActionContext): Awaitable<void | Partial<ActionContext>>;
+  run(ctx: Ctx): Awaitable<void | Partial<Ctx>>;
 }

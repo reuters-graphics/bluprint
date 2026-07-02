@@ -4,6 +4,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import { loadConfig } from './load';
 import type { BluprintConfig } from './types';
+import type { DefaultContext } from '../actions/types';
 import { log } from '@clack/prompts';
 import { fetchLocalConfig, fetchRemoteConfig } from './fetch';
 
@@ -60,6 +61,28 @@ class Config {
 
 export const config = Config.getInstance();
 
-export const defineConfig = (userConfig: BluprintConfig) => {
+/**
+ * Identity helper that types a bluprint's config module.
+ *
+ * Pass an `Extra` type argument describing the values your `prompt` / `run`
+ * actions contribute to the run context, and every action's `when`, `run`, and
+ * editor callback is typed against `DefaultContext & Extra` — so `ctx.myValue`
+ * autocompletes and type-checks instead of being `unknown`.
+ *
+ * @example
+ * interface Ctx { projectName: string; useTypeScript: boolean }
+ * export default defineConfig<Ctx>({
+ *   name: 'My bluprint',
+ *   files: ['**\/*'],
+ *   ignores: [],
+ *   actions: [
+ *     prompt({ name: 'projectName', type: 'text', message: 'Name?' }),
+ *     render({ files: ['README.md'], when: (ctx) => ctx.projectName !== '' }),
+ *   ],
+ * });
+ */
+export const defineConfig = <Extra extends object = Record<string, unknown>>(
+  userConfig: BluprintConfig<DefaultContext & Extra>
+): BluprintConfig<DefaultContext & Extra> => {
   return userConfig;
 };

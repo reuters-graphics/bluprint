@@ -3,7 +3,12 @@ import path from 'node:path';
 import chalk from 'chalk-template';
 import { log } from '@clack/prompts';
 import { renderMustache } from '../render/template';
-import type { Action, ActionContext, ActionOptions } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  DefaultContext,
+} from '../types';
 
 /** A `[from, to]` pair of project-relative paths. */
 export type PathPair = [from: string, to: string];
@@ -50,10 +55,10 @@ const normalizePairs = (paths: PathPair | PathPair[]): PathPair[] =>
  * @param paths A single `[from, to]` pair or an array of pairs.
  * @example copy(['tpl/readme.md', '{{name}}/README.md'])
  */
-export const copy = (
+export const copy = <Ctx extends DefaultContext = ActionContext>(
   paths: PathPair | PathPair[],
-  options: ActionOptions = {}
-): Action => ({
+  options: ActionOptions<Ctx> = {}
+): Action<Ctx> => ({
   name: 'copy',
   when: options.when,
   failOnError: options.failOnError,

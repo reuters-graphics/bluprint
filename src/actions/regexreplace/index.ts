@@ -3,14 +3,20 @@ import path from 'node:path';
 import chalk from 'chalk-template';
 import { log } from '@clack/prompts';
 import { renderMustache } from '../render/template';
-import type { Action, ActionContext, ActionOptions } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  DefaultContext,
+} from '../types';
 
 /** `[pattern, replacement]` or `[pattern, replacement, flags]` (default flags `'gm'`). */
 export type Replacement =
   | [pattern: string, replacement: string]
   | [pattern: string, replacement: string, flags: string];
 
-export interface RegexReplaceOptions extends ActionOptions {
+export interface RegexReplaceOptions<Ctx extends DefaultContext = ActionContext>
+  extends ActionOptions<Ctx> {
   /** Project-relative file(s) to run replacements in. */
   files: string | string[];
   /** A single replacement or an array of them. */
@@ -40,7 +46,9 @@ const normalizeReplacements = (
  *
  * @example regexreplace({ files: ['README.md'], replace: ['^# .*', '# {{title}}'] })
  */
-export const regexreplace = (options: RegexReplaceOptions): Action => {
+export const regexreplace = <Ctx extends DefaultContext = ActionContext>(
+  options: RegexReplaceOptions<Ctx>
+): Action<Ctx> => {
   const { files, replace, when, failOnError } = options;
   const fileList = Array.isArray(files) ? files : [files];
   const replacements = normalizeReplacements(replace);

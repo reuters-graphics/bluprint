@@ -39,7 +39,10 @@ some defaults and grows as actions (like `prompt`) contribute to it:
 | `bluprintPart` | The selected [part](/bluprint/guides/parts/), if any |
 
 A `prompt` action adds its answer under its `name`, and later actions can read
-it — in templates (`{{ name }}`) or via the `when` gate below.
+it — in templates (`{{ name }}`) or via the `when` gate below. To make those
+custom values type-checked (instead of `unknown`) in `when` / `run` / editor
+callbacks, declare them with `defineConfig<Context>` — see
+[Typing the run context](/bluprint/guides/creating/#typing-the-run-context).
 
 ## Gating actions with `when`
 

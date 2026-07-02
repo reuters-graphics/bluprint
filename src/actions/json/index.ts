@@ -1,6 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Action, ActionContext, ActionOptions, Awaitable } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  Awaitable,
+  DefaultContext,
+} from '../types';
 
 /**
  * Edit a JSON file. The editor receives the parsed data and the run context
@@ -18,11 +24,14 @@ import type { Action, ActionContext, ActionOptions, Awaitable } from '../types';
  * // merge / replace
  * json('tsconfig.json', (cfg) => ({ ...cfg, compilerOptions: { strict: true } }))
  */
-export const json = <T = Record<string, unknown>>(
+export const json = <
+  T = Record<string, unknown>,
+  Ctx extends DefaultContext = ActionContext,
+>(
   file: string,
-  editor: (data: T, ctx: ActionContext) => Awaitable<T>,
-  options: ActionOptions = {}
-): Action => ({
+  editor: (data: T, ctx: Ctx) => Awaitable<T>,
+  options: ActionOptions<Ctx> = {}
+): Action<Ctx> => ({
   name: 'json',
   when: options.when,
   failOnError: options.failOnError,

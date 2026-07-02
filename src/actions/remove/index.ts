@@ -1,6 +1,11 @@
 import fs from 'node:fs';
 import { globSync } from 'glob';
-import type { Action, ActionOptions } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  DefaultContext,
+} from '../types';
 
 /**
  * Remove files and directories matching one or more globs, relative to the
@@ -9,10 +14,10 @@ import type { Action, ActionOptions } from '../types';
  * @param paths A glob or array of globs, e.g. `'dist/*'` or `['*.log', 'tmp']`.
  * @example remove(['**\/*.test.ts', 'coverage'])
  */
-export const remove = (
+export const remove = <Ctx extends DefaultContext = ActionContext>(
   paths: string | string[],
-  options: ActionOptions = {}
-): Action => ({
+  options: ActionOptions<Ctx> = {}
+): Action<Ctx> => ({
   name: 'remove',
   when: options.when,
   failOnError: options.failOnError,

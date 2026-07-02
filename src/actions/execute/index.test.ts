@@ -94,9 +94,9 @@ describe('execute action', () => {
   it('errors the spinner and re-throws when the command errors (silent)', async () => {
     vi.mocked(spawn).mockImplementation(() => failingChild() as never);
 
-    await expect(
-      execute('nope', { silent: true }).run(ctx())
-    ).rejects.toThrow('spawn ENOENT');
+    await expect(execute('nope', { silent: true }).run(ctx())).rejects.toThrow(
+      'spawn ENOENT'
+    );
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('failed'));
   });
 });

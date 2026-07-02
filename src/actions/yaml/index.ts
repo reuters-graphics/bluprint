@@ -1,7 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parse, stringify } from 'yaml';
-import type { Action, ActionContext, ActionOptions, Awaitable } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  Awaitable,
+  DefaultContext,
+} from '../types';
 
 /**
  * Edit a YAML file (the structured-edit analog of {@link json}). The editor
@@ -15,11 +21,14 @@ import type { Action, ActionContext, ActionOptions, Awaitable } from '../types';
  * @example
  * yaml('.github/workflows/ci.yml', (wf, ctx) => { wf.name = ctx.name; return wf; })
  */
-export const yaml = <T = Record<string, unknown>>(
+export const yaml = <
+  T = Record<string, unknown>,
+  Ctx extends DefaultContext = ActionContext,
+>(
   file: string,
-  editor: (data: T, ctx: ActionContext) => Awaitable<T>,
-  options: ActionOptions = {}
-): Action => ({
+  editor: (data: T, ctx: Ctx) => Awaitable<T>,
+  options: ActionOptions<Ctx> = {}
+): Action<Ctx> => ({
   name: 'yaml',
   when: options.when,
   failOnError: options.failOnError,

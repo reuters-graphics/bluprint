@@ -1,7 +1,7 @@
 # Status
 
 > Single source of truth for current project state. **Update this before ending
-> any work session.** Last updated: **2026-07-01**.
+> any work session.** Last updated: **2026-07-02**.
 
 ## In one line
 
@@ -35,6 +35,7 @@ before publishing, plus a deferred real-repo smoke test.
 - [`docs/`](../docs/) — Astro/Starlight site rewritten for the new `bluprint.config.ts` + function-actions API (incl. a new Previewing guide). `pnpm build:docs` clean.
 - **knip** + **publint** wired in (`pnpm knip`, `pnpm publint`) and run in CI (the Lint workflow); both clean. Dead deps/files removed.
 - [`src/actions/`](../src/actions/) — 13 actions as typed factory functions (copy/move/remove/render/regexreplace/execute/log/prompt/run/json/append/prepend/yaml) + `runActions` runner (with `failOnError`), exported from the package root (task 0002).
+- **Typed run context** — `defineConfig<Context>` threads an author-declared context type into every action's `when`/`run`/editor callback (autocomplete + type-checking instead of `unknown`); untyped `defineConfig` stays loose. Backward-compatible; locked by `src/config/typedContext.test.ts`. See [0002](./tasks/0002-actions-function-api.md) (2026-07-02).
 
 ## What's broken / unfinished
 
@@ -42,11 +43,11 @@ before publishing, plus a deferred real-repo smoke test.
 - `start`/`clone`/`preview` haven't been run against a real repo end-to-end yet (no v1 `bluprint.config.ts` repo to test against); logic is unit/integration-tested with fixtures. Deferred until first 1.0 publish.
 - Pre-rewrite deletions + new modules are committed incrementally on `main`; the two earliest session commits predate the foundation commit (accepted).
 
-## Health check (2026-07-01)
+## Health check (2026-07-02)
 
 | Check | Command | Result |
 |---|---|---|
-| Tests | `pnpm test` (`vitest run`) | ✅ 139 passing (config + profile + all commands + scaffold + actions) |
+| Tests | `pnpm test` (`vitest run`) | ✅ 153 passing (config + profile + all commands + scaffold + actions) |
 | Lint | `pnpm lint` (`eslint`) | ✅ clean |
 | Typecheck | `npx tsc --noEmit` | ✅ clean |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |

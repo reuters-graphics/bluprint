@@ -34,6 +34,11 @@ type ActionContext = {
 } & Record<string, unknown>; // + values contributed by prompt / run
 ```
 
+The fixed keys above are `DefaultContext`. The `Record<string, unknown>` half
+holds values `prompt` / `run` contribute — typed `unknown` unless you declare
+them via `defineConfig<Context>`, which threads your `Context` into every
+callback. See [Typing the run context](/bluprint/guides/creating/#typing-the-run-context).
+
 ## `prompt(spec, options?)`
 
 `spec` is discriminated on `type`; the answer is stored in the context under

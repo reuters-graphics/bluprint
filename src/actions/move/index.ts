@@ -3,7 +3,12 @@ import path from 'node:path';
 import chalk from 'chalk-template';
 import { log } from '@clack/prompts';
 import { renderMustache } from '../render/template';
-import type { Action, ActionContext, ActionOptions } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  DefaultContext,
+} from '../types';
 import type { PathPair } from '../copy';
 
 const movePath = (from: string, to: string, context: ActionContext): void => {
@@ -33,10 +38,10 @@ const normalizePairs = (paths: PathPair | PathPair[]): PathPair[] =>
  * @param paths A single `[from, to]` pair or an array of pairs.
  * @example move(['src/index.ts', 'src/{{name}}.ts'])
  */
-export const move = (
+export const move = <Ctx extends DefaultContext = ActionContext>(
   paths: PathPair | PathPair[],
-  options: ActionOptions = {}
-): Action => ({
+  options: ActionOptions<Ctx> = {}
+): Action<Ctx> => ({
   name: 'move',
   when: options.when,
   failOnError: options.failOnError,

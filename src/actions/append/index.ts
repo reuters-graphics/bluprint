@@ -1,7 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { renderMustache } from '../render/template';
-import type { Action, ActionOptions } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  DefaultContext,
+} from '../types';
 
 const readIfExists = (filePath: string): string =>
   fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf-8') : '';
@@ -13,11 +18,11 @@ const readIfExists = (filePath: string): string =>
  *
  * @example append('.gitignore', 'dist\n.env\n')
  */
-export const append = (
+export const append = <Ctx extends DefaultContext = ActionContext>(
   file: string,
   content: string,
-  options: ActionOptions = {}
-): Action => ({
+  options: ActionOptions<Ctx> = {}
+): Action<Ctx> => ({
   name: 'append',
   when: options.when,
   failOnError: options.failOnError,
@@ -38,11 +43,11 @@ export const append = (
  *
  * @example prepend('src/index.ts', '// @generated for {{name}}\n')
  */
-export const prepend = (
+export const prepend = <Ctx extends DefaultContext = ActionContext>(
   file: string,
   content: string,
-  options: ActionOptions = {}
-): Action => ({
+  options: ActionOptions<Ctx> = {}
+): Action<Ctx> => ({
   name: 'prepend',
   when: options.when,
   failOnError: options.failOnError,

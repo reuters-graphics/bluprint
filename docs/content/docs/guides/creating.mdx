@@ -110,6 +110,51 @@ parts: {
 
 See the [Parts guide](/bluprint/guides/parts/).
 
+## Typing the run context
+
+Actions share a [context](/bluprint/guides/actions/#the-run-context) that `prompt`
+and `run` add values to. By default those custom values are typed `unknown`. Pass
+a type argument to `defineConfig` describing them, and every action's `when`,
+`run`, and editor callback is typed against it — `ctx.projectName` autocompletes,
+narrows, and catches typos:
+
+```ts
+import { defineConfig, prompt, render } from '@reuters-graphics/bluprint';
+
+interface Context {
+  projectName: string;
+  useTypeScript: boolean;
+}
+
+export default defineConfig<Context>({
+  name: 'My bluprint',
+  files: ['**/*'],
+  ignores: [],
+  actions: [
+    prompt({ name: 'projectName', type: 'text', message: 'Project name?' }),
+    prompt({ name: 'useTypeScript', type: 'confirm', message: 'TypeScript?' }),
+    render({
+      files: ['tsconfig.json'],
+      when: (ctx) => ctx.useTypeScript, // ✅ boolean, not unknown
+    }),
+  ],
+});
+```
+
+The built-in [`DefaultContext`](/bluprint/reference/actions/#context) keys
+(`year`, `dirname`, …) are always present on top of what you declare.
+
+:::note
+A value from a `when`-gated `prompt` may not exist at runtime if the prompt is
+skipped. If a context value is conditional, declare it optional
+(`projectName?: string`) so the types reflect reality.
+
+For [`json`](/bluprint/guides/actions/#json) / [`yaml`](/bluprint/guides/actions/#yaml)
+in a typed config, annotate the editor's data parameter
+(`json('package.json', (pkg: PackageJson, ctx) => …)`) rather than writing
+`json<PackageJson>(…)` — the type argument would switch off context inference.
+:::
+
 ## Publishing
 
 There's no publish step. Commit `bluprint.config.ts`, push to GitHub, and the

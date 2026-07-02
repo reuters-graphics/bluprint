@@ -1,4 +1,10 @@
-import type { Action, ActionContext, ActionOptions, Awaitable } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  Awaitable,
+  DefaultContext,
+} from '../types';
 
 /**
  * Run an arbitrary function as an action — the escape hatch for logic no
@@ -12,10 +18,13 @@ import type { Action, ActionContext, ActionOptions, Awaitable } from '../types';
  *   return { id: (await res.json()).id }; // available to later actions
  * })
  */
-export const run = (
-  fn: (ctx: ActionContext) => Awaitable<void | Partial<ActionContext>>,
-  options: ActionOptions = {}
-): Action => ({
+export const run = <
+  Ctx extends DefaultContext = ActionContext,
+  R extends Partial<Ctx> = Partial<Ctx>,
+>(
+  fn: (ctx: Ctx) => Awaitable<void | R>,
+  options: ActionOptions<Ctx> = {}
+): Action<Ctx> => ({
   name: 'run',
   when: options.when,
   failOnError: options.failOnError,

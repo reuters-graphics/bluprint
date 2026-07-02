@@ -1,9 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { renderWith, type RenderEngine } from './template';
-import type { Action, ActionOptions } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  DefaultContext,
+} from '../types';
 
-export interface RenderOptions extends ActionOptions {
+export interface RenderOptions<Ctx extends DefaultContext = ActionContext>
+  extends ActionOptions<Ctx> {
   /** Project-relative file(s) to render in place. */
   files: string | string[];
   /** Template engine to use. Defaults to `'mustache'`. */
@@ -19,7 +25,9 @@ export interface RenderOptions extends ActionOptions {
  *
  * @example render({ files: ['README.md', 'package.json'], engine: 'mustache' })
  */
-export const render = (options: RenderOptions): Action => {
+export const render = <Ctx extends DefaultContext = ActionContext>(
+  options: RenderOptions<Ctx>
+): Action<Ctx> => {
   const {
     files,
     engine = 'mustache',
@@ -34,7 +42,7 @@ export const render = (options: RenderOptions): Action => {
     when,
     failOnError,
     run: (ctx) => {
-      const localContext = { ...ctx, ...extra };
+      const localContext: Record<string, unknown> = { ...ctx, ...extra };
       for (const file of fileList) {
         const filePath = path.join(process.cwd(), file);
         const contents = fs.readFileSync(filePath, 'utf-8');

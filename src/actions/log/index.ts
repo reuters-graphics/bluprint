@@ -1,6 +1,11 @@
 import { template } from 'chalk-template';
 import { renderMustache } from '../render/template';
-import type { Action, ActionOptions } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  DefaultContext,
+} from '../types';
 
 /**
  * Print a message to the console. The message is rendered as a mustache
@@ -9,7 +14,10 @@ import type { Action, ActionOptions } from '../types';
  *
  * @example log('Scaffolded {green {{name}}}! Run {yellow pnpm install} next.')
  */
-export const log = (message: string, options: ActionOptions = {}): Action => ({
+export const log = <Ctx extends DefaultContext = ActionContext>(
+  message: string,
+  options: ActionOptions<Ctx> = {}
+): Action<Ctx> => ({
   name: 'log',
   when: options.when,
   failOnError: options.failOnError,

@@ -180,3 +180,24 @@ context by returning `{ [name]: answer }`.
   `rm -rf node_modules && pnpm install` fixed it (CI/clean installs are
   unaffected). Also hardened `__test__/utils.ts` to skip dangling top-level
   symlinks defensively.
+- **2026-07-02** — **Typed run context ("Tier 1").** Made `Action`,
+  `ActionOptions`, `BluprintConfig`, and all 13 action factories generic over
+  `Ctx extends DefaultContext = ActionContext`; `defineConfig<Extra>` threads
+  `DefaultContext & Extra` into every `when` / `run` / editor callback, so a
+  bluprint author declares their prompt/`run` values once and gets full
+  typing/autocomplete (instead of `unknown`). Untyped `defineConfig({…})`
+  defaults to the old loose `ActionContext` — fully backward-compatible.
+  Proved with a spike first, then rolled out; kept `src/config/typedContext.test.ts`
+  as a type-level regression test (positive annotations + `@ts-expect-error`).
+  **Type facts that shaped it:** (1) accumulation *across* an array literal is
+  impossible — sibling elements don't share contextual type — so this is a
+  single declared context, not per-position inference; (2) `DefaultContext & Extra`
+  (an interface) is **not** assignable to `Record<string, unknown>` (the implicit
+  index-signature trap), but generic calls typed by the *constraint*
+  `DefaultContext` are, so factory bodies passing `ctx` to helpers just work;
+  (3) `run` needed a second inferred `R extends Partial<Ctx>` so standalone calls
+  stay permissive; (4) `prompt` casts its dynamic-key return `as Partial<Ctx>`;
+  (5) `json`/`yaml`: passing an explicit data type arg (`json<T>`) switches off
+  `Ctx` inference — annotate the editor's data param in a typed config instead.
+  Docs: new "Typing the run context" section in `creating.mdx` + pointers from
+  the actions guide/reference. 153 tests, tsc/lint/knip/build/publint/docs green.

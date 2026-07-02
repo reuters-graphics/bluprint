@@ -1,8 +1,14 @@
 import { spawn } from 'node:child_process';
 import { spinner } from '@clack/prompts';
-import type { Action, ActionOptions } from '../types';
+import type {
+  Action,
+  ActionContext,
+  ActionOptions,
+  DefaultContext,
+} from '../types';
 
-export interface ExecuteOptions extends ActionOptions {
+export interface ExecuteOptions<Ctx extends DefaultContext = ActionContext>
+  extends ActionOptions<Ctx> {
   /** Hide the command's output behind a spinner instead of streaming it. */
   silent?: boolean;
 }
@@ -28,10 +34,10 @@ const runCommand = (
  * @example execute('pnpm install', { silent: true })
  * @example execute(['git', 'init'])
  */
-export const execute = (
+export const execute = <Ctx extends DefaultContext = ActionContext>(
   command: string | string[],
-  options: ExecuteOptions = {}
-): Action => ({
+  options: ExecuteOptions<Ctx> = {}
+): Action<Ctx> => ({
   name: 'execute',
   when: options.when,
   failOnError: options.failOnError,

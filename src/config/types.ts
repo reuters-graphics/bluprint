@@ -1,14 +1,14 @@
-import type { Action } from '../actions/types';
+import type { Action, ActionContext, DefaultContext } from '../actions/types';
 
-type BluprintPart = {
+type BluprintPart<Ctx extends DefaultContext = ActionContext> = {
   title?: string;
   hint?: string;
   files: string | string[];
   ignores: string | string[];
-  actions?: Action[];
+  actions?: Action<Ctx>[];
 };
 
-export type BluprintConfig = {
+export type BluprintConfig<Ctx extends DefaultContext = ActionContext> = {
   name:
     | string
     | {
@@ -18,6 +18,6 @@ export type BluprintConfig = {
   bluprint?: string;
   files: string | string[];
   ignores: string | string[];
-  actions?: Action[];
-  parts?: Record<string, BluprintPart>;
+  actions?: Action<Ctx>[];
+  parts?: Record<string, BluprintPart<Ctx>>;
 };
