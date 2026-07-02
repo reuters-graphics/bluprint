@@ -1,7 +1,7 @@
 # Status
 
 > Single source of truth for current project state. **Update this before ending
-> any work session.** Last updated: **2026-07-02**.
+> any work session.** Last updated: **2026-07-02** (E2E).
 
 ## In one line
 
@@ -36,18 +36,20 @@ before publishing, plus a deferred real-repo smoke test.
 - **knip** + **publint** wired in (`pnpm knip`, `pnpm publint`) and run in CI (the Lint workflow); both clean. Dead deps/files removed.
 - [`src/actions/`](../src/actions/) — 13 actions as typed factory functions (copy/move/remove/render/regexreplace/execute/log/prompt/run/json/append/prepend/yaml) + `runActions` runner (with `failOnError`), exported from the package root (task 0002).
 - **Typed run context** — `defineConfig<Context>` threads an author-declared context type into every action's `when`/`run`/editor callback (autocomplete + type-checking instead of `unknown`); untyped `defineConfig` stays loose. Backward-compatible; locked by `src/config/typedContext.test.ts`. See [0002](./tasks/0002-actions-function-api.md) (2026-07-02).
+- **End-to-end verified** against a real GitHub repo (`reuters-graphics/test-bluprint-v1`, public v1 fixture): `start` (all 5 demo actions + excludeConfig/ignores), `clone` (verbatim, keeps config), and local `preview` all pass. Surfaced + fixed a config-import resolution bug in `load.ts` (`efad252`) and a docs mustache-helper syntax bug (`114cf9b`). See [0001](./tasks/0001-v1-api-rewrite.md) (2026-07-02).
 
 ## What's broken / unfinished
 
 - `start` scaffolds **remote git bluprints only** — `file://` local bluprints are rejected for now (deferred).
-- `start`/`clone`/`preview` haven't been run against a real repo end-to-end yet (no v1 `bluprint.config.ts` repo to test against); logic is unit/integration-tested with fixtures. Deferred until first 1.0 publish.
+- End-to-end `start`/`clone`/`preview` now **verified** against `reuters-graphics/test-bluprint-v1` (2026-07-02). Not yet run: `add`+`start` via the real profile (skipped to avoid mutating `~/.bluprint`), and `new`. The test fixture's config dep is `file:../bluprint`; switch to `^1.0.0` post-publish.
 - Pre-rewrite deletions + new modules are committed incrementally on `main`; the two earliest session commits predate the foundation commit (accepted).
 
 ## Health check (2026-07-02)
 
 | Check | Command | Result |
 |---|---|---|
-| Tests | `pnpm test` (`vitest run`) | ✅ 153 passing (config + profile + all commands + scaffold + actions) |
+| Tests | `pnpm test` (`vitest run`) | ✅ 158 passing (config + profile + all commands + scaffold + actions) |
+| E2E | `start`/`clone`/`preview` vs `test-bluprint-v1` | ✅ all pass (2026-07-02) |
 | Lint | `pnpm lint` (`eslint`) | ✅ clean |
 | Typecheck | `npx tsc --noEmit` | ✅ clean |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |
@@ -57,11 +59,14 @@ before publishing, plus a deferred real-repo smoke test.
 
 ## Suggested next step
 
-The v1 code + docs + changeset are done, and dead deps/package hygiene are
-verified (knip + publint clean). Remaining before publish: the repo/release
-admin ([task 0003](./tasks/0003-repo-release-maintenance.md) — mostly GitHub/npm),
-and the deferred end-to-end `start`/`clone`/`preview` smoke test against a real
-repo at the first 1.0 publish.
+The v1 code + docs + changeset are done, dead deps/package hygiene are verified
+(knip + publint clean), and the commands are now **verified end-to-end** against
+a real GitHub bluprint (`reuters-graphics/test-bluprint-v1`). Remaining before
+publish: the repo/release admin ([task 0003](./tasks/0003-repo-release-maintenance.md)
+— switch this repo's default branch `master`→`main`, verify the changesets
+npm-publish workflow), and any docs-site polish. After the first 1.0 publish,
+add a `bluprint: '^1.0.0'` constraint to the test fixture and switch its
+`file:../bluprint` dep to the published version.
 
 > ⚠️ When testing commands that touch the `profile` singleton, **seed state in
 > `beforeEach`** — mock-fs doesn't reliably reset the singleton's writes between

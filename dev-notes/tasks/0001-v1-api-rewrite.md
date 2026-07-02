@@ -195,3 +195,20 @@ command fns to `defineConfig` + actions). **Open parity gaps:**
   added `profile.bluprintTitles` + `profile.promptForBluprintToRemove()` (title-
   keyed, unlike the URL-keyed `promptForBluprint`), wired into `cli.ts`, 4 tests
   (41 passing total). Root-causing the singleton quirk deferred per the user.
+- **2026-07-02** — **First real end-to-end run** against a live GitHub repo
+  (`reuters-graphics/test-bluprint-v1`, a new public v1 fixture demonstrating
+  `copy`/`execute`/`move`/`remove`/`render` + a typed-context `prompt`). `start`
+  (all five actions + `excludeConfig`/`ignores`), `clone` (verbatim, keeps the
+  config), and local `preview` all verified end-to-end. **Surfaced + fixed a
+  real bug** ([`../../src/config/load.ts`](../../src/config/load.ts), commit
+  `efad252`): a fetched config is loaded via jiti from a temp dir with no
+  `node_modules`, so its `import … from '@reuters-graphics/bluprint'` failed
+  ("Cannot find module") — this would have broken `start`/`preview` for every
+  real bluprint. Fixed by aliasing the package to its own entry (resolved via
+  `createRequire` self-reference). Also fixed a docs bug (`114cf9b`): the mustache
+  string helpers are lambda **sections** — `{{# slugify }}…{{ /slugify }}`, not
+  `{{ slugify }}…`. The `add` command that fetches the config resolves the same
+  way, so it benefits too. **Fixture dependency setup:** the test repo installs
+  the library via `file:../bluprint` (author-time types) with those authoring
+  files — `package.json`/`tsconfig.json` — kept out of the scaffold via the
+  config's `ignores`; swap to `^1.0.0` after the first publish.
