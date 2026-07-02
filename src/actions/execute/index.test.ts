@@ -8,8 +8,14 @@ vi.mock('node:child_process', () => ({ spawn: vi.fn() }));
 
 const startSpy = vi.fn();
 const stopSpy = vi.fn();
+const errorSpy = vi.fn();
 vi.mock('@clack/prompts', () => ({
-  spinner: vi.fn(() => ({ start: startSpy, stop: stopSpy, message: vi.fn() })),
+  spinner: vi.fn(() => ({
+    start: startSpy,
+    stop: stopSpy,
+    error: errorSpy,
+    message: vi.fn(),
+  })),
 }));
 
 const ctx = (): ActionContext => ({
@@ -24,6 +30,14 @@ const ctx = (): ActionContext => ({
 const fakeChild = (code = 0) => {
   const child = new EventEmitter();
   process.nextTick(() => child.emit('close', code));
+  return child;
+};
+
+// A fake ChildProcess that errors (e.g. the binary isn't found) on the next
+// tick, rather than closing.
+const failingChild = (err = new Error('spawn ENOENT')) => {
+  const child = new EventEmitter();
+  process.nextTick(() => child.emit('error', err));
   return child;
 };
 
@@ -66,13 +80,23 @@ describe('execute action', () => {
     expect(stopSpy).toHaveBeenCalledOnce();
   });
 
-  it('surfaces a non-zero exit code in the spinner stop message', async () => {
+  it('surfaces a non-zero exit code via the spinner error state', async () => {
     vi.mocked(spawn).mockImplementation(() => fakeChild(1) as never);
 
     await execute('false', { silent: true }).run(ctx());
 
-    expect(stopSpy).toHaveBeenCalledWith(
+    expect(stopSpy).not.toHaveBeenCalled(); // failure, not success
+    expect(errorSpy).toHaveBeenCalledWith(
       expect.stringContaining('exit code 1')
     );
+  });
+
+  it('errors the spinner and re-throws when the command errors (silent)', async () => {
+    vi.mocked(spawn).mockImplementation(() => failingChild() as never);
+
+    await expect(
+      execute('nope', { silent: true }).run(ctx())
+    ).rejects.toThrow('spawn ENOENT');
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('failed'));
   });
 });

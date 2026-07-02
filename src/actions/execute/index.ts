@@ -48,8 +48,16 @@ export const execute = (
       // animate; `ignore` discards output (an unread pipe could deadlock).
       const s = spinner();
       s.start(`Running ${label}`);
-      const code = await runCommand(cmd, args, isString, 'ignore');
-      s.stop(code === 0 ? label : `${label} (exit code ${code})`);
+      try {
+        const code = await runCommand(cmd, args, isString, 'ignore');
+        if (code === 0) s.stop(label);
+        else s.error(`${label} (exit code ${code})`);
+      } catch (error) {
+        // e.g. the command isn't found. Stop the spinner before the error
+        // unwinds, or it keeps animating over the runner's log output.
+        s.error(`${label} (failed)`);
+        throw error;
+      }
     } else {
       await runCommand(cmd, args, isString, 'inherit');
     }
