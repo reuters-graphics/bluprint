@@ -53,7 +53,11 @@ needs repo-admin access on GitHub and an npm token. Those items are marked 🔧.
 - [ ] Ensure the v1 **changeset is accurate** before first publish — ties to the
       task 0001 item ("fix the inaccurate v1 changeset").
 - [ ] 🔧 Confirm **GitHub Pages** is enabled (Settings → Pages, source = GitHub
-      Actions) so `docs.yaml` can deploy.
+      Actions) so `docs.yaml` can deploy. Until this is done the `github-pages`
+      environment doesn't exist, so the VS Code Actions extension flags
+      `environment: github-pages` in `docs.yaml` as *"Value 'github-pages' is not
+      valid"* — a benign false positive that clears once Pages is enabled (the
+      workflow YAML is correct as-is).
 - [ ] Dry-run / sanity-check: merge a PR with a changeset into `main` → the
       release workflow opens a "Version Packages" PR → merging it publishes to npm.
 
