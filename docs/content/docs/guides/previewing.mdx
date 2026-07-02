@@ -1,0 +1,50 @@
+---
+title: Previewing
+description: Test a bluprint locally before publishing it
+---
+
+Iterating on a bluprint used to mean a slow loop: push to GitHub, register it,
+scaffold a fresh directory, look, repeat. `bluprint preview` collapses that into
+one command.
+
+## Preview
+
+From inside your bluprint directory (or pass its path), run:
+
+```bash
+bluprint preview
+```
+
+It scaffolds your bluprint — your **current, on-disk files, uncommitted changes
+included** — into a temp directory, runs its actions, and prints the path:
+
+```bash
+✓ Previewed My bluprint at:
+  /tmp/bluprint/my-bluprint/
+
+  Inspect it, then re-run bluprint preview to refresh.
+```
+
+Open that directory to confirm the scaffolded, action-processed output is what
+you expect.
+
+## A tight iteration loop
+
+The output path is **stable** (derived from your bluprint's name) and emptied on
+each run. So you can keep a single editor or file-explorer window open on it,
+tweak your `bluprint.config.ts` or template files, re-run `preview`, and watch
+the result update in place.
+
+If your bluprint has [parts](/guides/parts), `preview` prompts for one just like
+`start`, so you can check each part's output.
+
+## What gets copied
+
+`preview` mirrors what a published tarball would contain: it honors your
+`.gitignore` (via git), so build output, `node_modules`, `.env` files, and the
+like are left out — while your not-yet-committed template files are included.
+
+:::note
+`preview` works with local bluprints only; it doesn't publish anything. To scaffold
+a **registered** bluprint into a real project, use [`start`](/guides/using).
+:::

@@ -1,0 +1,50 @@
+---
+title: blüprint
+description: Dead-easy application scaffolding and CLI for reusable code templates
+---
+
+Dead-easy application scaffolding and CLI.
+
+## Why this?
+
+Reusing good code is the fastest way to speed up development and share solid
+conventions across a team. But most scaffolding tools make you author templates
+in a bespoke meta-language that looks nothing like the code it produces.
+
+bluprint takes a simpler tack: **a bluprint is just a GitHub repo.** The repo
+_is_ the boilerplate — what you see is what you scaffold. To make a repo a
+bluprint, you add one file: a typed `bluprint.config.ts`.
+
+That config is where bluprint shines:
+
+- **It looks like the thing it builds.** Your bluprint is a real, runnable
+  project, so it's obvious at a glance what scaffolding it will produce.
+- **Anyone can make one.** If you can push a repo to GitHub, you can share a
+  bluprint. Distribution is just `git push`.
+- **The config is real TypeScript.** Actions are typed functions you import —
+  you get autocomplete, inline docs, and type-checking as you write them, not a
+  stringly-typed JSON blob you have to get exactly right.
+- **Test before you publish.** [`bluprint preview`](/guides/previewing) scaffolds
+  your in-progress bluprint into a temp directory so you can see the result
+  without publishing, registering, and running it for real.
+
+## What's it do?
+
+Add a `bluprint.config.ts` to the root of any repo to make it a bluprint, then
+register the ones you use with the CLI.
+
+When you start a new project, the CLI downloads the latest tarball of your files
+from GitHub (public or private) and scaffolds them into your directory — then
+runs any [actions](/guides/actions) from your config to transform them.
+
+Actions can move and rename files, run shell commands, ask the user questions,
+render files through a template engine, edit JSON/YAML, or run arbitrary
+TypeScript — all fully typed.
+
+[Parts](/guides/parts) let you split a bluprint into pieces users can scaffold
+individually — handy for syncing config files into projects already underway.
+
+## Getting started
+
+Head to the [Quickstart](/quickstart) to install bluprint and build your first
+template.

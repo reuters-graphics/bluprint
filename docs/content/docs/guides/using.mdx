@@ -1,0 +1,75 @@
+---
+title: Using bluprints
+description: Learn how to scaffold projects using the bluprint CLI
+---
+
+Once you've registered a bluprint, you can scaffold projects from it.
+
+## Register a bluprint
+
+Add a bluprint to your CLI by its GitHub repo:
+
+```bash
+bluprint add reuters-graphics/my-bluprint
+```
+
+The repo can be a URL, an SSH string, or the `user/repo` shorthand. Run `add`
+with no argument to be prompted.
+
+## Start a new project
+
+In an empty directory, run:
+
+```bash
+bluprint start
+```
+
+The CLI lists your registered bluprints, downloads the chosen one, scaffolds its
+files, and runs its actions — prompting you for anything they need.
+
+You can also pass a bluprint directly — a registered name, or any GitHub repo:
+
+```bash
+bluprint start reuters-graphics/my-bluprint
+```
+
+If the bluprint has [parts](/guides/parts), you'll be asked whether to scaffold
+the whole thing or just one part.
+
+## Clone a repo
+
+To copy a repo's files into the current directory **without** running any
+bluprint actions — even a repo that isn't a bluprint:
+
+```bash
+bluprint clone reuters-graphics/some-repo
+```
+
+Unlike `start`, `clone` copies the whole repo verbatim (including any
+`bluprint.config.ts`) and never runs actions or part selection.
+
+## Remove a bluprint
+
+```bash
+bluprint remove
+```
+
+Pick from your registered bluprints, or pass a name to remove it directly.
+
+## Private repositories
+
+Give the CLI access to private repos with a
+[personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens):
+
+```bash
+export GITHUB_TOKEN=<your token>   # environment variable
+```
+
+```bash
+bluprint token <your token>        # saved to your CLI profile (~/.bluprint)
+```
+
+:::note
+Upgrading from a pre-1.0 version? On first run, bluprint automatically imports
+your old `~/.bluprintrc` (registered bluprints and token) into the new profile.
+:::

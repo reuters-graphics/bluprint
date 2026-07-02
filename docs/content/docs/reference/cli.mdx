@@ -1,0 +1,74 @@
+---
+title: CLI reference
+description: Complete reference for all bluprint CLI commands
+---
+
+All commands are run as `bluprint <command>`.
+
+## `new [name]`
+
+Scaffold a starter `bluprint.config.ts` in the current directory, turning the
+repo into a bluprint. Prompts for a name if none is given; refuses if a config
+already exists.
+
+```bash
+bluprint new "My bluprint"
+```
+
+## `preview [path]`
+
+Scaffold a **local** bluprint (default: the current directory) into a temp
+directory and run its actions, for testing before publishing. Prints the output
+path. See [Previewing](/guides/previewing).
+
+```bash
+bluprint preview
+```
+
+## `add [repo]`
+
+Register a bluprint with your CLI by its GitHub repo (URL, SSH string, or
+`user/repo`). Prompts if no repo is given.
+
+```bash
+bluprint add reuters-graphics/my-bluprint
+```
+
+## `start [bluprint]`
+
+Scaffold a new project into the current directory from a registered bluprint or
+any GitHub repo. Prompts you to pick one — and to pick a [part](/guides/parts),
+if the bluprint defines them — then runs its actions.
+
+```bash
+bluprint start
+bluprint start reuters-graphics/my-bluprint
+```
+
+## `clone <repo>`
+
+Copy a git repo's files into the current directory verbatim — no part selection,
+no actions, config file kept. Works with any repo, not just bluprints.
+
+```bash
+bluprint clone reuters-graphics/some-repo
+```
+
+## `remove [bluprint]`
+
+Unregister a bluprint from your CLI. Prompts from your registered list if no
+name is given.
+
+```bash
+bluprint remove
+```
+
+## `token [accessToken]`
+
+Save a GitHub personal access token to your CLI profile (`~/.bluprint`) so the
+CLI can read private repos. Prompts if no token is given. You can also set the
+`GITHUB_TOKEN` environment variable instead.
+
+```bash
+bluprint token <your token>
+```

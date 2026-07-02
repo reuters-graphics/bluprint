@@ -31,13 +31,13 @@ What's left is mostly end-to-end verification, docs, and the changeset.
 - **All CLI commands ported (7)** — [`add`](../src/commands/add/index.ts), [`start`](../src/commands/start/index.ts), [`remove`](../src/commands/remove/index.ts), [`token`](../src/commands/token/index.ts), [`clone`](../src/commands/clone/index.ts), [`new`](../src/commands/new/index.ts), [`preview`](../src/commands/preview/index.ts) — on the new `profile`/`config`/`actions` APIs (with tests).
 - [`src/scaffold/`](../src/scaffold/) — shared scaffolding: tarball fetch+extract (`start`/`clone`) and `copyLocal` local copy (`preview`), sharing the glob filter + `excludeConfig` flag.
 - [`src/cli.ts`](../src/cli.ts) wires all seven commands; `bluprint --help` lists them.
+- [`docs/`](../docs/) — Astro/Starlight site rewritten for the new `bluprint.config.ts` + function-actions API (incl. a new Previewing guide). `pnpm build:docs` clean.
 - [`src/actions/`](../src/actions/) — 13 actions as typed factory functions (copy/move/remove/render/regexreplace/execute/log/prompt/run/json/append/prepend/yaml) + `runActions` runner (with `failOnError`), exported from the package root (task 0002).
 
 ## What's broken / unfinished
 
 - `start` scaffolds **remote git bluprints only** — `file://` local bluprints are rejected for now (deferred).
-- `start`/`clone` haven't been run against a real repo end-to-end yet (no v1 `bluprint.config.ts` repo to test against); logic is unit-tested with a tar fixture. Deferred until first 1.0 publish.
-- Docs content still describes the old `.bluprintrc` API.
+- `start`/`clone`/`preview` haven't been run against a real repo end-to-end yet (no v1 `bluprint.config.ts` repo to test against); logic is unit/integration-tested with fixtures. Deferred until first 1.0 publish.
 - The v1 changeset text is inaccurate (claims API unchanged).
 - `src/__archive/` is fully superseded and can be deleted.
 - Pre-rewrite deletions + new modules are committed incrementally on `main`; the two earliest session commits predate the foundation commit (accepted).
@@ -54,11 +54,12 @@ What's left is mostly end-to-end verification, docs, and the changeset.
 
 ## Suggested next step
 
-With commands complete, the remaining v1 work is: **rewrite the docs** for the
-new `bluprint.config.ts` + function-actions API (currently describes
-`.bluprintrc`), **fix the inaccurate v1 changeset**, and **delete `src/__archive/`**.
-End-to-end `start`/`clone` against a real repo is deferred until the first 1.0
-publish (per the user).
+Remaining v1 loose ends: **fix the inaccurate v1 changeset**
+([`.changeset/major-v1-rewrite.md`](../.changeset/major-v1-rewrite.md) still
+claims the CLI/`.bluprintrc` are unchanged), **delete `src/__archive/`** (fully
+superseded), and the repo/release admin ([task 0003](./tasks/0003-repo-release-maintenance.md)).
+End-to-end `start`/`clone`/`preview` against a real repo is deferred to the first
+1.0 publish (per the user).
 
 > ⚠️ When testing commands that touch the `profile` singleton, **seed state in
 > `beforeEach`** — mock-fs doesn't reliably reset the singleton's writes between

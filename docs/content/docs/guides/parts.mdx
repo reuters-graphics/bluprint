@@ -1,0 +1,96 @@
+---
+title: Parts guide
+description: Learn how to create reusable template segments with parts
+---
+
+Parts are named subsets of a bluprint a user can scaffold on their own, instead
+of the whole thing. They're handy for:
+
+- Dropping just the config/linters into a project already underway
+- Syncing specific files with the upstream bluprint
+- Offering optional pieces of a larger template
+
+## Defining parts
+
+Add a `parts` object to your config. Each part has its own `files`/`ignores`
+(and optional `actions` — see below), plus an optional `title`/`hint` for the
+picker:
+
+```ts title="bluprint.config.ts"
+import { defineConfig, execute } from '@reuters-graphics/bluprint';
+
+export default defineConfig({
+  name: 'My rig',
+  files: ['**/*'],
+  ignores: [],
+  actions: [execute('pnpm install')],
+  parts: {
+    config: {
+      title: 'Config files',
+      hint: 'Linters + tsconfig only',
+      files: ['.eslintrc.js', '.prettierrc', 'tsconfig.json'],
+      ignores: [],
+    },
+    button: {
+      title: 'Button component',
+      files: ['src/components/Button/**/*'],
+      ignores: [],
+    },
+  },
+});
+```
+
+## How parts work
+
+When a bluprint has parts, `start` asks whether to use the whole thing or pick a
+part. **Choosing a part replaces the top-level selection** — the CLI scaffolds
+that part's `files`/`ignores` and runs that part's `actions`:
+
+```ts
+parts: {
+  config: {
+    title: 'Config files',
+    files: ['.eslintrc.js', 'tsconfig.json'],
+    ignores: [],
+    // This part's own actions run when it's selected.
+    actions: [execute('pnpm install eslint typescript -D')],
+  },
+},
+```
+
+If a part defines **no** `actions`, it falls back to the top-level `actions`. If
+no part is chosen, the top-level `files`/`ignores`/`actions` are used.
+
+The selected part's key is available to actions as `ctx.bluprintPart`, so a
+shared top-level action can adapt to it:
+
+```ts
+actions: [
+  log('Set up the {green {{ bluprintPart }}} part.'),
+],
+```
+
+## Example: a component library
+
+Let developers pull in individual components without scaffolding a whole app:
+
+```ts
+parts: {
+  button: {
+    title: 'Button',
+    files: ['src/components/Button/**/*', 'src/styles/button.css'],
+    ignores: [],
+  },
+  modal: {
+    title: 'Modal',
+    files: ['src/components/Modal/**/*', 'src/styles/modal.css'],
+    ignores: [],
+  },
+},
+```
+
+:::tip
+Updating a `package.json` when scaffolding a part into an existing project? Reach
+for the [`json` action](/guides/actions#json) to merge fields rather than
+overwrite the file.
+:::

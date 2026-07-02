@@ -1,0 +1,109 @@
+---
+title: Quickstart
+description: Install bluprint and create your first template
+---
+
+## Install
+
+Install bluprint globally with your preferred package manager:
+
+```bash
+pnpm add -g @reuters-graphics/bluprint
+```
+
+```bash
+npm install -g @reuters-graphics/bluprint
+```
+
+:::note
+bluprint requires **Node 20 or later**.
+:::
+
+## Create a bluprint
+
+Any repo becomes a bluprint when you add a `bluprint.config.ts` to its root. In
+the project you want to templatize, run:
+
+```bash
+bluprint new
+```
+
+That scaffolds a starter config:
+
+```ts title="bluprint.config.ts"
+import { defineConfig } from '@reuters-graphics/bluprint';
+
+export default defineConfig({
+  name: 'My bluprint',
+  category: '',
+  bluprint: '^1.0.0',
+  files: ['**/*'],
+  ignores: [],
+  actions: [],
+});
+```
+
+- `files` / `ignores` decide which of the repo's files get scaffolded.
+- `actions` transform those files after they're copied — see the
+  [Actions guide](/guides/actions).
+- `category` groups similar bluprints in the CLI.
+
+See [Creating a bluprint](/guides/creating) for every option.
+
+## Preview it locally
+
+Before publishing, test your bluprint straight from your working directory:
+
+```bash
+bluprint preview
+```
+
+This scaffolds your current files into a temp directory, runs your actions, and
+prints the path so you can inspect exactly what a user would get — no publishing
+required. See [Previewing](/guides/previewing).
+
+## Publish
+
+Commit `bluprint.config.ts` and push to GitHub. That's it — there's no separate
+publish step; the CLI pulls straight from the repo.
+
+## Use it
+
+Register your bluprint with the CLI by its GitHub repo:
+
+```bash
+bluprint add reuters-graphics/my-bluprint
+```
+
+A repo can be referenced by URL (`https://github.com/user/repo`), SSH string
+(`git@github.com:user/repo.git`), or the `user/repo` shorthand.
+
+Then scaffold a new project from it in an empty directory:
+
+```bash
+bluprint start
+```
+
+The CLI lists your registered bluprints, scaffolds the files, and runs the
+actions — prompting you for anything they need.
+
+### Private repositories
+
+To let the CLI read a **private** repo, provide a
+[personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+one of two ways:
+
+```bash
+export GITHUB_TOKEN=<your token>   # environment variable
+```
+
+```bash
+bluprint token <your token>        # saved to your CLI profile
+```
+
+## Next steps
+
+- [Create a bluprint](/guides/creating) — every config option
+- [Actions](/guides/actions) — transform scaffolded files
+- [Parts](/guides/parts) — reusable segments
+- [Previewing](/guides/previewing) — test locally as you build

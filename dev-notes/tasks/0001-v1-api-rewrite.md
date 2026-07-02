@@ -35,7 +35,7 @@ Three strands:
 - [x] Port `start` command (bluprint select → config load → choose part → tarball scaffold → runActions)
 - [x] Port `clone` command (whole-repo tarball extract) + `new` command (starter `bluprint.config.ts`)
 - [x] All CLI commands ported → `src/__archive/` is now fully superseded (safe to delete)
-- [ ] Rewrite docs content for the new `bluprint.config.ts` API (currently still describes `.bluprintrc`)
+- [x] Rewrite docs content for the new `bluprint.config.ts` API (Astro/Starlight; added a Previewing guide)
 - [ ] Update the changeset — it inaccurately claims the CLI/`.bluprintrc` format is unchanged
 - [ ] Commit the working tree (currently all uncommitted)
 
@@ -120,6 +120,11 @@ command fns to `defineConfig` + actions). **Open parity gaps:**
   the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
   added 4 co-located tests (37 passing total). Discovered + documented the
   mock-fs/profile-singleton isolation quirk above (tests now self-seed state).
+- **2026-07-02** — Rewrote the docs site ([`../../docs/content/docs/`](../../docs/content/docs/))
+  for the new API: `.bluprintrc`→`bluprint.config.ts`, JSON action objects→typed
+  imported functions, `condition`→`when`, `mergeJson`→`json` action; added a
+  "Why this?" intro framing + a new Previewing guide; updated the sidebar.
+  `pnpm build:docs` clean (9 pages).
 - **2026-07-02** — Closed the parity gaps from the audit: restored `checkVersion`
   (semver guard in `start`/`add`), added the one-time `~/.bluprintrc` → v1 profile
   migration, and accepted the flat bluprint picker for v1 (per user). 132 tests.

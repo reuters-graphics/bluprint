@@ -1,0 +1,231 @@
+---
+title: Actions guide
+description: Learn how to use actions to transform your bluprint files
+---
+
+Actions transform your files after the repo is scaffolded. Each is a **function
+you import** from the package and add to your config's `actions` array — so
+every action and its options are fully typed.
+
+```ts title="bluprint.config.ts"
+import {
+  defineConfig,
+  prompt,
+  render,
+  execute,
+} from '@reuters-graphics/bluprint';
+
+export default defineConfig({
+  name: 'My bluprint',
+  files: ['**/*'],
+  ignores: [],
+  actions: [
+    prompt({ name: 'name', type: 'text', message: 'Project name?' }), // runs first
+    render({ files: ['README.md'] }), //                                then this
+    execute('pnpm install'), //                                         then this
+  ],
+});
+```
+
+## The run context
+
+Actions share a **context** object that flows through the run. It starts with
+some defaults and grows as actions (like `prompt`) contribute to it:
+
+| Key | Value |
+| --- | --- |
+| `year` / `month` / `day` | Date parts at run time (`"2026"`, `"07"`, `"02"`) |
+| `dirname` | Basename of the directory being scaffolded |
+| `bluprintPart` | The selected [part](/guides/parts), if any |
+
+A `prompt` action adds its answer under its `name`, and later actions can read
+it — in templates (`{{ name }}`) or via the `when` gate below.
+
+## Gating actions with `when`
+
+Every action takes an optional `when` predicate. Return `false` and the action
+is skipped. It receives the current context:
+
+```ts
+prompt({ name: 'useTypeScript', type: 'confirm', message: 'Use TypeScript?' }),
+render({
+  files: ['tsconfig.json'],
+  when: (ctx) => ctx.useTypeScript === true,
+}),
+```
+
+Gate on the selected part with `ctx.bluprintPart`:
+
+```ts
+execute('pnpm install', { when: (ctx) => ctx.bluprintPart === 'app' }),
+```
+
+## Handling errors with `failOnError`
+
+If an action throws, it's logged and skipped so the rest of the run continues.
+Set `failOnError: true` to abort the whole run instead:
+
+```ts
+execute('pnpm build', { failOnError: true }),
+```
+
+## Templating
+
+`render`, `log`, `json` values, and destination paths for `copy`/`move` are
+rendered with [mustache](https://mustache.github.io/) against the context, with
+these string helpers available: `camelize`, `capitalize`, `dasherize`,
+`humanize`, `latinise`, `slugify`, `titleCase`, `underscore`.
+
+```txt
+# {{ titleCase }}{{ name }}{{ /titleCase }}
+Created {{ year }} in {{ dirname }}.
+```
+
+`render` also supports [EJS](https://ejs.co/) via `engine: 'ejs'`.
+
+## The actions
+
+### `prompt`
+
+Ask the user a question; the answer is stored in the context under `name`. The
+spec is a discriminated union on `type` — `text`, `confirm`, `select`,
+`multiselect`, or `datetime`:
+
+```ts
+prompt({ name: 'name', type: 'text', message: 'Project name?' }),
+prompt({ name: 'ts', type: 'confirm', message: 'Use TypeScript?' }),
+prompt({
+  name: 'framework',
+  type: 'select',
+  message: 'Framework?',
+  options: [
+    { value: 'svelte', label: 'Svelte' },
+    { value: 'react', label: 'React' },
+  ],
+}),
+```
+
+### `render`
+
+Render template files **in place** against the context (plus any extra
+`context` you pass). Defaults to the mustache engine.
+
+```ts
+render({ files: ['README.md', 'package.json'] }),
+render({ files: ['index.html'], engine: 'ejs', context: { analytics: true } }),
+```
+
+### `copy` / `move`
+
+Copy or move files and directories. Take a single `[from, to]` pair or an array
+of them; the destination is rendered as a mustache template.
+
+```ts
+copy(['templates/component.tsx', 'src/{{ name }}.tsx']),
+move([
+  ['gitignore', '.gitignore'],
+  ['README.template.md', 'README.md'],
+]),
+```
+
+### `remove`
+
+Delete files and directories matching one or more globs.
+
+```ts
+remove(['**/*.test.ts', 'internal', 'TODO.md']),
+```
+
+### `regexreplace`
+
+Replace content in files with regular expressions. Each replacement is
+`[pattern, replacement, flags?]` (flags default to `gm`); the replacement is
+mustache-rendered.
+
+```ts
+regexreplace({
+  files: ['README.md'],
+  replace: [
+    ['^# .*$', '# {{ name }}'],
+    ['\\d{4}', '{{ year }}', 'g'],
+  ],
+}),
+```
+
+### `execute`
+
+Run a shell command in the project. Pass a string (run via the shell) or a
+`[command, ...args]` array (run without one). `silent` pipes output instead of
+inheriting it.
+
+```ts
+execute('pnpm install', { silent: true }),
+execute(['git', 'init']),
+```
+
+### `json`
+
+Edit a JSON file. The editor receives the parsed data and the context and
+**must return** the data to write (mutate then return, or return a new value):
+
+```ts
+json('package.json', (pkg, ctx) => {
+  pkg.name = ctx.name;
+  pkg.private = true;
+  return pkg;
+}),
+```
+
+Pass a type argument for typed editing: `json<PackageJson>('package.json', …)`.
+
+### `yaml`
+
+The `json` analog for YAML files (e.g. CI workflows). Same must-return editor.
+
+```ts
+yaml('.github/workflows/ci.yml', (workflow, ctx) => {
+  workflow.name = ctx.name;
+  return workflow;
+}),
+```
+
+:::caution
+`yaml` round-trips through plain data, so **comments and formatting are
+dropped**. Use it for generated config, not hand-curated files.
+:::
+
+### `append` / `prepend`
+
+Add (templated) content to a file, creating it if missing:
+
+```ts
+append('.gitignore', 'dist\n.env\n'),
+prepend('src/index.ts', '// @generated for {{ name }}\n'),
+```
+
+### `log`
+
+Print a message. Rendered with mustache, then styled with
+[chalk-template](https://github.com/chalk/chalk-template) color tags:
+
+```ts
+log('Scaffolded {green {{ name }}}! Run {yellow pnpm dev} to start.'),
+```
+
+### `run`
+
+The escape hatch: run any function. It receives the context and may return a
+partial context to merge in for later actions. Async is supported.
+
+```ts
+run(async (ctx) => {
+  const res = await fetch(`https://api.example.com/repos/${ctx.name}`);
+  return { repoId: (await res.json()).id }; // available to later actions
+}),
+```
+
+## Next steps
+
+- [Actions reference](/reference/actions) — every signature and option
+- [Parts](/guides/parts) — split a bluprint into reusable segments
+- [Previewing](/guides/previewing) — test your actions locally

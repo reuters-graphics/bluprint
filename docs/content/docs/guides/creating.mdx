@@ -1,0 +1,130 @@
+---
+title: Creating a bluprint
+description: Learn how to create and configure your own bluprint template
+---
+
+A bluprint is any GitHub repo with a `bluprint.config.ts` at its root. Create one
+with:
+
+```bash
+bluprint new
+```
+
+The config is authored with `defineConfig`, which gives you full type-checking
+and autocomplete on every option:
+
+```ts title="bluprint.config.ts"
+import { defineConfig } from '@reuters-graphics/bluprint';
+
+export default defineConfig({
+  name: 'My bluprint',
+  category: '',
+  bluprint: '^1.0.0',
+  files: ['**/*'],
+  ignores: [],
+  actions: [],
+});
+```
+
+## Configuration options
+
+### `name` (required)
+
+The bluprint's display name in the CLI. Either a string, or an object with a
+`hint` shown beside it in the picker:
+
+```ts
+name: 'My React component'
+```
+
+```ts
+name: {
+  title: 'My React component',
+  hint: 'TypeScript + tests',
+}
+```
+
+### `files` (required)
+
+Globs for which files to scaffold, relative to the repo root. Use `['**/*']` for
+everything.
+
+```ts
+files: ['src/**/*', 'package.json', 'README.md']
+```
+
+### `ignores` (required)
+
+Globs to exclude from `files`. (Files git already ignores are never scaffolded.)
+
+```ts
+ignores: ['**/*.test.ts', 'internal/**']
+```
+
+### `category` (optional)
+
+Groups similar bluprints in the CLI picker.
+
+```ts
+category: 'React components'
+```
+
+### `bluprint` (optional)
+
+A [semver range](https://github.com/npm/node-semver#ranges) for the CLI version
+your bluprint needs. The CLI warns on a mismatch and refuses to run if it's too
+old — a safety net when your actions rely on newer features.
+
+```ts
+bluprint: '^1.0.0'
+```
+
+### `actions` (optional)
+
+An array of [actions](/guides/actions) that transform the scaffolded files, run
+in order. Actions are functions you import from the package:
+
+```ts
+import { defineConfig, prompt, render, execute } from '@reuters-graphics/bluprint';
+
+export default defineConfig({
+  name: 'My bluprint',
+  files: ['**/*'],
+  ignores: [],
+  actions: [
+    prompt({ name: 'projectName', type: 'text', message: 'Project name?' }),
+    render({ files: ['README.md', 'package.json'] }),
+    execute('pnpm install', { silent: true }),
+  ],
+});
+```
+
+See the [Actions guide](/guides/actions).
+
+### `parts` (optional)
+
+Named subsets of your bluprint a user can scaffold on their own — each with its
+own `files`/`ignores` and optional `actions`:
+
+```ts
+parts: {
+  config: {
+    title: 'Config files',
+    hint: 'Just the linters + tsconfig',
+    files: ['.eslintrc.js', '.prettierrc', 'tsconfig.json'],
+    ignores: [],
+  },
+}
+```
+
+See the [Parts guide](/guides/parts).
+
+## Publishing
+
+There's no publish step. Commit `bluprint.config.ts`, push to GitHub, and the
+bluprint is ready — the CLI always pulls the latest from the repo.
+
+:::tip
+Run [`bluprint preview`](/guides/previewing) as you edit to see the scaffolded
+output without publishing.
+:::

@@ -1,0 +1,148 @@
+---
+title: Actions reference
+description: Complete reference for all bluprint actions
+---
+
+Every action is imported from `@reuters-graphics/bluprint` and added to your
+config's `actions` array. This page lists each signature; see the
+[Actions guide](/guides/actions) for concepts and worked examples.
+
+## Common options
+
+Every action accepts a trailing (or inlined) options object:
+
+```ts
+interface ActionOptions {
+  /** Skip the action when this returns false. */
+  when?: (ctx: ActionContext) => boolean;
+  /** Abort the whole run if the action throws (default: false = skip). */
+  failOnError?: boolean;
+}
+```
+
+## Context
+
+Actions receive an `ActionContext`:
+
+```ts
+type ActionContext = {
+  year: string; // e.g. "2026"
+  month: string; // zero-padded, e.g. "07"
+  day: string; // zero-padded, e.g. "02"
+  dirname: string; // basename of the directory being scaffolded
+  bluprintPart?: string; // selected part key, if any
+} & Record<string, unknown>; // + values contributed by prompt / run
+```
+
+## `prompt(spec, options?)`
+
+`spec` is discriminated on `type`; the answer is stored in the context under
+`spec.name`.
+
+```ts
+prompt({ name, type: 'text', message, placeholder?, initialValue?, validate? })
+prompt({ name, type: 'confirm', message, initialValue? })
+prompt({ name, type: 'select', message, options: { value, label?, hint? }[], initialValue? })
+prompt({ name, type: 'multiselect', message, options, initialValues?, required?, maxItems? })
+prompt({ name, type: 'datetime', message, initialValue? })
+```
+
+## `render(options)`
+
+Render template files in place.
+
+```ts
+render({
+  files: string | string[],
+  engine?: 'mustache' | 'ejs', // default 'mustache'
+  context?: Record<string, unknown>, // merged over the run context
+  when?, failOnError?,
+})
+```
+
+## `copy(paths, options?)` / `move(paths, options?)`
+
+```ts
+type PathPair = [from: string, to: string];
+copy(paths: PathPair | PathPair[], options?)
+move(paths: PathPair | PathPair[], options?)
+```
+
+Destination paths are rendered as mustache templates.
+
+## `remove(paths, options?)`
+
+```ts
+remove(paths: string | string[], options?)
+```
+
+Deletes files and directories matching the glob(s).
+
+## `regexreplace(options)`
+
+```ts
+type Replacement =
+  | [pattern: string, replacement: string]
+  | [pattern: string, replacement: string, flags: string]; // flags default 'gm'
+
+regexreplace({
+  files: string | string[],
+  replace: Replacement | Replacement[],
+  when?, failOnError?,
+})
+```
+
+The replacement string is mustache-rendered.
+
+## `execute(command, options?)`
+
+```ts
+execute(
+  command: string | string[], // string runs via the shell; array is [cmd, ...args]
+  options?: { silent?: boolean } & ActionOptions,
+)
+```
+
+## `json(file, editor, options?)`
+
+```ts
+json<T = Record<string, unknown>>(
+  file: string,
+  editor: (data: T, ctx: ActionContext) => T | Promise<T>, // must return the data
+  options?,
+)
+```
+
+## `yaml(file, editor, options?)`
+
+Same shape as `json`, for YAML files. **Drops comments/formatting** on
+round-trip.
+
+## `append(file, content, options?)` / `prepend(file, content, options?)`
+
+```ts
+append(file: string, content: string, options?)
+prepend(file: string, content: string, options?)
+```
+
+Adds (mustache-rendered) content to a file, creating it if missing.
+
+## `log(message, options?)`
+
+```ts
+log(message: string, options?)
+```
+
+Prints `message`, mustache-rendered then styled with chalk-template color tags.
+
+## `run(fn, options?)`
+
+```ts
+run(
+  fn: (ctx: ActionContext) => void | Partial<ActionContext> | Promise<void | Partial<ActionContext>>,
+  options?,
+)
+```
+
+Runs an arbitrary function. A returned object is merged into the context for
+later actions.
