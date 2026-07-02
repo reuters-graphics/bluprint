@@ -16,6 +16,9 @@ end-to-end verification, docs, and the changeset.
   the changeset, delete `__archive/`.
 - **[0002 — Actions function API](./tasks/0002-actions-function-api.md)** —
   *done* (docs deferred). 13 actions as typed factory functions + runner.
+- **[0003 — Repo & release maintenance](./tasks/0003-repo-release-maintenance.md)** —
+  *planned*. Switch GitHub default branch `master` → `main`; verify the
+  changesets npm-publish workflow. Mostly GitHub/npm admin work.
 
 ## What works right now
 
