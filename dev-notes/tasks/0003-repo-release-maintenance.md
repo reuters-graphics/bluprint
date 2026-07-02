@@ -72,6 +72,14 @@ needs repo-admin access on GitHub and an npm token. Those items are marked 🔧.
 
 ## Progress log
 
+- **2026-07-02** — Modernized the GitHub Actions: bumped `actions/checkout`
+  v4→v7, `actions/setup-node` v4→v6, `pnpm/action-setup` v4→v6,
+  `actions/upload-pages-artifact` v3→v5, `actions/deploy-pages` v4→v5. Moved CI
+  off **EOL Node 20** → single-version jobs on Node 22, test matrix `['22','24']`,
+  release input `node_version: '22'`. Left the org's reusable release workflow at
+  `@main` and `package.json` `engines` at `>=20` (a minimum floor — CI tests
+  current LTS). All four workflow YAMLs validate. *(Consideration for later:
+  whether to raise the `engines` floor off EOL Node 20.)*
 - **2026-07-02** — Task created. Audited workflows + changeset/package config:
   CI already targets `main` and changesets are configured for a scoped public
   package; the real gaps are the GitHub default-branch switch (main isn't even
