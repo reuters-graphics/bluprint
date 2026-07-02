@@ -6,8 +6,8 @@
 ## In one line
 
 Deep into the **v1.0.0 rewrite** — tooling done, the TS-config API and all 13
-actions built, and **all six CLI commands ported**. What's left is mostly
-end-to-end verification, docs, and the changeset.
+actions built, **all six commands ported**, plus the new **`preview`** command.
+What's left is mostly end-to-end verification, docs, and the changeset.
 
 ## Active work
 
@@ -19,18 +19,18 @@ end-to-end verification, docs, and the changeset.
 - **[0003 — Repo & release maintenance](./tasks/0003-repo-release-maintenance.md)** —
   *planned*. Switch GitHub default branch `master` → `main`; verify the
   changesets npm-publish workflow. Mostly GitHub/npm admin work.
-- **[0004 — `preview` command](./tasks/0004-preview-command.md)** — *planned*.
-  New v1 feature: scaffold a local bluprint into a temp dir + run its actions so
-  authors can test before publishing. Implements local scaffolding.
+- **[0004 — `preview` command](./tasks/0004-preview-command.md)** — *done*.
+  Scaffolds a local bluprint into a stable temp dir + runs its actions so authors
+  can test before publishing. Also implemented local scaffolding (`copyLocal`).
 
 ## What works right now
 
 - Tooling stack (pnpm, ESM, TS, Vitest, Valibot, changesets, rollup v4, Astro docs) — committed in `ca3eb43`.
 - New runtime modules with passing tests: [`config/`](../src/config/), [`profile/`](../src/profile/).
 - [`context/`](../src/context/) and [`prompts/`](../src/prompts/) modules in place.
-- **All CLI commands ported** — [`add`](../src/commands/add/index.ts), [`start`](../src/commands/start/index.ts), [`remove`](../src/commands/remove/index.ts), [`token`](../src/commands/token/index.ts), [`clone`](../src/commands/clone/index.ts), [`new`](../src/commands/new/index.ts) — on the new `profile`/`config`/`actions` APIs (with tests).
-- [`src/scaffold/`](../src/scaffold/) — shared tarball fetch+extract (glob filter, `excludeConfig` flag), used by `start` and `clone`.
-- [`src/cli.ts`](../src/cli.ts) wires all six commands; `bluprint --help` lists them.
+- **All CLI commands ported (7)** — [`add`](../src/commands/add/index.ts), [`start`](../src/commands/start/index.ts), [`remove`](../src/commands/remove/index.ts), [`token`](../src/commands/token/index.ts), [`clone`](../src/commands/clone/index.ts), [`new`](../src/commands/new/index.ts), [`preview`](../src/commands/preview/index.ts) — on the new `profile`/`config`/`actions` APIs (with tests).
+- [`src/scaffold/`](../src/scaffold/) — shared scaffolding: tarball fetch+extract (`start`/`clone`) and `copyLocal` local copy (`preview`), sharing the glob filter + `excludeConfig` flag.
+- [`src/cli.ts`](../src/cli.ts) wires all seven commands; `bluprint --help` lists them.
 - [`src/actions/`](../src/actions/) — 13 actions as typed factory functions (copy/move/remove/render/regexreplace/execute/log/prompt/run/json/append/prepend/yaml) + `runActions` runner (with `failOnError`), exported from the package root (task 0002).
 
 ## What's broken / unfinished
@@ -46,11 +46,11 @@ end-to-end verification, docs, and the changeset.
 
 | Check | Command | Result |
 |---|---|---|
-| Tests | `pnpm test` (`vitest run`) | ✅ 132 passing (config + profile + all commands + scaffold + actions) |
+| Tests | `pnpm test` (`vitest run`) | ✅ 139 passing (config + profile + all commands + scaffold + actions) |
 | Lint | `pnpm lint` (`eslint`) | ✅ clean (`__archive/` ignored) |
 | Typecheck | `npx tsc --noEmit` | ✅ clean (`__archive/` excluded) |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |
-| CLI smoke | `node dist/cli.js --help` | ✅ lists add / start / remove / token / clone / new |
+| CLI smoke | `node dist/cli.js --help` | ✅ lists add / start / remove / token / clone / new / preview |
 
 ## Suggested next step
 

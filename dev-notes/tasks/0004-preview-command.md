@@ -1,6 +1,6 @@
 # 0004 — `preview` command (test a bluprint locally)
 
-- **Status:** planned
+- **Status:** done
 - **Started:** 2026-07-02
 - **Owner:** hobbes7878
 
@@ -112,3 +112,9 @@ Register `preview [path]` → `await preview(path)`.
 - **2026-07-02** — Switched the output from a random temp dir to a stable
   `<tmp>/bluprint/<slug>` emptied in place each run, so authors can keep one
   editor window open and watch it refresh across runs.
+- **2026-07-02** — **Implemented.** `src/scaffold/copyLocal.ts` (git ls-files +
+  walk fallback), `src/commands/preview/index.ts` (stable dir, empty-in-place,
+  chdir + reuse choosePart/runActions/checkVersion), wired `preview [path]` into
+  the CLI. 7 new tests incl. a real `git init` fixture (139 total). tsc + eslint
+  clean, build lists `preview`. Not yet run against a real bluprint end-to-end
+  (deferred to first 1.0 publish, like start/clone).

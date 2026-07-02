@@ -6,6 +6,7 @@ import { name, version } from '../package.json';
 import { add } from './commands/add';
 import { clone } from './commands/clone';
 import { newBluprint } from './commands/new';
+import { preview } from './commands/preview';
 import { remove } from './commands/remove';
 import { start } from './commands/start';
 import { token } from './commands/token';
@@ -58,6 +59,13 @@ prog
   .describe('Create a new bluprint config file')
   .action(async (name?: string) => {
     await newBluprint(name);
+  });
+
+prog
+  .command('preview [path]')
+  .describe('Test a local bluprint by scaffolding it into a temp directory')
+  .action(async (path?: string) => {
+    await preview(path);
   });
 
 prog.parse(process.argv);
