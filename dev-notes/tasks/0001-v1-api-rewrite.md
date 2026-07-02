@@ -39,6 +39,27 @@ Three strands:
 - [ ] Update the changeset — it inaccurately claims the CLI/`.bluprintrc` format is unchanged
 - [ ] Commit the working tree (currently all uncommitted)
 
+## Backwards-parity audit (2026-07-02)
+
+Compared `src/__archive/` against the rewrite. Almost everything is ported or
+deliberately replaced (logger→clack, valibot schema→TS types + `defineConfig`,
+`mergeJson`→`json` action, `getUserConfig`→`profile`, lib exports shifted from
+command fns to `defineConfig` + actions). **Open parity gaps:**
+
+- [ ] **`checkVersion` not ported** — the config's `bluprint` version-constraint
+      field (e.g. `^1.0.0`) is never validated against the installed CLI. Old:
+      `utils/checkVersion.ts` used `semver.satisfies` to error (too old) or warn.
+      `semver` is now an unused dependency. *(Decision pending.)*
+- [ ] **Discovery UX shrank** — old `start` `chooseBluprint` offered browse-by-
+      category / search (autocomplete) / list-all; new `profile.promptForBluprint`
+      is a flat select (category only a hint). `remove` lost autocomplete too.
+      *(Decision pending.)*
+- [ ] **User-config migration** — location moved `~/.bluprintrc` →
+      `~/.bluprint/profile.json`; upgrading users lose registered bluprints +
+      token unless we add a one-time import. *(Decision pending.)*
+- Non-issue: old global SIGINT/SIGTERM/keypress handlers are covered by clack's
+  per-prompt cancellation.
+
 ## Notes / decisions
 
 - **Old code is parked, not deleted.** All pre-rewrite `src/**` was moved into
