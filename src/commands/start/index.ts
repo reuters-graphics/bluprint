@@ -3,6 +3,7 @@ import { log } from '@clack/prompts';
 
 import { profile } from '../../profile';
 import { config } from '../../config';
+import { checkVersion } from '../../config/checkVersion';
 import { runActions } from '../../actions';
 import { choosePart } from './choosePart';
 import { scaffold } from '../../scaffold';
@@ -40,6 +41,8 @@ export const start = async (bluprint?: string): Promise<void> => {
 
   await config.load(urlOrPath);
   if (!config.module) return;
+
+  checkVersion(config.module);
 
   const { part, files, ignores, actions } = await choosePart(config.module);
 

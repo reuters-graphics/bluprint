@@ -29,10 +29,40 @@ export const userProfilePath = path.join(
   `.bluprint/profile.json`
 );
 
-const defaultUserProfile: UserProfile = {
+const defaultUserProfile = (): UserProfile => ({
   version,
   token: '',
   bluprints: {},
+});
+
+/** Path to the pre-v1 user config that this version migrates from. */
+export const legacyConfigPath = path.join(os.homedir(), '.bluprintrc');
+
+/** Shape of the pre-v1 `~/.bluprintrc` (bluprints keyed by name). */
+type LegacyConfig = {
+  token?: string;
+  bluprints?: Record<
+    string,
+    { user?: string; project?: string; url?: string; category?: string }
+  >;
+};
+
+/**
+ * Map a legacy `~/.bluprintrc` into the v1 profile shape. Legacy entries stored
+ * `{ user, project }`; we join those into a `user/project` URL.
+ */
+export const mapLegacyProfile = (legacy: LegacyConfig): UserProfile => {
+  const bluprints: Record<string, BluprintProfile> = {};
+  for (const [title, entry] of Object.entries(legacy.bluprints ?? {})) {
+    const url =
+      entry.url ??
+      (entry.user && entry.project ?
+        `${entry.user}/${entry.project}`
+      : undefined);
+    if (!url) continue;
+    bluprints[title] = { url, category: entry.category ?? '', title };
+  }
+  return { version, token: legacy.token ?? '', bluprints };
 };
 
 class Profile {
@@ -42,10 +72,25 @@ class Profile {
     return Profile.instance;
   }
 
-  private readUserProfile() {
+  /** Import a legacy `~/.bluprintrc`, if one exists, into the v1 shape. */
+  private importLegacyProfile(): UserProfile | null {
+    if (!fs.existsSync(legacyConfigPath)) return null;
+    try {
+      const legacy = JSON.parse(
+        fs.readFileSync(legacyConfigPath, 'utf-8')
+      ) as LegacyConfig;
+      return mapLegacyProfile(legacy);
+    } catch {
+      return null;
+    }
+  }
+
+  private readUserProfile(): UserProfile {
     if (!fs.existsSync(userProfilePath)) {
-      this.writeUserProfile(defaultUserProfile);
-      return defaultUserProfile;
+      // First run: migrate a legacy config if present, else start fresh.
+      const profile = this.importLegacyProfile() ?? defaultUserProfile();
+      this.writeUserProfile(profile);
+      return profile;
     }
     const userProfile = JSON.parse(
       fs.readFileSync(userProfilePath, 'utf-8')

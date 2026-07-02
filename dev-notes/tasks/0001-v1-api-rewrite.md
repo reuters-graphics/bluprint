@@ -46,17 +46,19 @@ deliberately replaced (logger→clack, valibot schema→TS types + `defineConfig
 `mergeJson`→`json` action, `getUserConfig`→`profile`, lib exports shifted from
 command fns to `defineConfig` + actions). **Open parity gaps:**
 
-- [ ] **`checkVersion` not ported** — the config's `bluprint` version-constraint
-      field (e.g. `^1.0.0`) is never validated against the installed CLI. Old:
-      `utils/checkVersion.ts` used `semver.satisfies` to error (too old) or warn.
-      `semver` is now an unused dependency. *(Decision pending.)*
-- [ ] **Discovery UX shrank** — old `start` `chooseBluprint` offered browse-by-
-      category / search (autocomplete) / list-all; new `profile.promptForBluprint`
-      is a flat select (category only a hint). `remove` lost autocomplete too.
-      *(Decision pending.)*
-- [ ] **User-config migration** — location moved `~/.bluprintrc` →
-      `~/.bluprint/profile.json`; upgrading users lose registered bluprints +
-      token unless we add a one-time import. *(Decision pending.)*
+- [x] **`checkVersion` — RESTORED** ([`../../src/config/checkVersion.ts`](../../src/config/checkVersion.ts)):
+      `semver.satisfies` guard called by `start` and `add` after `config.load` —
+      errors+exits if the CLI is too old for the bluprint's `bluprint` constraint,
+      warns on other mismatch. Revives the `semver` dep.
+- [x] **Discovery UX — ACCEPTED flat list for v1** (user decision). `start`/`remove`
+      keep the single flat select (category shown as a hint); no category
+      browsing or search/autocomplete. Revisit post-1.0 if real usage warrants.
+- [x] **User-config migration — ADDED** one-time import
+      (`mapLegacyProfile` + `importLegacyProfile` in
+      [`../../src/profile/index.ts`](../../src/profile/index.ts)): first run with
+      no `~/.bluprint/profile.json` imports a legacy `~/.bluprintrc`
+      (`{user,project}`→`user/project` url, token, categories); legacy file left
+      in place.
 - Non-issue: old global SIGINT/SIGTERM/keypress handlers are covered by clack's
   per-prompt cancellation.
 
@@ -118,6 +120,9 @@ command fns to `defineConfig` + actions). **Open parity gaps:**
   the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
   added 4 co-located tests (37 passing total). Discovered + documented the
   mock-fs/profile-singleton isolation quirk above (tests now self-seed state).
+- **2026-07-02** — Closed the parity gaps from the audit: restored `checkVersion`
+  (semver guard in `start`/`add`), added the one-time `~/.bluprintrc` → v1 profile
+  migration, and accepted the flat bluprint picker for v1 (per user). 132 tests.
 - **2026-07-01** — Ported **`clone`** and **`new`**, completing the CLI command
   set (add/start/remove/token/clone/new). Moved `scaffold` from
   `commands/start/scaffold/` to a shared [`../../src/scaffold/`](../../src/scaffold/)

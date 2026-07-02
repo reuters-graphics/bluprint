@@ -43,7 +43,7 @@ end-to-end verification, docs, and the changeset.
 
 | Check | Command | Result |
 |---|---|---|
-| Tests | `pnpm test` (`vitest run`) | ✅ 124 passing (config + profile + all commands + scaffold + actions) |
+| Tests | `pnpm test` (`vitest run`) | ✅ 132 passing (config + profile + all commands + scaffold + actions) |
 | Lint | `pnpm lint` (`eslint`) | ✅ clean (`__archive/` ignored) |
 | Typecheck | `npx tsc --noEmit` | ✅ clean (`__archive/` excluded) |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |

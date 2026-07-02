@@ -8,6 +8,7 @@ import dedent from 'dedent';
 import * as prompts from '../../prompts';
 import { profile } from '../../profile';
 import { config } from '../../config';
+import { checkVersion } from '../../config/checkVersion';
 
 /**
  * Validate that a bluprint source is reachable.
@@ -62,6 +63,8 @@ export const add = async (urlOrPath?: string): Promise<void> => {
   await config.load(urlOrPath);
 
   if (!config.module) return;
+
+  checkVersion(config.module);
 
   const title =
     typeof config.module.name === 'string' ?
