@@ -91,8 +91,8 @@
     "vitest": "^3.0.5"
   },
   "dependencies": {
-    "@clack/prompts": "^0.11.0",
-    "@reuters-graphics/clack": "^0.0.2",
+    "@clack/core": "^1.4.2",
+    "@clack/prompts": "^1.6.0",
     "chalk-template": "^1.1.2",
     "dedent": "^1.7.0",
     "ejs": "^3.1.10",
@@ -102,6 +102,7 @@
     "jiti": "2.6.0",
     "minimatch": "^10.1.1",
     "mustache": "^4.2.0",
+    "picocolors": "^1.1.1",
     "sade": "^1.8.1",
     "semver": "^7.7.3",
     "string": "^3.3.3",

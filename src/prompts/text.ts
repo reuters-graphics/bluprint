@@ -47,7 +47,9 @@ export const text = async ({
     message,
     initialValue,
     placeholder,
-    validate,
+    // clack types the validated value as `string | undefined`; keep our API
+    // non-nullable and coerce an empty input to '' at the boundary.
+    validate: validate ? (v) => validate(v ?? '') : undefined,
   });
 
   if (isCancel(value)) {

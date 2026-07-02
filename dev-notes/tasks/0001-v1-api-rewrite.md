@@ -120,6 +120,18 @@ command fns to `defineConfig` + actions). **Open parity gaps:**
   the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
   added 4 co-located tests (37 passing total). Discovered + documented the
   mock-fs/profile-singleton isolation quirk above (tests now self-seed state).
+- **2026-07-02** — Removed the `@reuters-graphics/clack` dependency by rebuilding
+  its custom **datetime** prompt in-repo ([`../../src/prompts/datetime/`](../../src/prompts/datetime/)):
+  `fields.ts` (pure field-nav + Date rollover + formatting, unit-tested),
+  `DateTimePrompt.ts` (extends `@clack/core`'s `Prompt`, renders with
+  `@clack/prompts`'s own symbols for visual parity), `index.ts` wrapper. This
+  unblocked upgrading **`@clack/prompts` 0.11 → 1.6** (added `@clack/core@1.4` +
+  `picocolors` as direct deps). Now a single `@clack/core` → `isCancel` works and
+  the look is consistent (previously the datetime prompt straddled core 0.4 vs
+  0.5). One 1.x API change handled: `Validate<T>` now types the value as
+  `T | undefined`, so `text`/`datetime` adapt at the boundary to keep our
+  validators non-nullable. Interactive TUI testing deferred (manual), like the
+  other prompt-driven paths. 150 tests, all gates green.
 - **2026-07-02** — Dropped the `category` field from the config. With no more
   category-based discovery (flat picker) and a per-bluprint `hint` (via
   `name.hint`) covering the descriptive role, it was vestigial. Removed from
