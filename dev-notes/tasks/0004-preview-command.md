@@ -21,10 +21,15 @@ task 0001) — `start` could later reuse `copyLocal` for `file://` sources.
   author sees the real end-user experience.
 - **Output:** OS temp dir (`fs.mkdtempSync`), left in place, absolute path printed.
 - **Source:** optional path arg, defaulting to cwd (`bluprint preview [path]`).
-- **Faithful copy:** copy the working dir's files filtered by the config's
-  `files`/`ignores`, and **always also exclude `.git/` and `node_modules/`** (a
-  published git tarball wouldn't contain them). Excludes `bluprint.config.ts`
-  like `start` (`excludeConfig: true`).
+- **Faithful copy — honor `.gitignore` via git:** a GitHub tarball contains the
+  git tree, so ignored paths (`dist/`, `.env`, `node_modules/`, …) must be
+  skipped. Compute the file set with
+  `git ls-files --cached --others --exclude-standard` (run in `srcDir`) = tracked
+  **+** new-untracked, minus ignored — exactly a post-commit tarball, and it
+  still includes the author's *uncommitted new* files (the point). Fall back to a
+  plain recursive walk (skipping `.git`/`node_modules`) if `srcDir` isn't a git
+  repo / git is unavailable. The config's `files`/`ignores` + `excludeConfig`
+  (excludes `bluprint.config.ts`, like `start`) are then layered on top.
 
 ## Approach
 
@@ -36,10 +41,13 @@ into the temp dir and reuse everything unchanged.
 ```ts
 copyLocal(srcDir: string, { files, ignores, excludeConfig }: ScaffoldFilter): void
 ```
-- Walk `srcDir` recursively; for each **project-relative** path, include it via
-  `shouldInclude(relPath, files, ignores, excludeConfig)` (reused from
-  [`filter.ts`](../../src/scaffold/filter.ts)) — plus a hard-coded skip of
-  `.git` and `node_modules` directories (don't even descend into them).
+- Determine candidate **project-relative** paths:
+  `listGitFiles(srcDir)` → `git ls-files --cached --others --exclude-standard`
+  (via `child_process.execFileSync`, `cwd: srcDir`). On any error (not a repo /
+  no git), fall back to a recursive walk skipping `.git` and `node_modules`.
+- Filter candidates through `shouldInclude(relPath, files, ignores, excludeConfig)`
+  (reused from [`filter.ts`](../../src/scaffold/filter.ts)); skip any path no
+  longer on disk (e.g. a tracked-but-deleted working file).
 - Copy survivors into `process.cwd()` (the temp dir), creating parent dirs.
 - No `deRoot` needed (paths are already relative to `srcDir`, unlike the tarball).
 
@@ -61,11 +69,15 @@ Register `preview [path]` → `await preview(path)`.
 - `choosePart`, `runActions`, `config.load`, `checkVersion` — all as-is.
 
 ## Tests (co-located)
-- **`copyLocal.test.ts`** — real temp fixture (mirror `extract.test.ts`'s
-  approach; tar+fs/mock-fs don't mix, and neither does a recursive fs walk):
-  build a src dir with files + `.git/` + `node_modules/` + a dotfile + the config,
-  copy into a temp cwd, assert filtered result (globs applied, `.git`/
-  `node_modules`/config excluded, dotfiles kept).
+- **`copyLocal.test.ts`** — real temp fixtures (mirror `extract.test.ts`; git +
+  recursive fs don't mix with mock-fs):
+  - **git-repo fixture:** `git init` a temp src, add a `.gitignore` (e.g.
+    `dist/`, `secret.env`), commit some files, leave a *new untracked* template
+    file and an *ignored* file. Copy into a temp cwd; assert the untracked
+    template is included, the ignored/`dist` files are excluded, and the config
+    is excluded. (Verifies the git path + uncommitted-new-file behavior.)
+  - **non-repo fallback:** a plain dir (no `.git`) with `node_modules/`; assert
+    the walk fallback copies files but skips `.git`/`node_modules`.
 - **`preview/index.test.ts`** — mock `config`, `checkVersion`, `choosePart`,
   `copyLocal`, `runActions`, `@clack/prompts`; assert `config.load` gets
   `file://<srcDir>`, `copyLocal` gets the chosen globs, `runActions` gets the
@@ -84,3 +96,7 @@ Register `preview [path]` → `await preview(path)`.
 
 ## Progress log
 - **2026-07-02** — Task created; design + decisions agreed with user.
+- **2026-07-02** — Refined the copy to honor `.gitignore` via
+  `git ls-files --cached --others --exclude-standard` (with a walk fallback for
+  non-repos), so `preview` matches a real tarball while still including the
+  author's uncommitted new files.
