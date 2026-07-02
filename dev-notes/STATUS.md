@@ -33,7 +33,7 @@ before publishing, plus a deferred real-repo smoke test.
 - [`src/scaffold/`](../src/scaffold/) — shared scaffolding: tarball fetch+extract (`start`/`clone`) and `copyLocal` local copy (`preview`), sharing the glob filter + `excludeConfig` flag.
 - [`src/cli.ts`](../src/cli.ts) wires all seven commands; `bluprint --help` lists them.
 - [`docs/`](../docs/) — Astro/Starlight site rewritten for the new `bluprint.config.ts` + function-actions API (incl. a new Previewing guide). `pnpm build:docs` clean.
-- **knip** + **publint** wired in (`pnpm knip`, `pnpm publint`); both clean. Dead deps/files removed.
+- **knip** + **publint** wired in (`pnpm knip`, `pnpm publint`) and run in CI (the Lint workflow); both clean. Dead deps/files removed.
 - [`src/actions/`](../src/actions/) — 13 actions as typed factory functions (copy/move/remove/render/regexreplace/execute/log/prompt/run/json/append/prepend/yaml) + `runActions` runner (with `failOnError`), exported from the package root (task 0002).
 
 ## What's broken / unfinished

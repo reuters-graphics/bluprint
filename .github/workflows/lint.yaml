@@ -30,3 +30,9 @@ jobs:
 
       - name: Check Prettier formatting
         run: pnpm exec prettier . --check
+
+      - name: Check for dead code and dependencies
+        run: pnpm knip
+
+      - name: Validate publishable package
+        run: pnpm run publint
