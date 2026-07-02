@@ -15,7 +15,6 @@ export type BluprintConfig = {
         title: string;
         hint?: string;
       };
-  category?: string;
   bluprint?: string;
   files: string | string[];
   ignores: string | string[];

@@ -18,7 +18,6 @@ import { defineConfig } from '@reuters-graphics/bluprint';
 
 export default defineConfig({
   name: 'My bluprint',
-  category: '',
   bluprint: '^1.0.0',
   files: ['**/*'],
   ignores: [],
@@ -59,14 +58,6 @@ Globs to exclude from `files`. (Files git already ignores are never scaffolded.)
 
 ```ts
 ignores: ['**/*.test.ts', 'internal/**']
-```
-
-### `category` (optional)
-
-Groups similar bluprints in the CLI picker.
-
-```ts
-category: 'React components'
 ```
 
 ### `bluprint` (optional)

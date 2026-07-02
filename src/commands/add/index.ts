@@ -74,11 +74,9 @@ export const add = async (urlOrPath?: string): Promise<void> => {
     typeof config.module.name === 'string' ?
       undefined
     : config.module.name.hint;
-  const category = config.module.category || '';
 
   profile.addBluprint({
     url: urlOrPath,
-    category,
     title,
     hint,
   });

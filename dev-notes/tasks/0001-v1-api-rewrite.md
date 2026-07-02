@@ -120,6 +120,11 @@ command fns to `defineConfig` + actions). **Open parity gaps:**
   the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
   added 4 co-located tests (37 passing total). Discovered + documented the
   mock-fs/profile-singleton isolation quirk above (tests now self-seed state).
+- **2026-07-02** — Dropped the `category` field from the config. With no more
+  category-based discovery (flat picker) and a per-bluprint `hint` (via
+  `name.hint`) covering the descriptive role, it was vestigial. Removed from
+  `BluprintConfig`, the `profile` (the remove picker now hints off `hint`), the
+  `add` command, the `new` template, the legacy migration, docs, and tests.
 - **2026-07-02** — Upgraded the docs stack: **Astro 5 → 7**, **Starlight
   0.32 → 0.41** (latest Starlight requires Astro ^7). Fixed the one breaking
   change — Starlight's `social` config moved from an object to an array of

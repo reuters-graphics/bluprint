@@ -19,7 +19,7 @@ describe('mapLegacyProfile', () => {
     const result = mapLegacyProfile({
       token: 'tok',
       bluprints: {
-        'Graphics Kit': { user: 'reuters', project: 'kit', category: 'Rigs' },
+        'Graphics Kit': { user: 'reuters', project: 'kit' },
       },
     });
 
@@ -27,21 +27,20 @@ describe('mapLegacyProfile', () => {
     expect(result.token).toBe('tok');
     expect(result.bluprints['Graphics Kit']).toEqual({
       url: 'reuters/kit',
-      category: 'Rigs',
       title: 'Graphics Kit',
     });
   });
 
-  it('defaults a missing token/category and skips entries without a url', () => {
+  it('defaults a missing token and skips entries without a url', () => {
     const result = mapLegacyProfile({
       bluprints: {
         Good: { user: 'u', project: 'p' },
-        Bad: { category: 'x' }, // no user/project/url -> skipped
+        Bad: {}, // no user/project/url -> skipped
       },
     });
 
     expect(result.token).toBe('');
-    expect(result.bluprints.Good.category).toBe('');
+    expect(result.bluprints.Good.url).toBe('u/p');
     expect(result.bluprints.Bad).toBeUndefined();
   });
 
@@ -60,7 +59,7 @@ describe('legacy import on first run', () => {
       [path.join(HOME_DIR, '.bluprintrc')]: JSON.stringify({
         token: 'legacy-token',
         bluprints: {
-          'My Kit': { user: 'reuters', project: 'my-kit', category: 'Kits' },
+          'My Kit': { user: 'reuters', project: 'my-kit' },
         },
       }),
     });

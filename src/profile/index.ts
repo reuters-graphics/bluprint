@@ -7,8 +7,6 @@ import { select } from '../prompts';
 type BluprintProfile = {
   /** Git URL (or shorthand) or local directory path (file://...) to a bluprint */
   url: string;
-  /** Category bluprint is grouped under in the CLI */
-  category: string;
   /** Name of the bluprint */
   title: string;
   /** Some hint text shown in the prompt */
@@ -41,10 +39,7 @@ export const legacyConfigPath = path.join(os.homedir(), '.bluprintrc');
 /** Shape of the pre-v1 `~/.bluprintrc` (bluprints keyed by name). */
 type LegacyConfig = {
   token?: string;
-  bluprints?: Record<
-    string,
-    { user?: string; project?: string; url?: string; category?: string }
-  >;
+  bluprints?: Record<string, { user?: string; project?: string; url?: string }>;
 };
 
 /**
@@ -60,7 +55,7 @@ export const mapLegacyProfile = (legacy: LegacyConfig): UserProfile => {
         `${entry.user}/${entry.project}`
       : undefined);
     if (!url) continue;
-    bluprints[title] = { url, category: entry.category ?? '', title };
+    bluprints[title] = { url, title };
   }
   return { version, token: legacy.token ?? '', bluprints };
 };
@@ -172,7 +167,7 @@ class Profile {
       options: this.bluprintTitles.map((title) => ({
         value: title,
         label: profile.bluprints[title].title,
-        hint: profile.bluprints[title].category,
+        hint: profile.bluprints[title].hint,
       })),
     });
   }

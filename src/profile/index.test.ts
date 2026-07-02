@@ -75,7 +75,6 @@ describe('Profile', () => {
         bluprints: {
           'existing-bluprint': {
             url: 'https://github.com/user/repo',
-            category: 'Test',
             title: 'existing-bluprint',
           },
         },
@@ -97,7 +96,6 @@ describe('Profile', () => {
     it('should add a bluprint to an empty profile', () => {
       profile.addBluprint({
         url: 'https://github.com/user/new-repo',
-        category: 'Templates',
         title: 'my-bluprint',
         hint: 'A helpful hint',
       });
@@ -107,7 +105,6 @@ describe('Profile', () => {
       ) as UserProfile;
       expect(savedProfile.bluprints['my-bluprint']).toEqual({
         url: 'https://github.com/user/new-repo',
-        category: 'Templates',
         title: 'my-bluprint',
         hint: 'A helpful hint',
       });
@@ -116,7 +113,6 @@ describe('Profile', () => {
     it('should add a bluprint without a hint', () => {
       profile.addBluprint({
         url: 'user/repo',
-        category: 'Scaffolds',
         title: 'no-hint-bluprint',
       });
 
@@ -125,7 +121,6 @@ describe('Profile', () => {
       ) as UserProfile;
       expect(savedProfile.bluprints['no-hint-bluprint']).toEqual({
         url: 'user/repo',
-        category: 'Scaffolds',
         title: 'no-hint-bluprint',
       });
     });
@@ -133,13 +128,11 @@ describe('Profile', () => {
     it('should add multiple bluprints to the profile', () => {
       profile.addBluprint({
         url: 'user/repo1',
-        category: 'Category1',
         title: 'multi-bluprint-1',
       });
 
       profile.addBluprint({
         url: 'user/repo2',
-        category: 'Category2',
         title: 'multi-bluprint-2',
       });
 
@@ -156,13 +149,11 @@ describe('Profile', () => {
     it('should overwrite an existing bluprint with the same title', () => {
       profile.addBluprint({
         url: 'user/old-repo',
-        category: 'Old Category',
         title: 'same-title',
       });
 
       profile.addBluprint({
         url: 'user/new-repo',
-        category: 'New Category',
         title: 'same-title',
         hint: 'New hint',
       });
@@ -172,7 +163,6 @@ describe('Profile', () => {
       ) as UserProfile;
       expect(savedProfile.bluprints['same-title']).toEqual({
         url: 'user/new-repo',
-        category: 'New Category',
         title: 'same-title',
         hint: 'New hint',
       });
@@ -186,7 +176,6 @@ describe('Profile', () => {
         bluprints: {
           'existing-bluprint': {
             url: 'user/existing',
-            category: 'Existing',
             title: 'existing-bluprint',
           },
         },
@@ -195,7 +184,6 @@ describe('Profile', () => {
 
       profile.addBluprint({
         url: 'user/new',
-        category: 'New',
         title: 'new-bluprint',
       });
 
@@ -217,7 +205,6 @@ describe('Profile', () => {
         bluprints: {
           'to-remove': {
             url: 'user/repo',
-            category: 'Test',
             title: 'to-remove',
           },
         },
@@ -252,12 +239,10 @@ describe('Profile', () => {
         bluprints: {
           'keep-this': {
             url: 'user/keep',
-            category: 'Keep',
             title: 'keep-this',
           },
           'remove-this': {
             url: 'user/remove',
-            category: 'Remove',
             title: 'remove-this',
           },
         },
@@ -330,7 +315,6 @@ describe('Profile', () => {
       profile.token = 'test-token';
       profile.addBluprint({
         url: 'user/repo',
-        category: 'Test',
         title: 'test-bluprint',
       });
 
@@ -355,7 +339,6 @@ describe('Profile', () => {
     it('should handle file:// protocol URLs in bluprint', () => {
       profile.addBluprint({
         url: 'file:///local/path/to/bluprint',
-        category: 'Local',
         title: 'local-bluprint',
       });
 

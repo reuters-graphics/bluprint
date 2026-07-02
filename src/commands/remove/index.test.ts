@@ -33,7 +33,6 @@ const seedProfile = (bluprints: UserProfile['bluprints']) => {
 
 const bluprint = (title: string) => ({
   url: `user/${title}`,
-  category: 'Test',
   title,
 });
 

@@ -46,7 +46,6 @@ describe('Config', () => {
           title: 'Test Bluprint',
           hint: 'A test bluprint configuration',
         },
-        category: 'Test Category',
         bluprint: '^1.0.0',
         files: ['**/*'],
         ignores: ['node_modules/**'],
@@ -74,7 +73,6 @@ describe('Config', () => {
       title: 'Test Bluprint',
       hint: 'A test bluprint configuration',
     });
-    expect(module?.category).toBe('Test Category');
     expect(module?.bluprint).toBe('^1.0.0');
     expect(module?.files).toEqual(['**/*']);
     expect(module?.ignores).toEqual(['node_modules/**']);
@@ -88,7 +86,6 @@ describe('Config', () => {
 
       export default defineConfig({
         name: 'Remote Bluprint',
-        category: 'Remote Category',
         bluprint: '^2.0.0',
         files: ['src/**/*'],
         ignores: ['dist/**'],
@@ -106,7 +103,6 @@ describe('Config', () => {
     expect(fetchRemoteConfigMock).toHaveBeenCalledWith(remoteUrl);
     expect(module).toBeDefined();
     expect(module?.name).toBe('Remote Bluprint');
-    expect(module?.category).toBe('Remote Category');
     expect(module?.bluprint).toBe('^2.0.0');
   });
 
@@ -293,27 +289,6 @@ describe('Config', () => {
       title: 'Singleton Test',
       hint: 'Testing singleton behavior',
     });
-  });
-
-  it('should handle config with optional category field', async () => {
-    const noCategoryConfig = dedent`
-      import { defineConfig } from 'bluprint';
-
-      export default defineConfig({
-        name: 'No Category Config',
-        files: ['**/*'],
-        ignores: [],
-      });
-    `;
-
-    const configPath = path.join(CWD, 'bluprint.config.ts');
-    fs.writeFileSync(configPath, noCategoryConfig);
-
-    const module = await config.load(`file://${path.dirname(configPath)}`);
-
-    expect(module).toBeDefined();
-    expect(module?.name).toBe('No Category Config');
-    expect(module?.category).toBeUndefined();
   });
 
   it('should handle config with optional bluprint version field', async () => {

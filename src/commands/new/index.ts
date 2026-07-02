@@ -15,7 +15,6 @@ const template = (name: string): string =>
 
     export default defineConfig({
       name: ${JSON.stringify(name)},
-      category: '',
       bluprint: '^${version}',
       files: ['**/*'],
       ignores: [],
