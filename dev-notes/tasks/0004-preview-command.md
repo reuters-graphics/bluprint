@@ -85,6 +85,10 @@ Register `preview [path]` → `await preview(path)`.
     is excluded. (Verifies the git path + uncommitted-new-file behavior.)
   - **non-repo fallback:** a plain dir (no `.git`) with `node_modules/`; assert
     the walk fallback copies files but skips `.git`/`node_modules`.
+- **`preview/integration.test.ts`** — end-to-end: inject a `config.module` with a
+  real `render` action and run the *unmocked* `copyLocal` + `runActions`; assert
+  the template file in the temp dir was actually rendered (proves actions run on
+  the scaffolded files), and the config file wasn't copied.
 - **`preview/index.test.ts`** — mock `config`, `checkVersion`, `choosePart`,
   `copyLocal`, `runActions`, `@clack/prompts`; assert `config.load` gets
   `file://<srcDir>`, the output dir is the stable `<tmp>/bluprint/<slug>`, a
