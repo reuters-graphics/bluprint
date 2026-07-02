@@ -36,7 +36,7 @@ some defaults and grows as actions (like `prompt`) contribute to it:
 | --- | --- |
 | `year` / `month` / `day` | Date parts at run time (`"2026"`, `"07"`, `"02"`) |
 | `dirname` | Basename of the directory being scaffolded |
-| `bluprintPart` | The selected [part](/guides/parts), if any |
+| `bluprintPart` | The selected [part](/bluprint/guides/parts/), if any |
 
 A `prompt` action adds its answer under its `name`, and later actions can read
 it — in templates (`{{ name }}`) or via the `when` gate below.
@@ -226,6 +226,6 @@ run(async (ctx) => {
 
 ## Next steps
 
-- [Actions reference](/reference/actions) — every signature and option
-- [Parts](/guides/parts) — split a bluprint into reusable segments
-- [Previewing](/guides/previewing) — test your actions locally
+- [Actions reference](/bluprint/reference/actions/) — every signature and option
+- [Parts](/bluprint/guides/parts/) — split a bluprint into reusable segments
+- [Previewing](/bluprint/guides/previewing/) — test your actions locally
