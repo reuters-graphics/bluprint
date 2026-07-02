@@ -19,7 +19,11 @@ task 0001) — `start` could later reuse `copyLocal` for `file://` sources.
 - **Name:** `preview`.
 - **Parts:** interactive — reuse `choosePart` (same prompts as `start`), so the
   author sees the real end-user experience.
-- **Output:** OS temp dir (`fs.mkdtempSync`), left in place, absolute path printed.
+- **Output:** a **stable** dir `path.join(os.tmpdir(), 'bluprint', slugify(name))`
+  — *not* random — emptied at the start of each run and left in place, absolute
+  path printed. A stable path lets the author keep an editor/Finder window open
+  across runs and watch the output update as they iterate. (Two same-named
+  bluprints would share the dir — last run wins; acceptable.)
 - **Source:** optional path arg, defaulting to cwd (`bluprint preview [path]`).
 - **Faithful copy — honor `.gitignore` via git:** a GitHub tarball contains the
   git tree, so ignored paths (`dist/`, `.env`, `node_modules/`, …) must be
@@ -57,9 +61,12 @@ copyLocal(srcDir: string, { files, ignores, excludeConfig }: ScaffoldFilter): vo
    `bluprint.config.ts` there.
 2. `await config.load(\`file://${srcDir}\`)`; bail if no module; `checkVersion`.
 3. `const { part, files, ignores, actions } = await choosePart(config.module)`.
-4. `const out = fs.mkdtempSync(path.join(os.tmpdir(), 'bluprint-preview-'))`.
+4. Derive the stable output dir: `slug = slugify(name)` (guard: non-empty, else
+   bail); `out = path.join(os.tmpdir(), 'bluprint', slug)`. **Empty it in place**
+   (`mkdirSync(out, {recursive})` then remove each child) — keeps the dir inode
+   so open editor watchers survive, and drops files removed from the bluprint.
 5. `chdir(out)` → `try { copyLocal(srcDir, { files, ignores }); await runActions(actions, part); } finally { chdir(original) }`.
-6. `log.success` with the `out` path.
+6. `log.success` with the `out` path (+ hint: re-run `preview` to refresh).
 
 ### Edit: `src/cli.ts`
 Register `preview [path]` → `await preview(path)`.
@@ -80,8 +87,10 @@ Register `preview [path]` → `await preview(path)`.
     the walk fallback copies files but skips `.git`/`node_modules`.
 - **`preview/index.test.ts`** — mock `config`, `checkVersion`, `choosePart`,
   `copyLocal`, `runActions`, `@clack/prompts`; assert `config.load` gets
-  `file://<srcDir>`, `copyLocal` gets the chosen globs, `runActions` gets the
-  chosen actions/part, and cwd is restored afterward.
+  `file://<srcDir>`, the output dir is the stable `<tmp>/bluprint/<slug>`, a
+  pre-existing stale file in it is removed before the run (emptied in place),
+  `copyLocal`/`runActions` get the chosen globs/actions/part, and cwd is restored
+  afterward.
 
 ## Verification
 1. `npx tsc --noEmit`, `pnpm vitest run`, `pnpm lint` — clean.
@@ -100,3 +109,6 @@ Register `preview [path]` → `await preview(path)`.
   `git ls-files --cached --others --exclude-standard` (with a walk fallback for
   non-repos), so `preview` matches a real tarball while still including the
   author's uncommitted new files.
+- **2026-07-02** — Switched the output from a random temp dir to a stable
+  `<tmp>/bluprint/<slug>` emptied in place each run, so authors can keep one
+  editor window open and watch it refresh across runs.
