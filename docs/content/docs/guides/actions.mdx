@@ -155,8 +155,9 @@ regexreplace({
 ### `execute`
 
 Run a shell command in the project. Pass a string (run via the shell) or a
-`[command, ...args]` array (run without one). `silent` pipes output instead of
-inheriting it.
+`[command, ...args]` array (run without one). By default the command's output
+streams to the terminal; with `silent`, output is hidden and a spinner is shown
+instead.
 
 ```ts
 execute('pnpm install', { silent: true }),

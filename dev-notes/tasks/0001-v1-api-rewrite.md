@@ -120,6 +120,13 @@ command fns to `defineConfig` + actions). **Open parity gaps:**
   the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
   added 4 co-located tests (37 passing total). Discovered + documented the
   mock-fs/profile-singleton isolation quirk above (tests now self-seed state).
+- **2026-07-02** — `execute` action now shows a **clack spinner** when
+  `silent: true` (output hidden). Required switching from `spawnSync` to async
+  `spawn` (a blocking sync call can't animate a spinner); silent uses
+  `stdio: 'ignore'`, non-silent still inherits (streams output, no spinner). Also
+  now rejects on spawn `error` (e.g. missing binary), so the runner surfaces it
+  (previously swallowed). Test rewritten to mock async `spawn` + `spinner`; docs
+  updated.
 - **2026-07-02** — Removed the `@reuters-graphics/clack` dependency by rebuilding
   its custom **datetime** prompt in-repo ([`../../src/prompts/datetime/`](../../src/prompts/datetime/)):
   `fields.ts` (pure field-nav + Date rollover + formatting, unit-tested),

@@ -99,7 +99,7 @@ The replacement string is mustache-rendered.
 ```ts
 execute(
   command: string | string[], // string runs via the shell; array is [cmd, ...args]
-  options?: { silent?: boolean } & ActionOptions,
+  options?: { silent?: boolean } & ActionOptions, // silent: hide output, show a spinner
 )
 ```
 

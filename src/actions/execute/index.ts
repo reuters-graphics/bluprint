@@ -1,10 +1,24 @@
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
+import { spinner } from '@clack/prompts';
 import type { Action, ActionOptions } from '../types';
 
 export interface ExecuteOptions extends ActionOptions {
-  /** Pipe output instead of inheriting the parent stdio. */
+  /** Hide the command's output behind a spinner instead of streaming it. */
   silent?: boolean;
 }
+
+/** Run a command to completion, resolving its exit code. */
+const runCommand = (
+  cmd: string,
+  args: string[],
+  shell: boolean,
+  stdio: 'inherit' | 'ignore'
+): Promise<number> =>
+  new Promise((resolve, reject) => {
+    const child = spawn(cmd, args, { cwd: process.cwd(), shell, stdio });
+    child.on('error', reject);
+    child.on('close', (code) => resolve(code ?? 0));
+  });
 
 /**
  * Run a shell command in the project root.
@@ -21,22 +35,23 @@ export const execute = (
   name: 'execute',
   when: options.when,
   failOnError: options.failOnError,
-  run: () => {
-    const stdio = options.silent ? 'pipe' : 'inherit';
-    if (typeof command === 'string') {
-      spawnSync(command, {
-        cwd: process.cwd(),
-        shell: true,
-        stdio,
-        encoding: 'utf8',
-      });
+  run: async () => {
+    const isString = typeof command === 'string';
+    // A string is run via the shell (it parses the whole line); an array is
+    // run directly as [command, ...args] with no shell.
+    const cmd = isString ? command : command[0];
+    const args = isString ? [] : command.slice(1);
+    const label = isString ? command : command.join(' ');
+
+    if (options.silent) {
+      // Output is hidden, so show a spinner for feedback. Running async lets it
+      // animate; `ignore` discards output (an unread pipe could deadlock).
+      const s = spinner();
+      s.start(`Running ${label}`);
+      const code = await runCommand(cmd, args, isString, 'ignore');
+      s.stop(code === 0 ? label : `${label} (exit code ${code})`);
     } else {
-      const [cmd, ...args] = command;
-      spawnSync(cmd, args, {
-        cwd: process.cwd(),
-        stdio,
-        encoding: 'utf8',
-      });
+      await runCommand(cmd, args, isString, 'inherit');
     }
   },
 });
