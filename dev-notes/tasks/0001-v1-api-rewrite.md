@@ -120,6 +120,12 @@ command fns to `defineConfig` + actions). **Open parity gaps:**
   the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
   added 4 co-located tests (37 passing total). Discovered + documented the
   mock-fs/profile-singleton isolation quirk above (tests now self-seed state).
+- **2026-07-02** — Upgraded the docs stack: **Astro 5 → 7**, **Starlight
+  0.32 → 0.41** (latest Starlight requires Astro ^7). Fixed the one breaking
+  change — Starlight's `social` config moved from an object to an array of
+  `{ icon, label, href }` (changed in 0.33). Docs build clean (10 pages), links
+  + social render correctly, knip still green. Docs-only; no impact on the
+  library build/tests.
 - **2026-07-02** — Added **knip** + **publint** (scripts `pnpm knip` / `pnpm
   publint`). knip found dead deps/files; removed `chalk`, `prompts`, `winston`,
   `valibot`, `@rollup/plugin-node-resolve`, `@types/prompts`, `@types/tar`,

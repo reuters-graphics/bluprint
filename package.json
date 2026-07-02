@@ -61,7 +61,7 @@
     "changeset:publish": "git add --all && changeset publish"
   },
   "devDependencies": {
-    "@astrojs/starlight": "^0.32.2",
+    "@astrojs/starlight": "^0.41.2",
     "@changesets/cli": "^2.27.9",
     "@reuters-graphics/yaks-eslint": "^0.0.6",
     "@reuters-graphics/yaks-prettier": "^0.0.4",
@@ -77,7 +77,7 @@
     "@types/string": "^0.0.34",
     "@types/update-notifier": "^6.0.8",
     "@vitest/coverage-v8": "^3.0.5",
-    "astro": "^5.4.0",
+    "astro": "^7.0.5",
     "eslint": "^9.39.1",
     "knip": "^6.24.0",
     "mock-fs": "^5.5.0",

@@ -21,9 +21,13 @@ export default defineConfig({
       },
       favicon:
         'https://graphics.thomsonreuters.com/style-assets/images/logos/favicon/favicon.ico',
-      social: {
-        github: 'https://github.com/reuters-graphics/bluprint/',
-      },
+      social: [
+        {
+          icon: 'github',
+          label: 'GitHub',
+          href: 'https://github.com/reuters-graphics/bluprint/',
+        },
+      ],
       sidebar: [
         {
           label: 'Getting Started',
