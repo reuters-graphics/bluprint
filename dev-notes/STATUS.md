@@ -5,9 +5,10 @@
 
 ## In one line
 
-Deep into the **v1.0.0 rewrite** — tooling done, the TS-config API and all 13
-actions built, **all six commands ported**, plus the new **`preview`** command.
-What's left is mostly end-to-end verification, docs, and the changeset.
+The **v1.0.0 rewrite** is essentially code-complete — tooling, the TS-config API,
+all 13 actions, all 7 commands (incl. new `preview`), docs, and the changeset are
+done. What's left is repo/release admin ([0003](./tasks/0003-repo-release-maintenance.md))
+before publishing, plus a deferred real-repo smoke test.
 
 ## Active work
 
@@ -38,8 +39,7 @@ What's left is mostly end-to-end verification, docs, and the changeset.
 
 - `start` scaffolds **remote git bluprints only** — `file://` local bluprints are rejected for now (deferred).
 - `start`/`clone`/`preview` haven't been run against a real repo end-to-end yet (no v1 `bluprint.config.ts` repo to test against); logic is unit/integration-tested with fixtures. Deferred until first 1.0 publish.
-- The v1 changeset text is inaccurate (claims API unchanged).
-- `src/__archive/` is fully superseded and can be deleted.
+- `valibot` is a **dead dependency** — listed in package.json but unused (config is TS-only, no runtime schema validation). Safe to remove in a dep cleanup.
 - Pre-rewrite deletions + new modules are committed incrementally on `main`; the two earliest session commits predate the foundation commit (accepted).
 
 ## Health check (2026-07-01)
@@ -47,19 +47,18 @@ What's left is mostly end-to-end verification, docs, and the changeset.
 | Check | Command | Result |
 |---|---|---|
 | Tests | `pnpm test` (`vitest run`) | ✅ 139 passing (config + profile + all commands + scaffold + actions) |
-| Lint | `pnpm lint` (`eslint`) | ✅ clean (`__archive/` ignored) |
-| Typecheck | `npx tsc --noEmit` | ✅ clean (`__archive/` excluded) |
+| Lint | `pnpm lint` (`eslint`) | ✅ clean |
+| Typecheck | `npx tsc --noEmit` | ✅ clean |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |
 | CLI smoke | `node dist/cli.js --help` | ✅ lists add / start / remove / token / clone / new / preview |
 
 ## Suggested next step
 
-Remaining v1 loose ends: **fix the inaccurate v1 changeset**
-([`.changeset/major-v1-rewrite.md`](../.changeset/major-v1-rewrite.md) still
-claims the CLI/`.bluprintrc` are unchanged), **delete `src/__archive/`** (fully
-superseded), and the repo/release admin ([task 0003](./tasks/0003-repo-release-maintenance.md)).
-End-to-end `start`/`clone`/`preview` against a real repo is deferred to the first
-1.0 publish (per the user).
+The v1 code + docs + changeset are done. Remaining before publish: the
+repo/release admin ([task 0003](./tasks/0003-repo-release-maintenance.md) —
+mostly GitHub/npm), an optional `valibot` dep cleanup, and the deferred
+end-to-end `start`/`clone`/`preview` smoke test against a real repo at the first
+1.0 publish.
 
 > ⚠️ When testing commands that touch the `profile` singleton, **seed state in
 > `beforeEach`** — mock-fs doesn't reliably reset the singleton's writes between

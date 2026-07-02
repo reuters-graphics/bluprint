@@ -2,50 +2,86 @@
 "@reuters-graphics/bluprint": major
 ---
 
-# Major Rewrite to v1.0.0
+# Major rewrite to v1.0.0
 
-This is a complete rewrite of bluprint with modern tooling and significant breaking changes.
+A complete rewrite of bluprint with modern tooling and a new, typed configuration
+API. This is a breaking release: **existing bluprints need to migrate.**
 
-## Breaking Changes
+## Breaking changes
+
+### Configuration: `.bluprintrc` → `bluprint.config.ts`
+
+Bluprints are now configured with a typed TypeScript file authored via
+`defineConfig`, instead of a `.bluprintrc` JSON file. Run `bluprint new` to
+scaffold a starter config.
+
+```ts
+import { defineConfig } from '@reuters-graphics/bluprint';
+
+export default defineConfig({
+  name: 'My bluprint',
+  files: ['**/*'],
+  ignores: [],
+  actions: [],
+});
+```
+
+### Actions are now typed functions
+
+Actions were plain objects (`{ action: 'copy', paths: [...] }`) dispatched by a
+central switch. They're now **functions you import** from the package, so you get
+autocomplete, inline docs, and type-checking:
+
+```ts
+import { copy, render, prompt } from '@reuters-graphics/bluprint';
+// actions: [ copy(['a', 'b']), render({ files: ['README.md'] }), ... ]
+```
+
+- Conditional actions use a `when: (ctx) => boolean` predicate instead of the old
+  `condition` tuple.
+- New actions: `run` (arbitrary function), `json`/`yaml` (structured edits),
+  `append`/`prepend` (add content to files).
+- The fetch-time `mergeJson` option is gone — use the `json` action to merge
+  structured data.
+
+### CLI
+
+- Command names are unchanged (`add`, `start`, `clone`, `new`, `remove`,
+  `token`), plus a new **`preview`** command that scaffolds a local, in-progress
+  bluprint into a temp directory so authors can test before publishing.
+- User config moved from `~/.bluprintrc` to `~/.bluprint/profile.json`. On first
+  run, an existing `~/.bluprintrc` (registered bluprints + token) is imported
+  automatically.
+
+### Library API
+
+The package now exports `defineConfig` and the action functions (for authoring
+bluprints), rather than the command functions. Imports are ES modules.
 
 ### Infrastructure
-- **Node.js requirement**: Minimum Node version is now 20.0.0 (was 8.0.0)
-- **Package manager**: Migrated from npm/yarn to pnpm
-- **Module system**: Now uses ES modules (`"type": "module"`) instead of CommonJS
 
-### TypeScript Migration
-- Complete rewrite in TypeScript with full type definitions
-- All source code migrated from JavaScript to TypeScript
-- Type definitions (`.d.ts`) now included in published package
-- Schema validation migrated from Ajv to Valibot
+- **Node** ≥ 20 (was ≥ 8); ESM (`"type": "module"`); package manager is pnpm.
+- Rewritten in **TypeScript** with published `.d.ts` types.
+- Runtime schema validation (Ajv) removed — the config is validated by the
+  TypeScript compiler and `defineConfig`.
+- Tests migrated from Mocha/Sinon/expect.js to **Vitest**, co-located with source.
+- **rollup** v1 → v4, **minimatch** v3 → v10, and other deps updated.
+- Version management via **changesets**; new GitHub Actions release + docs workflows.
 
-### Testing
-- Test framework changed from Mocha to Vitest
-- Assertion library changed from expect.js to Vitest's built-in expect
-- Mocking changed from Sinon to Vitest's built-in mocking utilities
-- Tests are now co-located with source files
+## Migration guide
 
-### Dependencies
-- Removed: `ajv`, `mocha`, `expect.js`, `sinon`, `mocha-sinon`, `memfs`, `eslint-plugin-mocha`
-- Added: `valibot`, `vitest`, `@vitest/coverage-v8`, `typescript`, and various `@types/*` packages
-- Updated: `rollup` v1 → v4, `minimatch` v3 → v10, and other dependencies to latest versions
+1. **Update Node** to 20 or later.
+2. **Convert `.bluprintrc` → `bluprint.config.ts`.** Run `bluprint new` for a
+   starter, then port your config: actions become imported function calls,
+   `condition` becomes `when`, and `mergeJson` becomes a `json` action. See the
+   [docs](https://reuters-graphics.github.io/bluprint/).
+3. **CLI users**: nothing to do — your registered bluprints and token are
+   imported from `~/.bluprintrc` on first run.
+4. **Library importers**: import `defineConfig` and actions from the package
+   using ES module syntax.
 
-### Release Management
-- Integrated changesets for version management
-- New GitHub Actions workflow for automated releases
-- Test workflow now runs on Node 20 and 22
+## What's not changed
 
-## Migration Guide
-
-If you're using bluprint in your projects:
-
-1. **Update Node.js**: Ensure you're running Node 20 or later
-2. **API compatibility**: The CLI interface and `.bluprintrc` format remain the same - no changes needed to your bluprints
-3. **If importing bluprint as a library**: TypeScript types are now available, and imports should use ES module syntax
-
-## What's Not Changed
-
-- The CLI interface remains the same
-- `.bluprintrc` format is unchanged
-- All actions work exactly as before
-- Bluprints created with previous versions are fully compatible
+- A bluprint is still just a GitHub repo, distributed by `git push`.
+- The CLI command names (other than the added `preview`).
+- Public and private repos are both supported.

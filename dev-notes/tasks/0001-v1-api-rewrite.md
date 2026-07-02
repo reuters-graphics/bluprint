@@ -34,7 +34,8 @@ Three strands:
 - [x] Wire up `actions` in the new API → **split out to task [0002](./0002-actions-function-api.md)** (function-based redesign, done)
 - [x] Port `start` command (bluprint select → config load → choose part → tarball scaffold → runActions)
 - [x] Port `clone` command (whole-repo tarball extract) + `new` command (starter `bluprint.config.ts`)
-- [x] All CLI commands ported → `src/__archive/` is now fully superseded (safe to delete)
+- [x] All CLI commands ported → `src/__archive/` **deleted** (fully superseded); tsconfig/eslint exclusions removed
+- [x] Fix the inaccurate v1 changeset (now describes the real breaking API changes)
 - [x] Rewrite docs content for the new `bluprint.config.ts` API (Astro/Starlight; added a Previewing guide)
 - [ ] Update the changeset — it inaccurately claims the CLI/`.bluprintrc` format is unchanged
 - [ ] Commit the working tree (currently all uncommitted)
@@ -87,9 +88,8 @@ command fns to `defineConfig` + actions). **Open parity gaps:**
 - *(resolved 2026-07-01)* ~~No `src/cli.ts`~~ — recreated with `sade`; build +
   CLI smoke test pass. Only `add` is wired; remaining commands get registered as
   they're ported.
-- **Decide `__archive`'s fate** — currently excluded from `tsconfig` *and*
-  `eslint` (so `tsc` and `pnpm lint` are clean) but still on disk as porting
-  reference. Delete once all commands/actions are ported.
+- *(resolved 2026-07-02)* ~~`__archive`'s fate~~ — **deleted** now that all
+  commands + actions are ported; its `tsconfig`/`eslint` exclusions were removed.
 - **mock-fs + `profile` singleton test-isolation quirk** — the `profile`
   singleton's `fs` writes (to `~/.bluprint/profile.json`) appear to **survive
   mock-fs resets between tests**, even though raw `fs` writes in the test file
@@ -120,6 +120,11 @@ command fns to `defineConfig` + actions). **Open parity gaps:**
   the `profile` singleton + new prompt wrappers, wired it into `cli.ts`, and
   added 4 co-located tests (37 passing total). Discovered + documented the
   mock-fs/profile-singleton isolation quirk above (tests now self-seed state).
+- **2026-07-02** — Fixed the v1 changeset to describe the real breaking changes
+  (was claiming the CLI/`.bluprintrc`/actions were unchanged). Deleted
+  `src/__archive/` (fully superseded) and removed its tsconfig/eslint exclusions.
+  Noted `valibot` is now a **dead dependency** (unused; config is TS-only) — a
+  follow-up dep cleanup. 140 tests green, tsc/lint/build clean.
 - **2026-07-02** — Rewrote the docs site ([`../../docs/content/docs/`](../../docs/content/docs/))
   for the new API: `.bluprintrc`→`bluprint.config.ts`, JSON action objects→typed
   imported functions, `condition`→`when`, `mergeJson`→`json` action; added a
