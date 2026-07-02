@@ -79,10 +79,15 @@ rendered with [mustache](https://mustache.github.io/) against the context, with
 these string helpers available: `camelize`, `capitalize`, `dasherize`,
 `humanize`, `latinise`, `slugify`, `titleCase`, `underscore`.
 
+The helpers are mustache **lambda sections**, so wrap the value in a section
+(note the `#`): `{{# helper }}…{{ /helper }}`.
+
 ```txt
-# {{ titleCase }}{{ name }}{{ /titleCase }}
+# {{# titleCase }}{{ name }}{{ /titleCase }}
 Created {{ year }} in {{ dirname }}.
 ```
+
+For example, a templated copy destination: `src/{{# slugify }}{{ name }}{{ /slugify }}.ts`.
 
 `render` also supports [EJS](https://ejs.co/) via `engine: 'ejs'`.
 
