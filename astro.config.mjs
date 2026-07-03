@@ -44,6 +44,7 @@ export default defineConfig({
             { label: 'Actions', slug: 'guides/actions' },
             { label: 'Parts', slug: 'guides/parts' },
             { label: 'Previewing', slug: 'guides/previewing' },
+            { label: 'Scaffolding in CI', slug: 'guides/ci' },
           ],
         },
         {

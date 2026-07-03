@@ -1,0 +1,112 @@
+---
+title: Scaffolding in CI
+description: Run bluprint non-interactively on a cloud machine to scaffold projects and create repos
+---
+
+bluprint can run headless — on a CI runner or any cloud machine — to scaffold a
+project and, if you want, create a brand-new repo from it. This is the bluprint
+answer to "generate a repo from a template in an Action."
+
+## Non-interactive mode
+
+`start` runs interactively by default. It switches to **non-interactive** mode
+when you pass `--ci`, when stdin isn't a TTY, or when the `CI` environment
+variable is set (so most CI systems trigger it automatically). In this mode it
+**never prompts**:
+
+- **Prompt answers** come from a JSON file passed with `--input`, keyed by each
+  prompt's `name`. A prompt with no supplied value falls back to its
+  `initialValue`; if it has neither, the run fails (rather than hang).
+- **Part selection** comes from `--part`; with parts and no `--part`, the whole
+  bluprint is scaffolded.
+- **Failures are fatal.** Any action error (including a shell command that exits
+  non-zero) aborts the run with a non-zero exit code, so a broken scaffold can't
+  pass silently.
+
+```bash
+bluprint start reuters-graphics/my-bluprint --input answers.json --ci
+```
+
+```json title="answers.json"
+{
+  "projectName": "My New Project",
+  "useTypeScript": true
+}
+```
+
+## Authentication
+
+Reading a bluprint needs no auth if its repo is **public**. For a **private**
+bluprint, set a token via the `GITHUB_TOKEN` environment variable (or
+[`bluprint token`](/bluprint/reference/cli/)). Note the token that CI systems
+inject automatically is usually scoped to the current repo — reading a bluprint
+in another repo, or creating a new repo, needs a **personal access token** (or
+GitHub App token) with `repo` scope, stored as a secret.
+
+## Creating a new repo
+
+bluprint scaffolds files; it doesn't create repos itself. Pair it with `git` and
+the [`gh` CLI](https://cli.github.com/) in your workflow:
+
+```yaml title=".github/workflows/scaffold.yaml"
+name: Scaffold a new project
+on:
+  workflow_dispatch:
+    inputs:
+      projectName:
+        description: Project name
+        required: true
+      repo:
+        description: New repo (owner/name)
+        required: true
+
+jobs:
+  scaffold:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Scaffold the project
+        env:
+          # Needed only for a private bluprint.
+          GITHUB_TOKEN: ${{ secrets.SCAFFOLD_PAT }}
+        run: |
+          mkdir project
+          printf '{ "projectName": %s }' "$(jq -Rn --arg v "${{ inputs.projectName }}" '$v')" \
+            > "$RUNNER_TEMP/answers.json"
+          cd project
+          npx -y @reuters-graphics/bluprint start reuters-graphics/my-bluprint \
+            --input "$RUNNER_TEMP/answers.json" --ci
+
+      - name: Create and push the repo
+        env:
+          GH_TOKEN: ${{ secrets.SCAFFOLD_PAT }}
+        run: |
+          cd project
+          git init -q && git add -A
+          git commit -qm "Scaffolded from my-bluprint"
+          gh repo create "${{ inputs.repo }}" --private --source=. --push
+```
+
+:::note
+Keeping the answers file in `$RUNNER_TEMP` (not the scaffold directory) keeps it
+out of the new repo. If your bluprint's own actions already run `git init` (via
+an [`execute`](/bluprint/guides/actions/#execute) action), drop the `git init`
+above.
+:::
+
+## Doing it all inside the bluprint
+
+Because [`execute`](/bluprint/guides/actions/#execute) can run any shell command,
+a bluprint can own the git and `gh` steps itself — then CI only calls `start`:
+
+```ts title="bluprint.config.ts"
+execute(['git', 'init'], { silent: true }),
+execute('git add -A && git commit -m "Initial commit"'),
+execute('gh repo create {{ projectName }} --private --source=. --push'),
+```
+
+Gate these on a prompt or context value if you only want them in CI — e.g.
+`when: (ctx) => ctx.publish === true` with `--input '{ "publish": true }'`.

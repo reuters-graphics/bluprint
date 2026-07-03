@@ -45,6 +45,21 @@ bluprint start
 bluprint start reuters-graphics/my-bluprint
 ```
 
+| Option | Description |
+| --- | --- |
+| `--input <file>` | JSON file of answers for the bluprint's `prompt` actions, keyed by prompt `name`. |
+| `--part <key>` | Scaffold a specific [part](/bluprint/guides/parts/) instead of the whole bluprint. |
+| `--ci` | Run non-interactively (also auto-detected when stdin isn't a TTY or `CI` is set). |
+
+In non-interactive mode `start` never prompts: prompt answers come from
+`--input` (falling back to each prompt's `initialValue`), the part comes from
+`--part`, and **any action failure aborts with a non-zero exit** so a CI run
+can't pass silently. See [Scaffolding in CI](/bluprint/guides/ci/).
+
+```bash
+bluprint start reuters-graphics/my-bluprint --input answers.json --ci
+```
+
 ## `clone <repo>`
 
 Copy a git repo's files into the current directory verbatim — no part selection,
