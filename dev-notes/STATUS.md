@@ -36,20 +36,21 @@ before publishing, plus a deferred real-repo smoke test.
 - **knip** + **publint** wired in (`pnpm knip`, `pnpm publint`) and run in CI (the Lint workflow); both clean. Dead deps/files removed.
 - [`src/actions/`](../src/actions/) — 13 actions as typed factory functions (copy/move/remove/render/regexreplace/execute/log/prompt/run/json/append/prepend/yaml) + `runActions` runner (with `failOnError`), exported from the package root (task 0002).
 - **Typed run context** — `defineConfig<Context>` threads an author-declared context type into every action's `when`/`run`/editor callback (autocomplete + type-checking instead of `unknown`); untyped `defineConfig` stays loose. Backward-compatible; locked by `src/config/typedContext.test.ts`. See [0002](./tasks/0002-actions-function-api.md) (2026-07-02).
-- **End-to-end verified** against a real GitHub repo (`reuters-graphics/test-bluprint-v1`, public v1 fixture): `start` (all 5 demo actions + excludeConfig/ignores), `clone` (verbatim, keeps config), and local `preview` all pass. Surfaced + fixed a config-import resolution bug in `load.ts` (`efad252`) and a docs mustache-helper syntax bug (`114cf9b`). See [0001](./tasks/0001-v1-api-rewrite.md) (2026-07-02).
+- **End-to-end tested** against a real GitHub repo (`reuters-graphics/test-bluprint-v1`, public v1 fixture): an automated, network-gated test [`src/__e2e__/scaffold.e2e.test.ts`](../src/__e2e__/scaffold.e2e.test.ts) runs the built CLI for `start` (all 5 demo actions + excludeConfig/ignores) and `clone` (verbatim, keeps config); local `preview` also verified by hand. The fixture uses a `run` action (not `prompt`) so the flow is non-interactive. First run surfaced + fixed a config-import resolution bug in `load.ts` (`efad252`) and a docs mustache-helper syntax bug (`114cf9b`). CI `test.yaml` now builds before testing. See [0001](./tasks/0001-v1-api-rewrite.md) (2026-07-02).
 
 ## What's broken / unfinished
 
 - `start` scaffolds **remote git bluprints only** — `file://` local bluprints are rejected for now (deferred).
-- End-to-end `start`/`clone`/`preview` now **verified** against `reuters-graphics/test-bluprint-v1` (2026-07-02). Not yet run: `add`+`start` via the real profile (skipped to avoid mutating `~/.bluprint`), and `new`. The test fixture's config dep is `file:../bluprint`; switch to `^1.0.0` post-publish.
+- End-to-end `start`/`clone` now covered by an **automated** network-gated test against `reuters-graphics/test-bluprint-v1` (2026-07-02); `preview` verified by hand. Not yet covered: `add`+`start` via the real profile (skipped to avoid mutating `~/.bluprint`), and `new`. The test fixture's config dep is `file:../bluprint`; switch to `^1.0.0` post-publish.
+- The E2E test needs the network and a built `dist/` (it builds in `beforeAll` if missing), so `pnpm test` now fails offline — accepted trade-off.
 - Pre-rewrite deletions + new modules are committed incrementally on `main`; the two earliest session commits predate the foundation commit (accepted).
 
 ## Health check (2026-07-02)
 
 | Check | Command | Result |
 |---|---|---|
-| Tests | `pnpm test` (`vitest run`) | ✅ 158 passing (config + profile + all commands + scaffold + actions) |
-| E2E | `start`/`clone`/`preview` vs `test-bluprint-v1` | ✅ all pass (2026-07-02) |
+| Tests | `pnpm test` (`vitest run`) | ✅ 160 passing (incl. 2 network E2E; needs internet + `dist/`) |
+| E2E | `src/__e2e__/scaffold.e2e.test.ts` vs `test-bluprint-v1` | ✅ start + clone pass |
 | Lint | `pnpm lint` (`eslint`) | ✅ clean |
 | Typecheck | `npx tsc --noEmit` | ✅ clean |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |
