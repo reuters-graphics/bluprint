@@ -44,6 +44,50 @@ TypeScript — all fully typed.
 [Parts](/bluprint/guides/parts/) let you split a bluprint into pieces users can scaffold
 individually — handy for syncing config files into projects already underway.
 
+## How it compares
+
+Scaffolding is a crowded space; here's where bluprint fits.
+
+| | Template is a runnable repo? | Prompts & transforms | Distribution |
+| --- | --- | --- | --- |
+| **bluprint** | ✅ what you see is what you scaffold | ✅ typed TypeScript actions | `git push` |
+| GitHub templates | ✅ | ❌ verbatim copy only | built into GitHub |
+| cookiecutter | ❌ files full of `{{ }}` tags | ✅ Jinja + JSON + Python hooks | any git repo |
+| Yeoman | ❌ you write a generator | ✅ imperative JavaScript | npm package |
+| degit / giget | ✅ | ❌ copy only | any git repo |
+
+**GitHub template repositories** ("Use this template") share bluprint's core
+idea — start from a repo — but only copy files verbatim into a new repo. There's
+no way to fill in a project name, drop files a project doesn't need, or run setup
+steps. bluprint keeps the repo-is-the-template model and adds prompts,
+templating, and post-scaffold [actions](/bluprint/guides/actions/), scaffolding
+into any directory from the CLI. (Its [`clone`](/bluprint/reference/cli/) command
+covers the plain verbatim-copy case.)
+
+**cookiecutter** is the dominant, language-agnostic option, and it's genuinely
+powerful. The trade-off: a cookiecutter template isn't a runnable project — its
+files and folder names are peppered with `{{ cookiecutter.* }}` tags, so you
+can't run or test the template as real code, and its logic lives in a
+`cookiecutter.json` plus Python hook scripts. bluprint's templates are real
+projects you can run, and its logic is typed TypeScript with autocomplete.
+
+**Yeoman** generators are extremely flexible, but each is a separate npm package
+you write imperatively and publish. bluprint trades some of that power for much
+lighter authoring — there's no generator to write, just a repo to push.
+
+**degit / giget** download a repo's files without its git history. Great for a
+clean copy, but they stop there; bluprint does the same download and then layers
+configuration and transforms on top.
+
+The upshot: if you only need a verbatim copy, a GitHub template or degit is
+simpler. If you need heavy, language-agnostic templating and don't mind a
+non-runnable template, reach for cookiecutter. Framework-specific `create-*` CLIs
+(create-vite, create-next-app) are purpose-built for one stack — bluprint is the
+general tool for rolling your own from any repo. It targets the middle most teams
+actually live in: real example repos you want to reuse, with light per-project
+customization, authored and shared with nothing more than a typed config and
+`git push`.
+
 ## Getting started
 
 Head to the [Quickstart](/bluprint/quickstart/) to install bluprint and build your first
