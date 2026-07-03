@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { execFileSync, execSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -35,8 +35,12 @@ const runCli = (args: string[], cwd: string): string => {
   }
 };
 
-const tmpDir = (): string =>
-  fs.mkdtempSync(path.join(os.tmpdir(), 'bluprint-e2e-'));
+const createdDirs: string[] = [];
+const tmpDir = (): string => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bluprint-e2e-'));
+  createdDirs.push(dir);
+  return dir;
+};
 const exists = (dir: string, p: string): boolean =>
   fs.existsSync(path.join(dir, p));
 const read = (dir: string, p: string): string =>
@@ -53,6 +57,14 @@ describe('e2e: scaffolding from a real bluprint repo', () => {
       });
     }
   }, 180_000);
+
+  afterAll(() => {
+    // Remove the scratch dirs each test scaffolded into (each also holds a
+    // `git init`ed repo), so runs don't accumulate under the OS temp dir.
+    for (const dir of createdDirs) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
 
   it('start: fetches, scaffolds, and runs all actions', () => {
     const dir = tmpDir();
