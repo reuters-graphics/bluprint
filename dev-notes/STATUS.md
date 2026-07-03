@@ -1,7 +1,7 @@
 # Status
 
 > Single source of truth for current project state. **Update this before ending
-> any work session.** Last updated: **2026-07-02** (E2E).
+> any work session.** Last updated: **2026-07-03** (non-interactive / CI).
 
 ## In one line
 
@@ -36,7 +36,8 @@ before publishing, plus a deferred real-repo smoke test.
 - **knip** + **publint** wired in (`pnpm knip`, `pnpm publint`) and run in CI (the Lint workflow); both clean. Dead deps/files removed.
 - [`src/actions/`](../src/actions/) — 13 actions as typed factory functions (copy/move/remove/render/regexreplace/execute/log/prompt/run/json/append/prepend/yaml) + `runActions` runner (with `failOnError`), exported from the package root (task 0002).
 - **Typed run context** — `defineConfig<Context>` threads an author-declared context type into every action's `when`/`run`/editor callback (autocomplete + type-checking instead of `unknown`); untyped `defineConfig` stays loose. Backward-compatible; locked by `src/config/typedContext.test.ts`. See [0002](./tasks/0002-actions-function-api.md) (2026-07-02).
-- **End-to-end tested** against a real GitHub repo (`reuters-graphics/test-bluprint-v1`, public v1 fixture): an automated, network-gated test [`src/__e2e__/scaffold.e2e.test.ts`](../src/__e2e__/scaffold.e2e.test.ts) runs the built CLI for `start` (all 5 demo actions + excludeConfig/ignores) and `clone` (verbatim, keeps config); local `preview` also verified by hand. The fixture uses a `run` action (not `prompt`) so the flow is non-interactive. First run surfaced + fixed a config-import resolution bug in `load.ts` (`efad252`) and a docs mustache-helper syntax bug (`114cf9b`). CI `test.yaml` now builds before testing. See [0001](./tasks/0001-v1-api-rewrite.md) (2026-07-02).
+- **End-to-end tested** against a real GitHub repo (`reuters-graphics/test-bluprint-v1`, public v1 fixture): an automated, network-gated test [`src/__e2e__/scaffold.e2e.test.ts`](../src/__e2e__/scaffold.e2e.test.ts) runs the built CLI for `start` (all 5 demo actions + excludeConfig/ignores), `start --input` (injected prompt answers), and `clone` (verbatim, keeps config); local `preview` also verified by hand. First run surfaced + fixed a config-import resolution bug in `load.ts` (`efad252`) and a docs mustache-helper syntax bug (`114cf9b`). CI `test.yaml` now builds before testing. See [0001](./tasks/0001-v1-api-rewrite.md) (2026-07-02).
+- **Non-interactive / CI scaffolding** — `start --input answers.json --part <key> --ci` runs headless (auto-detected off a TTY / `CI`): prompt answers come from `--input` (or `initialValue`), and any action failure aborts with a non-zero exit (`execute` too). Mode rides a `process.env` flag ([`src/runtime.ts`](../src/runtime.ts)) so it crosses the cli/index bundle boundary. Docs: [guides/ci](../docs/content/docs/guides/ci.mdx). bluprint stays a scaffolder — repo creation is a documented git+gh recipe. See [0001](./tasks/0001-v1-api-rewrite.md) (2026-07-03).
 
 ## What's broken / unfinished
 
@@ -49,8 +50,8 @@ before publishing, plus a deferred real-repo smoke test.
 
 | Check | Command | Result |
 |---|---|---|
-| Tests | `pnpm test` (`vitest run`) | ✅ 160 passing (incl. 2 network E2E; needs internet + `dist/`) |
-| E2E | `src/__e2e__/scaffold.e2e.test.ts` vs `test-bluprint-v1` | ✅ start + clone pass |
+| Tests | `pnpm test` (`vitest run`) | ✅ 173 passing (incl. 3 network E2E; needs internet + `dist/`) |
+| E2E | `src/__e2e__/scaffold.e2e.test.ts` vs `test-bluprint-v1` | ✅ start + start --input + clone pass |
 | Lint | `pnpm lint` (`eslint`) | ✅ clean |
 | Typecheck | `npx tsc --noEmit` | ✅ clean |
 | Build | `pnpm build` (`rollup`) | ✅ builds `dist/index.js` + `dist/cli.js` |
