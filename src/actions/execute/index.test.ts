@@ -2,13 +2,17 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { EventEmitter } from 'node:events';
 import { spawn } from 'node:child_process';
 import { execute } from './index';
+import { runtime } from '../../runtime';
 import type { ActionContext } from '../types';
 
 vi.mock('node:child_process', () => ({ spawn: vi.fn() }));
 
-const startSpy = vi.fn();
-const stopSpy = vi.fn();
-const errorSpy = vi.fn();
+const { startSpy, stopSpy, errorSpy, logInfoSpy } = vi.hoisted(() => ({
+  startSpy: vi.fn(),
+  stopSpy: vi.fn(),
+  errorSpy: vi.fn(),
+  logInfoSpy: vi.fn(),
+}));
 vi.mock('@clack/prompts', () => ({
   spinner: vi.fn(() => ({
     start: startSpy,
@@ -16,6 +20,7 @@ vi.mock('@clack/prompts', () => ({
     error: errorSpy,
     message: vi.fn(),
   })),
+  log: { info: logInfoSpy, error: vi.fn() },
 }));
 
 const ctx = (): ActionContext => ({
@@ -44,7 +49,10 @@ const failingChild = (err = new Error('spawn ENOENT')) => {
 beforeEach(() => {
   vi.mocked(spawn).mockImplementation(() => fakeChild(0) as never);
 });
-afterEach(() => vi.clearAllMocks());
+afterEach(() => {
+  vi.clearAllMocks();
+  runtime.interactive = true; // restore default between tests
+});
 
 describe('execute action', () => {
   it('runs a string command via the shell, inheriting stdio (not silent)', async () => {
@@ -98,5 +106,30 @@ describe('execute action', () => {
       'spawn ENOENT'
     );
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('failed'));
+  });
+
+  it('non-interactive: logs instead of a spinner, ignores stdio when silent', async () => {
+    runtime.interactive = false;
+
+    await execute('pnpm install', { silent: true }).run(ctx());
+
+    expect(startSpy).not.toHaveBeenCalled(); // no spinner in CI
+    expect(logInfoSpy).toHaveBeenCalledWith(
+      expect.stringContaining('pnpm install')
+    );
+    expect(spawn).toHaveBeenCalledWith(
+      'pnpm install',
+      [],
+      expect.objectContaining({ stdio: 'ignore' })
+    );
+  });
+
+  it('non-interactive: throws on a non-zero exit so CI fails', async () => {
+    runtime.interactive = false;
+    vi.mocked(spawn).mockImplementation(() => fakeChild(2) as never);
+
+    await expect(execute('false').run(ctx())).rejects.toThrow(
+      /exited with code 2/
+    );
   });
 });

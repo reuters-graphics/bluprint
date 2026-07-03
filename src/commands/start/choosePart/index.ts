@@ -1,4 +1,7 @@
+import chalk from 'chalk-template';
+import { log } from '@clack/prompts';
 import * as prompts from '../../../prompts';
+import { runtime } from '../../../runtime';
 import type { BluprintConfig } from '../../../config/types';
 import type { Action } from '../../../actions/types';
 
@@ -10,15 +13,36 @@ export interface PartSelection {
   actions: Action[];
 }
 
+/** Resolve a named part into a selection, or throw if the key is unknown. */
+const selectPart = (config: BluprintConfig, key: string): PartSelection => {
+  const part = config.parts?.[key];
+  if (!part) {
+    throw new Error(
+      `Unknown part "${key}". Available: ${Object.keys(config.parts ?? {}).join(', ') || '(none)'}`
+    );
+  }
+  return {
+    part: key,
+    files: part.files,
+    ignores: part.ignores,
+    actions: part.actions ?? config.actions ?? [],
+  };
+};
+
 /**
  * Resolve which files and actions a `start` run should use. If the bluprint
  * defines parts, the user is asked whether to use one; choosing a part uses
  * that part's `files`/`ignores` and its `actions` (falling back to the
  * top-level actions if the part defines none). Otherwise the top-level
  * `files`/`ignores`/`actions` are used.
+ *
+ * @param config The bluprint config.
+ * @param requestedPart A part key chosen up front (e.g. `start --part`). Skips
+ *   the interactive picker.
  */
 export const choosePart = async (
-  config: BluprintConfig
+  config: BluprintConfig,
+  requestedPart?: string
 ): Promise<PartSelection> => {
   const whole: PartSelection = {
     part: null,
@@ -27,8 +51,19 @@ export const choosePart = async (
     actions: config.actions ?? [],
   };
 
+  // An explicit `--part` wins in any mode.
+  if (requestedPart) return selectPart(config, requestedPart);
+
   const { parts } = config;
   if (!parts || Object.keys(parts).length === 0) return whole;
+
+  // Non-interactive: can't ask, so scaffold the whole bluprint.
+  if (!runtime.interactive) {
+    log.info(
+      chalk`This bluprint has parts; scaffolding the whole thing. Pass {yellow --part} to pick one.`
+    );
+    return whole;
+  }
 
   const usePart = await prompts.confirm({
     message:
@@ -46,11 +81,5 @@ export const choosePart = async (
     })),
   });
 
-  const part = parts[key];
-  return {
-    part: key,
-    files: part.files,
-    ignores: part.ignores,
-    actions: part.actions ?? config.actions ?? [],
-  };
+  return selectPart(config, key);
 };

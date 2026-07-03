@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
-import { spinner } from '@clack/prompts';
+import { spinner, log } from '@clack/prompts';
+import { runtime } from '../../runtime';
 import type {
   Action,
   ActionContext,
@@ -48,6 +49,23 @@ export const execute = <Ctx extends DefaultContext = ActionContext>(
     const cmd = isString ? command : command[0];
     const args = isString ? [] : command.slice(1);
     const label = isString ? command : command.join(' ');
+
+    if (!runtime.interactive) {
+      // CI / non-interactive: no spinner (it can't animate), and a non-zero
+      // exit must fail the run so it can't pass silently. Output streams unless
+      // silenced.
+      log.info(`Running ${label}`);
+      const code = await runCommand(
+        cmd,
+        args,
+        isString,
+        options.silent ? 'ignore' : 'inherit'
+      );
+      if (code !== 0) {
+        throw new Error(`Command "${label}" exited with code ${code}`);
+      }
+      return;
+    }
 
     if (options.silent) {
       // Output is hidden, so show a spinner for feedback. Running async lets it

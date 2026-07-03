@@ -1,4 +1,5 @@
 import * as prompts from '../../prompts';
+import { runtime } from '../../runtime';
 import type {
   Action,
   ActionContext,
@@ -71,7 +72,25 @@ export const prompt = <Ctx extends DefaultContext = ActionContext>(
   name: 'prompt',
   when: options.when,
   failOnError: options.failOnError,
-  run: async () => {
+  run: async (ctx) => {
+    // A value supplied ahead of time (e.g. via `--input`) wins — keep it, don't
+    // prompt. It's already in the context, so return nothing to merge.
+    if (spec.name in ctx) return {};
+
+    // Non-interactive (CI): can't ask. Fall back to the spec's default if it has
+    // one, otherwise fail loudly so the run doesn't silently scaffold a blank.
+    if (!runtime.interactive) {
+      const fallback =
+        spec.type === 'multiselect' ? spec.initialValues : spec.initialValue;
+      if (fallback === undefined) {
+        throw new Error(
+          `Missing required input "${spec.name}" in non-interactive mode. ` +
+            `Provide it with --input.`
+        );
+      }
+      return { [spec.name]: fallback } as Partial<Ctx>;
+    }
+
     const answer = await ask(spec);
     // The answer is stored under a dynamic key (`spec.name`); a typed config is
     // expected to declare it on its context (see `defineConfig`).

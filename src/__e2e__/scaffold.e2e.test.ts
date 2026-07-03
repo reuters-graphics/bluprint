@@ -70,7 +70,8 @@ describe('e2e: scaffolding from a real bluprint repo', () => {
     const dir = tmpDir();
     runCli(['start', REPO], dir);
 
-    // render — README templated with the run-supplied name + date/dirname.
+    // render — README templated with the prompt's initialValue (non-interactive
+    // falls back to it) + date/dirname.
     const readme = read(dir, 'README.md');
     expect(readme).toContain('# My Project');
     expect(readme).not.toContain('{{'); // nothing left un-rendered
@@ -95,6 +96,19 @@ describe('e2e: scaffolding from a real bluprint repo', () => {
     expect(exists(dir, 'bluprint.config.ts')).toBe(false);
     expect(exists(dir, 'package.json')).toBe(false);
     expect(exists(dir, 'tsconfig.json')).toBe(false);
+  }, 90_000);
+
+  it('start --input: injects prompt answers non-interactively', () => {
+    const dir = tmpDir();
+    const answers = path.join(dir, 'answers.json');
+    fs.writeFileSync(answers, JSON.stringify({ projectName: 'Injected Name' }));
+
+    runCli(['start', REPO, '--input', answers], dir);
+
+    // The injected value flows into render and the templated copy destination.
+    expect(read(dir, 'README.md')).toContain('# Injected Name');
+    expect(exists(dir, 'src/injected-name.js')).toBe(true);
+    expect(exists(dir, 'src/my-project.js')).toBe(false); // default was overridden
   }, 90_000);
 
   it('clone: copies the repo verbatim and runs no actions', () => {

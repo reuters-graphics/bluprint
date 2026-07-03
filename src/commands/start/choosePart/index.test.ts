@@ -1,10 +1,15 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { choosePart } from './index';
+import { runtime } from '../../../runtime';
 import type { BluprintConfig } from '../../../config/types';
 
 vi.mock('../../../prompts', () => ({
   confirm: vi.fn(),
   select: vi.fn(),
+}));
+
+vi.mock('@clack/prompts', () => ({
+  log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
 import * as prompts from '../../../prompts';
@@ -20,7 +25,10 @@ const baseConfig = (
 });
 
 describe('choosePart', () => {
-  afterEach(() => vi.clearAllMocks());
+  afterEach(() => {
+    vi.clearAllMocks();
+    runtime.interactive = true;
+  });
 
   it('returns the whole bluprint when there are no parts', async () => {
     const result = await choosePart(baseConfig());
@@ -77,5 +85,38 @@ describe('choosePart', () => {
 
     expect(result.part).toBe('docs');
     expect(result.actions[0].name).toBe('top'); // fell back to config.actions
+  });
+
+  it('selects a requested part without prompting', async () => {
+    const result = await choosePart(
+      baseConfig({ parts: { api: { files: ['api/**'], ignores: [] } } }),
+      'api'
+    );
+
+    expect(prompts.confirm).not.toHaveBeenCalled();
+    expect(prompts.select).not.toHaveBeenCalled();
+    expect(result.part).toBe('api');
+    expect(result.files).toEqual(['api/**']);
+  });
+
+  it('throws on an unknown requested part', async () => {
+    await expect(
+      choosePart(
+        baseConfig({ parts: { api: { files: ['api/**'], ignores: [] } } }),
+        'nope'
+      )
+    ).rejects.toThrow(/Unknown part "nope"/);
+  });
+
+  it('scaffolds the whole bluprint non-interactively when parts exist', async () => {
+    runtime.interactive = false;
+
+    const result = await choosePart(
+      baseConfig({ parts: { api: { files: ['api/**'], ignores: [] } } })
+    );
+
+    expect(prompts.confirm).not.toHaveBeenCalled();
+    expect(result.part).toBeNull();
+    expect(result.files).toEqual(['**/*']);
   });
 });

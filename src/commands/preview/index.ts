@@ -66,7 +66,7 @@ export const preview = async (pathArg?: string): Promise<void> => {
   process.chdir(out);
   try {
     copyLocal(srcDir, { files, ignores });
-    await runActions(actions, part ?? undefined);
+    await runActions(actions, { bluprintPart: part ?? undefined });
   } finally {
     process.chdir(originalCwd);
   }

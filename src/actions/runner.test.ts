@@ -14,8 +14,27 @@ describe('runActions', () => {
   });
 
   it('passes bluprintPart into the context', async () => {
-    const ctx = await runActions([], 'my-part');
+    const ctx = await runActions([], { bluprintPart: 'my-part' });
     expect(ctx.bluprintPart).toBe('my-part');
+  });
+
+  it('seeds the context with provided values', async () => {
+    const ctx = await runActions([], { values: { projectName: 'My App' } });
+    expect(ctx.projectName).toBe('My App');
+  });
+
+  it('failFast aborts on the first error regardless of failOnError', async () => {
+    const boom = {
+      name: 'boom',
+      run: () => {
+        throw new Error('kaboom');
+      },
+    };
+    const next = { name: 'next', run: vi.fn() };
+    await expect(runActions([boom, next], { failFast: true })).rejects.toThrow(
+      'kaboom'
+    );
+    expect(next.run).not.toHaveBeenCalled();
   });
 
   it('skips actions whose `when` returns false', async () => {

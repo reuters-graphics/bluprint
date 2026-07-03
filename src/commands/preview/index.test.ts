@@ -59,7 +59,7 @@ describe('preview', () => {
       files: ['**/*'],
       ignores: [],
     });
-    expect(runActions).toHaveBeenCalledWith([], undefined);
+    expect(runActions).toHaveBeenCalledWith([], { bluprintPart: undefined });
     expect(fs.existsSync(outDir)).toBe(true);
     expect(log.success).toHaveBeenCalledOnce();
   });

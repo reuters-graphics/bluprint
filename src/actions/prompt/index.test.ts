@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { prompt } from './index';
+import { runtime } from '../../runtime';
 import type { ActionContext } from '../types';
 
 vi.mock('../../prompts', () => ({
@@ -12,15 +13,19 @@ vi.mock('../../prompts', () => ({
 
 import * as prompts from '../../prompts';
 
-const ctx = (): ActionContext => ({
+const ctx = (extra: Record<string, unknown> = {}): ActionContext => ({
   year: '2026',
   month: '07',
   day: '01',
   dirname: 'proj',
+  ...extra,
 });
 
 describe('prompt action', () => {
-  afterEach(() => vi.clearAllMocks());
+  afterEach(() => {
+    vi.clearAllMocks();
+    runtime.interactive = true; // restore default between tests
+  });
 
   it('runs a text prompt and returns the answer under `name`', async () => {
     vi.mocked(prompts.text).mockResolvedValue('my-project');
@@ -61,5 +66,43 @@ describe('prompt action', () => {
 
     expect(prompts.select).toHaveBeenCalledOnce();
     expect(result).toEqual({ choice: 'b' });
+  });
+
+  it('uses an injected value from context and does not prompt', async () => {
+    const result = await prompt({
+      name: 'projectName',
+      type: 'text',
+      message: 'Project name?',
+    }).run(ctx({ projectName: 'from-input' }));
+
+    expect(prompts.text).not.toHaveBeenCalled();
+    expect(result).toEqual({}); // value already in context, nothing to merge
+  });
+
+  it('falls back to initialValue in non-interactive mode', async () => {
+    runtime.interactive = false;
+
+    const result = await prompt({
+      name: 'projectName',
+      type: 'text',
+      message: 'Project name?',
+      initialValue: 'Default Name',
+    }).run(ctx());
+
+    expect(prompts.text).not.toHaveBeenCalled();
+    expect(result).toEqual({ projectName: 'Default Name' });
+  });
+
+  it('throws for a missing required input in non-interactive mode', async () => {
+    runtime.interactive = false;
+
+    await expect(
+      prompt({
+        name: 'projectName',
+        type: 'text',
+        message: 'Project name?',
+      }).run(ctx())
+    ).rejects.toThrow(/Missing required input "projectName"/);
+    expect(prompts.text).not.toHaveBeenCalled();
   });
 });

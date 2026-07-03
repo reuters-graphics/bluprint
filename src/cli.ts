@@ -29,9 +29,22 @@ prog
 prog
   .command('start [bluprint]')
   .describe('Start a new project from a bluprint')
-  .action(async (bluprint?: string) => {
-    await start(bluprint);
-  });
+  .option('--input', 'JSON file of answers for the bluprint’s prompts')
+  .option('--part', 'Scaffold a specific part of the bluprint')
+  .option('--ci', 'Run non-interactively (also auto-detected off a TTY / CI)')
+  .example('start user/repo --input answers.json --ci')
+  .action(
+    async (
+      bluprint: string | undefined,
+      opts: { input?: string; part?: string; ci?: boolean }
+    ) => {
+      await start(bluprint, {
+        input: opts.input,
+        part: opts.part,
+        ci: opts.ci,
+      });
+    }
+  );
 
 prog
   .command('remove [bluprint]')

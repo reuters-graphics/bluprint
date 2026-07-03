@@ -13,6 +13,10 @@ vi.mock('../../config', () => ({
 vi.mock('../../scaffold', () => ({ scaffold: vi.fn() }));
 vi.mock('./choosePart', () => ({ choosePart: vi.fn() }));
 vi.mock('../../actions', () => ({ runActions: vi.fn() }));
+vi.mock('../../runtime', () => ({
+  runtime: { interactive: true },
+  isInteractive: vi.fn(() => true),
+}));
 vi.mock('@clack/prompts', () => ({
   log: { info: vi.fn(), error: vi.fn(), success: vi.fn(), warn: vi.fn() },
 }));
@@ -23,6 +27,7 @@ import { config } from '../../config';
 import { scaffold } from '../../scaffold';
 import { choosePart } from './choosePart';
 import { runActions } from '../../actions';
+import { isInteractive } from '../../runtime';
 import { log } from '@clack/prompts';
 
 const setSelection = (overrides = {}) =>
@@ -86,7 +91,11 @@ describe('start', () => {
       files: ['api/**'],
       ignores: [],
     });
-    expect(runActions).toHaveBeenCalledWith(actions, 'api');
+    expect(runActions).toHaveBeenCalledWith(actions, {
+      bluprintPart: 'api',
+      values: {},
+      failFast: false,
+    });
   });
 
   it('rejects file:// sources and does not scaffold', async () => {
@@ -105,5 +114,36 @@ describe('start', () => {
     expect(log.info).toHaveBeenCalledOnce();
     expect(profile.promptForBluprint).not.toHaveBeenCalled();
     expect(scaffold).not.toHaveBeenCalled();
+  });
+
+  describe('non-interactive mode', () => {
+    let exitSpy: { mockRestore: () => void };
+
+    beforeEach(() => {
+      vi.mocked(isInteractive).mockReturnValue(false);
+      exitSpy = vi.spyOn(process, 'exit').mockImplementation(((
+        code?: number
+      ) => {
+        throw new Error(`exit:${code}`);
+      }) as never);
+    });
+    afterEach(() => exitSpy.mockRestore());
+
+    it('runs actions with failFast and never prompts', async () => {
+      await start('user/repo', { ci: true });
+
+      expect(profile.promptForBluprint).not.toHaveBeenCalled();
+      expect(runActions).toHaveBeenCalledWith([], {
+        bluprintPart: undefined,
+        values: {},
+        failFast: true,
+      });
+    });
+
+    it('errors (exit 1) when no bluprint arg is given', async () => {
+      await expect(start(undefined, { ci: true })).rejects.toThrow('exit:1');
+      expect(log.error).toHaveBeenCalledOnce();
+      expect(scaffold).not.toHaveBeenCalled();
+    });
   });
 });
