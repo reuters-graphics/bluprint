@@ -28,8 +28,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run tests
-        run: pnpm test -- --run
-
+      # Build before testing: the end-to-end test runs the built CLI, and
+      # config-import resolution resolves against dist/.
       - name: Build
         run: pnpm run build
+
+      - name: Run tests
+        run: pnpm test -- --run
