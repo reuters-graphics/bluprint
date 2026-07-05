@@ -1,5 +1,3 @@
-![Reuters](./badge.svg)
-
 <br />
 <img src="./logo.svg" width="300" alt="bluprint logo" />
 <br />
