@@ -101,14 +101,14 @@ spec is a discriminated union on `type` — `text`, `confirm`, `select`,
 
 ```ts
 prompt({ name: 'name', type: 'text', message: 'Project name?' }),
-prompt({ name: 'ts', type: 'confirm', message: 'Use TypeScript?' }),
+prompt({ name: 'analytics', type: 'confirm', message: 'Add analytics?' }),
 prompt({
-  name: 'framework',
+  name: 'kind',
   type: 'select',
-  message: 'Framework?',
+  message: 'What kind of project?',
   options: [
-    { value: 'svelte', label: 'Svelte' },
-    { value: 'react', label: 'React' },
+    { value: 'blog', label: 'Blog' },
+    { value: 'scraper', label: 'Data scraper' },
   ],
 }),
 ```
@@ -228,8 +228,25 @@ partial context to merge in for later actions. Async is supported.
 
 ```ts
 run(async (ctx) => {
-  const res = await fetch(`https://api.example.com/repos/${ctx.name}`);
-  return { repoId: (await res.json()).id }; // available to later actions
+  const res = await fetch(`https://example.com/${ctx.name}`);
+  return { headline: (await res.json()).title }; // available to later actions
+}),
+```
+
+Under a [typed config](/bluprint/guides/creating/#typing-a-run-action), `ctx` and
+the returned object are typed: declare the keys `run` contributes on your
+`Context`, and later actions read them type-safely.
+
+```ts
+interface Context {
+  name: string;
+  headline: string; // contributed by the run action
+}
+
+// inside defineConfig<Context>({ actions: [ … ] })
+run(async (ctx): Promise<Partial<Context>> => {
+  const res = await fetch(`https://example.com/${ctx.name}`);
+  return { headline: (await res.json()).title };
 }),
 ```
 

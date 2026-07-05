@@ -33,13 +33,13 @@ The bluprint's display name in the CLI. Either a string, or an object with a
 `hint` shown beside it in the picker:
 
 ```ts
-name: 'My React component'
+name: 'Svelte blog'
 ```
 
 ```ts
 name: {
-  title: 'My React component',
-  hint: 'TypeScript + tests',
+  title: 'Svelte blog',
+  hint: 'SvelteKit + Markdown posts',
 }
 ```
 
@@ -123,19 +123,19 @@ import { defineConfig, prompt, render } from '@reuters-graphics/bluprint';
 
 interface Context {
   projectName: string;
-  useTypeScript: boolean;
+  includeCms: boolean;
 }
 
 export default defineConfig<Context>({
-  name: 'My bluprint',
+  name: 'Svelte blog',
   files: ['**/*'],
   ignores: [],
   actions: [
     prompt({ name: 'projectName', type: 'text', message: 'Project name?' }),
-    prompt({ name: 'useTypeScript', type: 'confirm', message: 'TypeScript?' }),
+    prompt({ name: 'includeCms', type: 'confirm', message: 'Add a CMS?' }),
     render({
-      files: ['tsconfig.json'],
-      when: (ctx) => ctx.useTypeScript, // ✅ boolean, not unknown
+      files: ['svelte.config.js'],
+      when: (ctx) => ctx.includeCms, // ✅ boolean, not unknown
     }),
   ],
 });
@@ -143,6 +143,34 @@ export default defineConfig<Context>({
 
 The built-in [`DefaultContext`](/bluprint/reference/actions/#context) keys
 (`year`, `dirname`, …) are always present on top of what you declare.
+
+### Typing a `run` action
+
+A [`run`](/bluprint/guides/actions/#run) action's `ctx` is typed too, and the
+object it returns must match keys you've declared — so values it contributes are
+type-safe in later actions. Declare those keys on your `Context`:
+
+```ts
+interface Context {
+  projectName: string;
+  slug: string; // contributed by the run action below
+}
+
+export default defineConfig<Context>({
+  name: 'Svelte blog',
+  files: ['**/*'],
+  ignores: [],
+  actions: [
+    prompt({ name: 'projectName', type: 'text', message: 'Project name?' }),
+    run((ctx) => {
+      // ctx.projectName is typed; the return must be a Partial<Context>.
+      return { slug: ctx.projectName.toLowerCase().replace(/\s+/g, '-') };
+    }),
+    // Later actions read ctx.slug as a string.
+    render({ files: ['package.json'] }),
+  ],
+});
+```
 
 :::note
 A value from a `when`-gated `prompt` may not exist at runtime if the prompt is
