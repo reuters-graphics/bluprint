@@ -33,7 +33,7 @@ The bluprint's display name in the CLI. Either a string, or an object with a
 `hint` shown beside it in the picker:
 
 ```ts
-name: 'Svelte blog'
+name: 'Svelte blog';
 ```
 
 ```ts
@@ -49,7 +49,7 @@ Globs for which files to scaffold, relative to the repo root. Use `['**/*']` for
 everything.
 
 ```ts
-files: ['src/**/*', 'package.json', 'README.md']
+files: ['src/**/*', 'package.json', 'README.md'];
 ```
 
 ### `ignores` (required)
@@ -57,7 +57,7 @@ files: ['src/**/*', 'package.json', 'README.md']
 Globs to exclude from `files`. (Files git already ignores are never scaffolded.)
 
 ```ts
-ignores: ['**/*.test.ts', 'internal/**']
+ignores: ['**/*.test.ts', 'internal/**'];
 ```
 
 ### `bluprint` (optional)
@@ -67,7 +67,7 @@ your bluprint needs. The CLI warns on a mismatch and refuses to run if it's too
 old — a safety net when your actions rely on newer features.
 
 ```ts
-bluprint: '^1.0.0'
+bluprint: '^1.0.0';
 ```
 
 ### `actions` (optional)
@@ -76,7 +76,12 @@ An array of [actions](/bluprint/guides/actions/) that transform the scaffolded f
 in order. Actions are functions you import from the package:
 
 ```ts
-import { defineConfig, prompt, render, execute } from '@reuters-graphics/bluprint';
+import {
+  defineConfig,
+  prompt,
+  render,
+  execute,
+} from '@reuters-graphics/bluprint';
 
 export default defineConfig({
   name: 'My bluprint',

@@ -32,11 +32,11 @@ export default defineConfig({
 Actions share a **context** object that flows through the run. It starts with
 some defaults and grows as actions (like `prompt`) contribute to it:
 
-| Key | Value |
-| --- | --- |
-| `year` / `month` / `day` | Date parts at run time (`"2026"`, `"07"`, `"02"`) |
-| `dirname` | Basename of the directory being scaffolded |
-| `bluprintPart` | The selected [part](/bluprint/guides/parts/), if any |
+| Key                      | Value                                                |
+| ------------------------ | ---------------------------------------------------- |
+| `year` / `month` / `day` | Date parts at run time (`"2026"`, `"07"`, `"02"`)    |
+| `dirname`                | Basename of the directory being scaffolded           |
+| `bluprintPart`           | The selected [part](/bluprint/guides/parts/), if any |
 
 A `prompt` action adds its answer under its `name`, and later actions can read
 it — in templates (`{{ name }}`) or via the `when` gate below. To make those

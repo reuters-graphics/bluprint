@@ -45,11 +45,11 @@ bluprint start
 bluprint start reuters-graphics/my-bluprint
 ```
 
-| Option | Description |
-| --- | --- |
-| `--input <file>` | JSON file of answers for the bluprint's `prompt` actions, keyed by prompt `name`. |
-| `--part <key>` | Scaffold a specific [part](/bluprint/guides/parts/) instead of the whole bluprint. |
-| `--ci` | Run non-interactively (also auto-detected when stdin isn't a TTY or `CI` is set). |
+| Option           | Description                                                                        |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| `--input <file>` | JSON file of answers for the bluprint's `prompt` actions, keyed by prompt `name`.  |
+| `--part <key>`   | Scaffold a specific [part](/bluprint/guides/parts/) instead of the whole bluprint. |
+| `--ci`           | Run non-interactively (also auto-detected when stdin isn't a TTY or `CI` is set).  |
 
 In non-interactive mode `start` never prompts: prompt answers come from
 `--input` (falling back to each prompt's `initialValue`), the part comes from

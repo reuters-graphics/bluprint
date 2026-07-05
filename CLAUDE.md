@@ -19,7 +19,7 @@ progress log so the next session can pick up cleanly. See
 scaffolding from reusable "bluprints" (templates hosted in git repos).
 
 > **Note:** the project is mid-rewrite to v1.0.0. The architecture below
-> describes the *target* design. Pre-rewrite code is parked in
+> describes the _target_ design. Pre-rewrite code is parked in
 > [`src/__archive/`](./src/__archive/) for reference and is not part of the build.
 
 ## Tech stack
@@ -32,7 +32,7 @@ scaffolding from reusable "bluprints" (templates hosted in git repos).
 - **Build:** Rollup v4 → `dist/`
 - **Prompts:** `@clack/prompts` (wrapped in [`src/prompts/`](./src/prompts/))
 - **CLI framework:** `sade`
-- **Docs:** Astro + Starlight (source in [`docs/`](./docs), *not* `src`)
+- **Docs:** Astro + Starlight (source in [`docs/`](./docs), _not_ `src`)
 - **Releases:** changesets
 - **Lint/format:** eslint + prettier via `@reuters-graphics/yaks-*` shared configs
 
@@ -65,7 +65,7 @@ Source lives in [`src/`](./src):
 - **`commands/`** — one directory per CLI command (`add`, and — being ported from
   `__archive/` — `start`, `clone`, `new`, `remove`, `token`).
 - **`index.ts`** — public library entry (exports `defineConfig`).
-- **`cli.ts`** — CLI entry (bin `bluprint`). *Not yet recreated in the rewrite.*
+- **`cli.ts`** — CLI entry (bin `bluprint`). _Not yet recreated in the rewrite._
 
 The key API shift: bluprints are configured with a **`bluprint.config.ts`**
 module, replacing the old `.bluprintrc` JSON.
