@@ -4,14 +4,14 @@ Guidance for Claude Code (and humans) working in this repository.
 
 ## 📍 Start here every session
 
-**Read [`dev-notes/STATUS.md`](./dev-notes/STATUS.md) first** — it's the single
+**Read [`.agents/STATUS.md`](./.agents/STATUS.md) first** — it's the single
 source of truth for where the project currently stands ("where did we leave
-off?"). Then open the relevant [`dev-notes/tasks/`](./dev-notes/tasks/) file for
+off?"). Then open the relevant [`.agents/tasks/`](./.agents/tasks/) file for
 detail.
 
 **Before ending a work session, update `STATUS.md`** and the active task's
 progress log so the next session can pick up cleanly. See
-[`dev-notes/README.md`](./dev-notes/README.md) for how the notes system works.
+[`.agents/README.md`](./.agents/README.md) for how the notes system works.
 
 ## What this is
 

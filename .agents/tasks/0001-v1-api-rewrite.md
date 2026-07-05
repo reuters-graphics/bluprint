@@ -108,7 +108,7 @@ command fns to `defineConfig` + actions). **Open parity gaps:**
   modules started; `add` command begun.
 - **2026-07-01** — Reconstructed state after a break. `config` + `profile` tests
   green (33 passing). Identified the two blockers above (broken `add`, missing
-  `cli.ts`). Set up this dev-notes system to avoid re-deriving state next time.
+  `cli.ts`). Set up this notes system to avoid re-deriving state next time.
 - **2026-07-01** — Cleared both blockers. Fixed `add` to use the `profile`
   singleton (`addBluprint`) and derive `title`/`hint` from `config.module.name`.
   Recreated [`../../src/cli.ts`](../../src/cli.ts) with `sade` (only `add` wired

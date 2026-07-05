@@ -36,7 +36,7 @@ describe('token command', () => {
   beforeEach(() => {
     mock({ [HOME_DIR]: {} });
     // Seed a known-empty profile every test. The `profile` singleton's fs
-    // writes survive mock-fs resets between tests (see dev-notes task 0001),
+    // writes survive mock-fs resets between tests (see .agents task 0001),
     // so we establish state explicitly rather than rely on the reset.
     seedProfile('');
   });

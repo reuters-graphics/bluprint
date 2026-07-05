@@ -40,7 +40,7 @@ describe('remove command', () => {
   beforeEach(() => {
     mock({ [HOME_DIR]: {} });
     // The `profile` singleton's fs writes survive mock-fs resets between tests
-    // (see dev-notes task 0001), so establish state explicitly each test.
+    // (see .agents task 0001), so establish state explicitly each test.
     seedProfile({});
   });
 

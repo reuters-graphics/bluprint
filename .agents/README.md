@@ -1,8 +1,8 @@
-# Dev notes
+# Agent notes
 
-Internal working notes for developing bluprint. **Not published** — the Astro
-docs site lives in [`../docs`](../docs); this directory is for contributors and
-for Claude Code to track in-progress work.
+Internal working notes for developing bluprint (the `.agents/` directory). **Not
+published** — the Astro docs site lives in [`../docs`](../docs); this directory
+is for contributors and for coding agents to track in-progress work.
 
 The goal is that anyone (human or AI) picking the project back up can answer
 "where did we leave off?" in under a minute.
